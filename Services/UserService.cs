@@ -1,68 +1,163 @@
 using VenueBookingSystem.Models;
 using VenueBookingSystem.Data;
+using System.Security.Cryptography;
+using System;
+using System.Linq;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using VenueBookingSystem.Dto;
+
 
 namespace VenueBookingSystem.Services
 {
     public class UserService : IUserService
     {
         private readonly IRepository<User> _userRepository;
+        private readonly IRepository<Admin> _adminRepository;
+        private readonly IConfiguration _configuration;
 
-        // 构造函数，注入存储库
-        public UserService(IRepository<User> userRepository)
+
+        // 构造函数，注入存储库和配置
+        public UserService(IRepository<User> userRepository, IRepository<Admin> adminRepository, IConfiguration configuration)
         {
             _userRepository = userRepository;
+            _adminRepository = adminRepository;
+            _configuration = configuration;
         }
 
         // 注册用户
-        public void Register(UserDto userDto)
+        public RegisterResult Register(UserDto userDto)
         {
+            // 确保用户名、真实姓名和联系电话唯一
+            if (_userRepository.Find(u => u.Username == userDto.Username).Any() ||
+                _userRepository.Find(u => u.RealName == userDto.RealName).Any() ||
+                _userRepository.Find(u => u.ContactNumber == userDto.ContactNumber).Any())
+            {
+                return new RegisterResult
+                {
+                    State = 0,
+                    Info = "用户名、真实姓名或联系电话已被注册"
+                };
+            }
+
             var user = new User
             {
+                UserId = Guid.NewGuid().ToString(), // 分配唯一的用户ID
                 Username = userDto.Username,
-                Password = HashPassword(userDto.Password),
+                RealName = userDto.RealName,
+                Password = userDto.Password, // 已加密密码，直接存储
                 ContactNumber = userDto.ContactNumber,
-                IsVip = userDto.IsVip,
-                RegistrationDate = DateTime.Now
+                RegistrationDate = DateTime.Now,
+                UserType = "普通用户" // 默认类型
             };
+
             _userRepository.Add(user);
+
+            return new RegisterResult
+            {
+                State = 1,
+                UserId = user.UserId,
+                Info = ""
+            };
         }
 
-        // 用户认证
-        public string Authenticate(LoginDto loginDto)
+        // 根据用户名认证用户
+        public LoginResult AuthenticateByUsername(string username, string password)
         {
-            // 获取第一个符合条件的用户对象
-            var user = _userRepository.Find(u => u.Username == loginDto.Username).FirstOrDefault();
-            
-            // 如果未找到用户或者密码不匹配，抛出未授权访问异常
-            if (user == null || !VerifyPassword(loginDto.Password, user.Password))
-            {
-                throw new UnauthorizedAccessException("无效的凭据");
-    }
+            var user = _userRepository.Find(u => u.Username == username).FirstOrDefault();
+            var admin = _adminRepository.Find(a => a.Username == username).FirstOrDefault();
 
-    // 如果验证通过，生成JWT令牌并返回
-    return GenerateJwtToken(user);
+            if (user != null && user.Password == password)
+            {
+                return new LoginResult { State = 1, UserId = user.UserId, UserName = user.Username, IsAdmin = 0 };
+            }
+            else if (admin != null && admin.Password == password)
+            {
+                return new LoginResult { State = 1, UserId = admin.AdminId, UserName = admin.Username, IsAdmin = 1 };
+            }
+            else
+            {
+                return new LoginResult { State = 0, Info = "账号或密码错误" };
+            }
+        }
+
+        // 根据用户ID认证用户
+        public LoginResult AuthenticateByUserId(string userId, string password)
+        {
+            var user = _userRepository.Find(u => u.UserId == userId).FirstOrDefault();
+            var admin = _adminRepository.Find(a => a.AdminId == userId).FirstOrDefault();
+
+            if (user != null && user.Password == password)
+            {
+                return new LoginResult { State = 1, UserId = user.UserId, UserName = user.Username, IsAdmin = 0 };
+            }
+            else if (admin != null && admin.Password == password)
+            {
+                return new LoginResult { State = 1, UserId = admin.AdminId, UserName = admin.Username, IsAdmin = 1 };
+            }
+            else
+            {
+                return new LoginResult { State = 0, Info = "账号或密码错误" };
+            }
         }
 
         // 密码哈希处理
         private string HashPassword(string password)
         {
-            // 密码哈希逻辑
-            return password; // 示例：仅返回原始密码
+            using (var rng = new Rfc2898DeriveBytes(password, 16, 10000, HashAlgorithmName.SHA256))
+            {
+                byte[] salt = rng.Salt;
+                byte[] key = rng.GetBytes(32);
+                return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(key)}";
+            }
         }
 
         // 验证密码
         private bool VerifyPassword(string inputPassword, string storedHash)
         {
-            // 密码验证逻辑
-            return inputPassword == storedHash;
+            var parts = storedHash.Split(':');
+            if (parts.Length != 2)
+                throw new FormatException("存储的哈希格式无效");
+
+            var salt = Convert.FromBase64String(parts[0]);
+            var storedKey = Convert.FromBase64String(parts[1]);
+
+            using (var rng = new Rfc2898DeriveBytes(inputPassword, salt, 10000, HashAlgorithmName.SHA256))
+            {
+                byte[] keyToCheck = rng.GetBytes(32);
+                return keyToCheck.SequenceEqual(storedKey);
+            }
         }
 
         // 生成JWT令牌
-        private string GenerateJwtToken(User user)
+        public string GenerateJwtToken(string userId, string userName, int isAdmin)
         {
-            // JWT生成逻辑
-            return "token"; // 示例：返回示例令牌
+            var userType = isAdmin == 1 ? "管理员" : "普通用户";
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, userName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, userId),
+                new Claim(ClaimTypes.Role, userType)
+            };
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpiresInMinutes"])),
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
 
         // 其他用户服务逻辑...
     }

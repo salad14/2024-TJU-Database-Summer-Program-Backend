@@ -1,11 +1,15 @@
 namespace VenueBookingSystem.Models
 {
-    // 定义 UserDto 类，用于用户注册的数据传输对象
     public class UserDto
     {
         public required string Username { get; set; }  // 用户名
         public required string Password { get; set; }  // 密码
         public required string ContactNumber { get; set; }  // 联系电话
-        public bool IsVip { get; set; }  // 是否为VIP用户
+        public required string UserType { get; set; }  // 用户类型
+        public bool ReservationPermission { get; set; }  // 预约权限
+        public int ViolationCount { get; set; } = 0;  // 违约次数
+        public bool IsVip { get; set; }  // VIP状态
+        public double DiscountRate { get; set; } = 0.0;  // 折扣力度
+         public required string RealName { get; set; }  // 真实姓名
     }
 }

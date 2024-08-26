@@ -1,9 +1,9 @@
-namespace VenueBookingSystem.Models
+namespace VenueBookingSystem.Dto
 {
-    // 定义 LoginDto 类，用于用户登录的数据传输对象
     public class LoginDto
     {
-        public required string Username { get; set; }  // 用户名
-        public required string Password { get; set; }  // 密码
+        public required string Username { get; set; }  // 用户名（可选）
+        public required string UserId { get; set; }  // 用户ID（可选）
+        public required string Password { get; set; }  // 密码（必需）
     }
 }

@@ -1,14 +1,15 @@
-using VenueBookingSystem.Models;  // 引入 UserDto 和 LoginDto 所在的命名空间
+using VenueBookingSystem.Dto;
+using VenueBookingSystem.Models;
 
 namespace VenueBookingSystem.Services
 {
-    // 定义 IUserService 接口
     public interface IUserService
     {
-        // 用户注册的方法签名
-        void Register(UserDto userDto);
+        RegisterResult Register(UserDto userDto);
+        LoginResult AuthenticateByUsername(string username, string password);
+        LoginResult AuthenticateByUserId(string userId, string password);
 
-        // 用户认证的方法签名
-        string Authenticate(LoginDto loginDto);
+        public string GenerateJwtToken(string userId, string userName, int isAdmin);
+
     }
 }
