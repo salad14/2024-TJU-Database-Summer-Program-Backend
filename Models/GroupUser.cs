@@ -2,7 +2,7 @@ namespace VenueBookingSystem.Models
 {
     public class GroupUser
     {
-        public int UserId { get; set; }
+        public required string UserId { get; set; }
         public required User User { get; set; }
 
         public int GroupId { get; set; }
