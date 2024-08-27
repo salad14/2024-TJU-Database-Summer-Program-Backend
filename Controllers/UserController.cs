@@ -66,24 +66,45 @@ namespace VenueBookingSystem.Controllers
                     var token = _userService.GenerateJwtToken(loginResult.UserId, loginResult.UserName, loginResult.UserType);
                     return Ok(new 
                     { 
+                        status = 1,  // 成功状态
                         token, 
-                        userType = loginResult.UserType  // 返回用户类型
+                        loginResult  // 返回所有 loginResult 信息
                     });
                 }
                 else
                 {
-                    return Unauthorized(new { message = loginResult.Info });
+                    // 根据不同的状态码返回更详细的错误信息
+                    string errorMessage = loginResult.Info.Contains("账号或密码错误")
+                        ? "账号或密码错误"
+                        : "登录失败，" + loginResult.Info;
+
+                    return Unauthorized(new 
+                    { 
+                        status = 0,  // 失败状态
+                        message = errorMessage 
+                    });
                 }
             }
             catch (UnauthorizedAccessException)
             {
-                return Unauthorized(new { message = "无效的凭据" });
+                return Unauthorized(new 
+                { 
+                    status = 0,  // 失败状态
+                    message = "无效的凭据" 
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = "登录失败", error = ex.Message });
+                return BadRequest(new 
+                { 
+                    status = 0,  // 失败状态
+                    message = "登录失败", 
+                    error = ex.Message 
+                });
             }
         }
+
+
 
 
         // 其他用户相关操作...

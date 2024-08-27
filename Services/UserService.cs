@@ -191,8 +191,6 @@ namespace VenueBookingSystem.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-
-
         // 其他用户服务逻辑...
     }
 }
