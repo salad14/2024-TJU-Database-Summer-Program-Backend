@@ -18,10 +18,10 @@ namespace VenueBookingSystem.Models
 
          public required string RealName { get; set; }  // 真实姓名
 
-        // 导航属性：用户的预约记录
-         public ICollection<Reservation>? Reservations { get; set; }
+        // 导航属性：用户的预约记录 (多对多)
+        public ICollection<UserReservation>? UserReservations { get; set; } // 通过 UserReservation 表建立多对多关系
 
-          // 导航属性：用户所属的团体
+        // 导航属性：用户所属的团体 (多对多)
         public ICollection<GroupUser> GroupUsers { get; set; } = new List<GroupUser>();
 
     }

@@ -47,13 +47,17 @@ namespace VenueBookingSystem.Services
             // 创建新的预约对象，并设置其属性
             var reservation = new Reservation
             {
+                ReservationId = Guid.NewGuid().ToString(), // 自动生成 ReservationId
                 StartTime = reservationDto.StartTime,  // 设置预约开始时间
                 EndTime = reservationDto.EndTime,  // 设置预约结束时间
-                AmountPaid = reservationDto.AmountPaid,  // 设置支付金额
-                UserId = reservationDto.UserId,  // 设置关联的用户ID
+                PaymentAmount = reservationDto.PaymentAmount,  // 设置支付金额
                 VenueId = reservationDto.VenueId,  // 设置关联的场地ID
-                User = user,  // 初始化 User 属性
-                Venue = venue  // 初始化 Venue 属性
+                AvailabilityId = reservationDto.AvailabilityId,  // 设置关联的开放时间段ID
+                ReservationItem = reservationDto.ReservationItem,  // 设置预约项目描述
+                ReservationTime = DateTime.UtcNow,  // 设置预约操作时间
+                NumOfPeople = reservationDto.NumOfPeople,  // 设置预约人数
+                                                           // 初始化导航属性
+                Venue = venue
             };
 
             // 将新的预约记录添加到数据库
