@@ -1,10 +1,14 @@
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using VenueBookingSystem.Models;
 using VenueBookingSystem.Services;
 
 namespace VenueBookingSystem.Controllers
 {
-    public class VenueController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    [EnableCors("_allowSpecificOrigins")]
+    public class VenueController : ControllerBase
     {
         private readonly IVenueService _venueService;
 
@@ -15,7 +19,7 @@ namespace VenueBookingSystem.Controllers
         }
 
         // 获取所有场地信息
-        [HttpGet]
+        [HttpGet("GetAllVenues")]
         public IActionResult GetAllVenues()
         {
             var venues = _venueService.GetAllVenues();
@@ -23,7 +27,7 @@ namespace VenueBookingSystem.Controllers
         }
 
         // 添加新场地
-        [HttpPost]
+        [HttpPost("AddVenue")]
         public IActionResult AddVenue(VenueDto venueDto)
         {
             _venueService.AddVenue(venueDto);

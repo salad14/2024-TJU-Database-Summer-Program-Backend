@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using VenueBookingSystem.Models;
 using VenueBookingSystem.Services;
 
 namespace VenueBookingSystem.Controllers
 {
+    [EnableCors("AllowSpecificOrigins")]
     public class AnnouncementController : Controller
     {
         private readonly IAnnouncementService _announcementService;

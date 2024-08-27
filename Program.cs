@@ -13,12 +13,31 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 定义 CORS 策略名称
+var AllowSpecificOrigins = "AllowSpecificOrigins";
+
+// 添加 CORS 服务
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(AllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("*")
+                                .SetIsOriginAllowedToAllowWildcardSubdomains()
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
+});
+
 // 添加服务到容器中
 builder.Services.AddControllersWithViews();
 
 // 配置 ApplicationDbContext 使用 Oracle 数据库
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information);
+});
 
 // 配置JWT认证服务
 builder.Services.AddAuthentication(options =>
@@ -44,9 +63,12 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IRepository<User>, Repository<User>>();
 builder.Services.AddScoped<IRepository<Group>, Repository<Group>>();
 builder.Services.AddScoped<IRepository<GroupUser>, Repository<GroupUser>>();
-builder.Services.AddScoped<IRepository<Admin>, Repository<Admin>>();  // 添加对 Admin 的存储库注册
+builder.Services.AddScoped<IRepository<Admin>, Repository<Admin>>();
+builder.Services.AddScoped<IRepository<Venue>, Repository<Venue>>();
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddScoped<IVenueService, VenueService>();
 
 var app = builder.Build();
 
@@ -61,6 +83,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseCors(AllowSpecificOrigins); // 启用 CORS 中间件
 
 app.UseAuthentication(); // 添加认证中间件
 app.UseAuthorization();

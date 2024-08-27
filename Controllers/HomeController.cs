@@ -1,9 +1,12 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using sports_management.Models;
 
 namespace sports_management.Controllers;
 
+
+[EnableCors("_allowSpecificOrigins")]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;

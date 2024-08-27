@@ -1,19 +1,26 @@
 using System;
-
+// 预约记录表建模
 namespace VenueBookingSystem.Models
 {
     public class Reservation
     {
-        public int ReservationId { get; set; } // 预约ID
-        public DateTime StartTime { get; set; } // 预约开始时间
-        public DateTime EndTime { get; set; } // 预约结束时间
-        public decimal AmountPaid { get; set; } // 支付金额
+        public required string ReservationId { get; set; } // 预约ID
+        public required string VenueId { get; set; } // 场地ID
+        public required string AvailabilityId { get; set; } // 开放时间段ID
+        public required string ReservationItem { get; set; } // 预约项目的描述
+        public required DateTime ReservationTime { get; set; } = DateTime.UtcNow; // 预约操作时间
+        public required DateTime StartTime { get; set; } // 预约开始时间
+        public required DateTime EndTime { get; set; } // 预约结束时间
+        public required decimal PaymentAmount { get; set; } // 支付金额
+        public required int NumOfPeople { get; set; } // 预约人数
 
-        // 导航属性
-        public int UserId { get; set; } // 关联的用户ID
-        public required User User { get; set; } // 关联的用户
-        public int VenueId { get; set; } // 关联的场地ID
-        public required Venue Venue { get; set; } // 关联的场地
-        
+        // 导航属性：场地 (一对多)
+        public Venue? Venue { get; set; } // 可空，ORM 将填充
+
+        // 导航属性：开放时间段 (一对多)
+        public VenueAvailability? VenueAvailability { get; set; } // 可空，ORM 将填充
+
+        // 导航属性：用户的预约记录 (多对多)
+        public ICollection<UserReservation>? UserReservations { get; set; } // 可空，ORM 将填充
     }
 }

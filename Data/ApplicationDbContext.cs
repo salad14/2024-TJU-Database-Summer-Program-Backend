@@ -64,6 +64,37 @@ namespace VenueBookingSystem.Data
                 .WithMany(e => e.VenueEvents)
                 .HasForeignKey(ve => ve.EventId);
 
+            // 配置 User 和 Reservation 之间的多对多关系
+            modelBuilder.Entity<UserReservation>()
+                .HasKey(ur => new { ur.UserId, ur.ReservationId });
+
+            modelBuilder.Entity<UserReservation>()
+                .HasOne(ur => ur.User)
+                .WithMany(u => u.UserReservations) // 确保与 UserReservation 关联
+                .HasForeignKey(ur => ur.UserId);
+
+            modelBuilder.Entity<UserReservation>()
+                .HasOne(ur => ur.Reservation)
+                .WithMany(r => r.UserReservations)
+                .HasForeignKey(ur => ur.ReservationId);
+
+            // 配置 Group 和 Reservation 之间的一对多关系
+            modelBuilder.Entity<Group>()
+                .HasMany(g => g.GroupReservations)
+                .WithOne(gr => gr.Group)
+                .HasForeignKey(gr => gr.GroupId);
+
+            // 配置 Venue 和 Reservation 之间的一对多关系
+            modelBuilder.Entity<Venue>()
+                .HasMany(v => v.Reservations)
+                .WithOne(r => r.Venue)
+                .HasForeignKey(r => r.VenueId);
+
+            // 配置 Venue 和 VenueAvailability 之间的一对多关系
+            modelBuilder.Entity<Venue>()
+                .HasMany(v => v.VenueAvailabilities)
+                .WithOne(va => va.Venue)
+                .HasForeignKey(va => va.VenueId);
             // 这里可以添加其他实体的配置，例如关系、约束等
         }
     }

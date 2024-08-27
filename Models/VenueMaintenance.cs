@@ -7,7 +7,7 @@ namespace VenueBookingSystem.Models
         public string Description { get; set; } // 保养描述
 
         // 导航属性：关联的场地
-        public int VenueId { get; set; }
+        public string VenueId { get; set; }
         public Venue Venue { get; set; }
     }
 }

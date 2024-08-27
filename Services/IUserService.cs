@@ -9,7 +9,6 @@ namespace VenueBookingSystem.Services
         LoginResult AuthenticateByUsername(string username, string password);
         LoginResult AuthenticateByUserId(string userId, string password);
 
-        public string GenerateJwtToken(string userId, string userName, int isAdmin);
-
+        public string GenerateJwtToken(string userId, string userName, string userType);
     }
 }

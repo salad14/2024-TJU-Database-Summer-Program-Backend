@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using VenueBookingSystem.Models;
 using VenueBookingSystem.Services;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Cors;
 
 namespace VenueBookingSystem.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableCors("_allowSpecificOrigins")]
     public class GroupController : ControllerBase
     {
         private readonly IGroupService _groupService;

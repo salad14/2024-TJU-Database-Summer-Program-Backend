@@ -3,11 +3,13 @@ using VenueBookingSystem.Dto; // 确保使用了正确的命名空间
 using VenueBookingSystem.Services;
 using System;
 using VenueBookingSystem.Models;
+using Microsoft.AspNetCore.Cors;
 
 namespace VenueBookingSystem.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableCors("_allowSpecificOrigins")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -38,7 +40,7 @@ namespace VenueBookingSystem.Controllers
             catch (Exception ex)
             {
                 // 处理注册时的任何异常
-                return BadRequest(new { message = "注册失败", error = ex.Message });
+                return BadRequest(new { message = "注册失败1234", error = ex.Message });
             }
         }
 
@@ -48,7 +50,6 @@ namespace VenueBookingSystem.Controllers
         {
             try
             {
-                // 根据用户名或用户ID登录
                 LoginResult loginResult;
 
                 if (!string.IsNullOrEmpty(loginDto.Username))
@@ -62,8 +63,12 @@ namespace VenueBookingSystem.Controllers
 
                 if (loginResult.State == 1)
                 {
-                    var token = _userService.GenerateJwtToken(loginResult.UserId, loginResult.UserName, loginResult.IsAdmin);
-                    return Ok(new { token });
+                    var token = _userService.GenerateJwtToken(loginResult.UserId, loginResult.UserName, loginResult.UserType);
+                    return Ok(new 
+                    { 
+                        token, 
+                        userType = loginResult.UserType  // 返回用户类型
+                    });
                 }
                 else
                 {
@@ -76,10 +81,10 @@ namespace VenueBookingSystem.Controllers
             }
             catch (Exception ex)
             {
-                // 处理其他可能的异常
                 return BadRequest(new { message = "登录失败", error = ex.Message });
             }
         }
+
 
         // 其他用户相关操作...
     }

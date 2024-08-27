@@ -64,45 +64,63 @@ namespace VenueBookingSystem.Services
             };
         }
 
-        // 根据用户名认证用户
         public LoginResult AuthenticateByUsername(string username, string password)
         {
             var user = _userRepository.Find(u => u.Username == username).FirstOrDefault();
-            var admin = _adminRepository.Find(a => a.Username == username).FirstOrDefault();
 
             if (user != null && user.Password == password)
             {
-                return new LoginResult { State = 1, UserId = user.UserId, UserName = user.Username, IsAdmin = 0 };
-            }
-            else if (admin != null && admin.Password == password)
-            {
-                return new LoginResult { State = 1, UserId = admin.AdminId, UserName = admin.Username, IsAdmin = 1 };
+                return new LoginResult 
+                { 
+                    State = 1, 
+                    UserId = user.UserId, 
+                    UserName = user.Username, 
+                    UserType = user.UserType,
+                    Info = "" 
+                };
             }
             else
             {
-                return new LoginResult { State = 0, Info = "账号或密码错误" };
+                return new LoginResult 
+                { 
+                    State = 0, 
+                    UserId = string.Empty, 
+                    UserName = string.Empty, 
+                    UserType = string.Empty, 
+                    Info = "账号或密码错误" 
+                };
             }
         }
 
-        // 根据用户ID认证用户
         public LoginResult AuthenticateByUserId(string userId, string password)
         {
             var user = _userRepository.Find(u => u.UserId == userId).FirstOrDefault();
-            var admin = _adminRepository.Find(a => a.AdminId == userId).FirstOrDefault();
 
             if (user != null && user.Password == password)
             {
-                return new LoginResult { State = 1, UserId = user.UserId, UserName = user.Username, IsAdmin = 0 };
-            }
-            else if (admin != null && admin.Password == password)
-            {
-                return new LoginResult { State = 1, UserId = admin.AdminId, UserName = admin.Username, IsAdmin = 1 };
+                return new LoginResult 
+                { 
+                    State = 1, 
+                    UserId = user.UserId, 
+                    UserName = user.Username, 
+                    UserType = user.UserType,
+                    Info = "" 
+                };
             }
             else
             {
-                return new LoginResult { State = 0, Info = "账号或密码错误" };
+                return new LoginResult 
+                { 
+                    State = 0, 
+                    UserId = string.Empty, 
+                    UserName = string.Empty, 
+                    UserType = string.Empty, 
+                    Info = "账号或密码错误" 
+                };
             }
         }
+
+
 
         // 密码哈希处理
         private string HashPassword(string password)
@@ -133,9 +151,24 @@ namespace VenueBookingSystem.Services
         }
 
         // 生成JWT令牌
-        public string GenerateJwtToken(string userId, string userName, int isAdmin)
+        public string GenerateJwtToken(string userId, string userName, string userType)
         {
-            var userType = isAdmin == 1 ? "管理员" : "普通用户";
+            // 根据 userType 判断角色
+            string role;
+            switch (userType.ToLower())
+            {
+                case "system":
+                case "venue":
+                case "device":
+                case "venue-device":
+                    role = "管理员";
+                    break;
+                case "normal":
+                    role = "普通用户";
+                    break;
+                default:
+                    throw new ArgumentException("无效的用户类型", nameof(userType));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -145,7 +178,7 @@ namespace VenueBookingSystem.Services
                 new Claim(JwtRegisteredClaimNames.Sub, userName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.NameIdentifier, userId),
-                new Claim(ClaimTypes.Role, userType)
+                new Claim(ClaimTypes.Role, role) // 将用户角色添加为声明
             };
 
             var token = new JwtSecurityToken(
@@ -157,6 +190,7 @@ namespace VenueBookingSystem.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
 
 
         // 其他用户服务逻辑...
