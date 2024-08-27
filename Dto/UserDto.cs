@@ -10,6 +10,7 @@ namespace VenueBookingSystem.Models
         public int ViolationCount { get; set; } = 0;  // 违约次数
         public bool IsVip { get; set; }  // VIP状态
         public double DiscountRate { get; set; } = 0.0;  // 折扣力度
-         public required string RealName { get; set; }  // 真实姓名
+        public required string RealName { get; set; }  // 真实姓名
+        public DateTime RegistrationDate { get; set; } = DateTime.UtcNow; // 注册时间
     }
 }

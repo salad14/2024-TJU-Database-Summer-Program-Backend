@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\sports_management.props" />
+</Project>

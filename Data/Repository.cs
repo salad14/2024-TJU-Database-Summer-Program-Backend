@@ -17,7 +17,7 @@ namespace VenueBookingSystem.Data
             _dbSet = _context.Set<T>();
         }
 
-       public T GetById(int id)
+        public T GetById(object id)  // 修改为object类型以支持不同类型的主键
         {
             return _dbSet.Find(id) ?? throw new InvalidOperationException($"实体未找到，ID: {id}");
         }
@@ -29,23 +29,37 @@ namespace VenueBookingSystem.Data
 
         public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
         {
-            return _dbSet.Where(predicate);
+            return _dbSet.Where(predicate).ToList();
         }
 
         public void Add(T entity)
         {
-            _dbSet.Add(entity);
-            _context.SaveChanges();
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    _dbSet.Add(entity);
+                    _context.SaveChanges();
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
         }
 
         public void Update(T entity)
         {
-            _dbSet.Update(entity);
+            _dbSet.Attach(entity);
+            _context.Entry(entity).State = EntityState.Modified;
             _context.SaveChanges();
         }
 
         public void Delete(T entity)
         {
+            _dbSet.Attach(entity);
             _dbSet.Remove(entity);
             _context.SaveChanges();
         }

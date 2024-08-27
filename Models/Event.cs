@@ -9,5 +9,8 @@ namespace VenueBookingSystem.Models
 
         public int VenueId { get; set; } // 关联的场地ID
          public Venue? Venue { get; set; }  // 可为空的场地属性
+
+         // 导航属性：场地事件关系
+        public ICollection<VenueEvent> VenueEvents { get; set; }
     }
 }

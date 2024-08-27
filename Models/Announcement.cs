@@ -8,6 +8,9 @@ namespace VenueBookingSystem.Models
         public DateTime PublishedDate { get; set; } // 发布时间
 
         public int UserId { get; set; } // 发布公告的用户ID
-        public required User User { get; set; } // 发布公告的用户
+        public User User { get; set; } // 发布公告的用户
+
+    // 导航属性：场地公告关系
+    public ICollection<VenueAnnouncement> VenueAnnouncements { get; set; }
     }
 }

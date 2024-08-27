@@ -9,11 +9,16 @@ using System.Text;
 using VenueBookingSystem.Data;
 using VenueBookingSystem.Services;
 using VenueBookingSystem.Models;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // 添加服务到容器中
 builder.Services.AddControllersWithViews();
+
+// 配置 ApplicationDbContext 使用 Oracle 数据库
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // 配置JWT认证服务
 builder.Services.AddAuthentication(options =>
@@ -35,23 +40,21 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// 注册应用程序的服务（例如用户服务和存储库）
+// 注册应用程序的服务和存储库
 builder.Services.AddScoped<IRepository<User>, Repository<User>>();
 builder.Services.AddScoped<IRepository<Group>, Repository<Group>>();
 builder.Services.AddScoped<IRepository<GroupUser>, Repository<GroupUser>>();
+builder.Services.AddScoped<IRepository<Admin>, Repository<Admin>>();  // 添加对 Admin 的存储库注册
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
-
-
-
 
 var app = builder.Build();
 
 // 配置HTTP请求管道
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts(); // 强制使用HTTPS，生产环境推荐开启HSTS
+    app.UseExceptionHandler("/Home/Error"); // 使用指定路径的异常处理程序
+    app.UseHsts(); // 在生产环境中启用 HSTS
 }
 
 app.UseHttpsRedirection();
@@ -59,11 +62,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// 启用身份认证和授权中间件
-app.UseAuthentication(); // 必须在UseAuthorization之前调用
+app.UseAuthentication(); // 添加认证中间件
 app.UseAuthorization();
 
-// 配置控制器路由
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
