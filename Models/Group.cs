@@ -5,7 +5,7 @@ namespace VenueBookingSystem.Models
 {
     public class Group
     {
-        public int GroupId { get; set; } // 团体ID
+        public required string GroupId { get; set; } // 团体ID
         public required string GroupName { get; set; } // 团体名称
         public string? Description { get; set; } // 团体描述
         public int MemberCount { get; set; } = 0; // 团队人数，初始为0

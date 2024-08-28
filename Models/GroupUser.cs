@@ -5,7 +5,7 @@ namespace VenueBookingSystem.Models
         public required string UserId { get; set; }
         public required User User { get; set; }
 
-        public int GroupId { get; set; }
+        public string GroupId { get; set; }
         public required Group Group { get; set; }
 
         public DateTime JoinDate { get; set; } = DateTime.UtcNow; // 加入时间

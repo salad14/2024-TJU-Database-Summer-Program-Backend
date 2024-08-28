@@ -95,6 +95,26 @@ namespace VenueBookingSystem.Data
                 .HasMany(v => v.VenueAvailabilities)
                 .WithOne(va => va.Venue)
                 .HasForeignKey(va => va.VenueId);
+
+            // 配置 GroupReservationMember 的复合主键
+            modelBuilder.Entity<GroupReservationMember>()
+                .HasKey(grm => new { grm.ReservationId, grm.GroupId });
+
+            modelBuilder.Entity<GroupReservationMember>()
+                .HasOne(grm => grm.Group)
+                .WithMany(g => g.GroupReservations)
+                .HasForeignKey(grm => grm.GroupId);
+
+            modelBuilder.Entity<GroupReservationMember>()
+                .HasOne(grm => grm.Reservation)
+                .WithMany(r => r.GroupReservationMembers)
+                .HasForeignKey(grm => grm.ReservationId);
+
+
+            // 配置 VenueAvailability 的主键
+            modelBuilder.Entity<VenueAvailability>()
+                .HasKey(va => va.AvailabilityId); // 配置主键
+
             // 这里可以添加其他实体的配置，例如关系、约束等
         }
     }

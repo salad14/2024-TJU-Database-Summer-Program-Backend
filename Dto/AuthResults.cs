@@ -3,9 +3,9 @@ namespace VenueBookingSystem.Dto
     // 注册结果类
     public class RegisterResult
     {
-        public int State { get; set; } // 0为注册失败，1为注册成功
-        public string UserId { get; set; } = string.Empty;
-        public string Info { get; set; } = string.Empty;
+        public int State { get; set; }
+        public string? UserId { get; set; }
+        public string? Info { get; set; }
     }
 
     // 登录结果类
@@ -16,6 +16,14 @@ namespace VenueBookingSystem.Dto
     public required string UserName { get; set; }  // 用户名
     public required string UserType { get; set; }  // 用户类型
     public required string Info { get; set; }  // 额外的信息，通常用于存储错误消息
+    }
+
+    //创建团队结果类
+    public class GroupCreateResult
+    {
+        public int State { get; set; }  // 创建操作的结果：0为创建失败，1为创建成功
+        public string? GroupId { get; set; }  // 该团体分配的ID
+        public string Info { get; set; } = "";  // 创建结果的说明
     }
 
 }

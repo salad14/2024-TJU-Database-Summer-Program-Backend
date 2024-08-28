@@ -13,6 +13,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();  // 添加控制台日志记录
+
 // 定义 CORS 策略名称
 var AllowSpecificOrigins = "AllowSpecificOrigins";
 
@@ -35,9 +38,11 @@ builder.Services.AddControllersWithViews();
 // 配置 ApplicationDbContext 使用 Oracle 数据库
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection"));
-    options.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information);
+    options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information)
+           .EnableSensitiveDataLogging(); // 可选：启用敏感数据日志记录
 });
+
 
 // 配置JWT认证服务
 builder.Services.AddAuthentication(options =>

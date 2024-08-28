@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using VenueBookingSystem.Dto; // 确保使用了正确的命名空间
+using VenueBookingSystem.Dto;
 using VenueBookingSystem.Services;
 using System;
 using VenueBookingSystem.Models;
 using Microsoft.AspNetCore.Cors;
+using System.Linq;
+using VenueBookingSystem.Data;
 
 namespace VenueBookingSystem.Controllers
 {
@@ -13,11 +15,13 @@ namespace VenueBookingSystem.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IRepository<User> _userRepository;
 
-        // 构造函数，注入用户服务
-        public UserController(IUserService userService)
+        // 构造函数，注入用户服务和用户存储库
+        public UserController(IUserService userService, IRepository<User> userRepository)
         {
             _userService = userService;
+            _userRepository = userRepository;
         }
 
         // 注册用户
@@ -26,23 +30,28 @@ namespace VenueBookingSystem.Controllers
         {
             try
             {
+                // 为 ReservationPermission 和 IsVip 设置默认值
+                userDto.ReservationPermission ??= "n";
+                userDto.IsVip ??= "n";
+
+                // 调用服务层进行注册
                 var result = _userService.Register(userDto);
 
-                if (result.State == 1)
-                {
-                    return Ok(new { message = "注册成功", userId = result.UserId });
-                }
-                else
-                {
-                    return BadRequest(new { message = "注册失败", error = result.Info });
-                }
+                return Ok(result);  // 直接返回 RegisterResult 对象
             }
             catch (Exception ex)
             {
-                // 处理注册时的任何异常
-                return BadRequest(new { message = "注册失败1234", error = ex.Message });
+                // 处理注册时的任何异常，返回失败的 RegisterResult
+                return BadRequest(new RegisterResult 
+                { 
+                    State = 0, 
+                    UserId = null, 
+                    Info = $"注册失败: {ex.Message}" 
+                });
             }
         }
+
+
 
         // 用户登录
         [HttpPost("login")]
@@ -103,9 +112,6 @@ namespace VenueBookingSystem.Controllers
                 });
             }
         }
-
-
-
 
         // 其他用户相关操作...
     }

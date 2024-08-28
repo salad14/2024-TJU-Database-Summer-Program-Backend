@@ -31,37 +31,67 @@ namespace VenueBookingSystem.Services
         // 注册用户
         public RegisterResult Register(UserDto userDto)
         {
-            // 确保用户名、真实姓名和联系电话唯一
-            if (_userRepository.Find(u => u.Username == userDto.Username).Any() ||
-                _userRepository.Find(u => u.RealName == userDto.RealName).Any() ||
-                _userRepository.Find(u => u.ContactNumber == userDto.ContactNumber).Any())
+            // 确保用户名和联系电话唯一
+            if (_userRepository.Find(u => u.Username == userDto.Username).Any())
             {
                 return new RegisterResult
                 {
                     State = 0,
-                    Info = "用户名、真实姓名或联系电话已被注册"
+                    UserId = null,
+                    Info = "用户名已被注册"
                 };
             }
 
+            if (_userRepository.Find(u => u.ContactNumber == userDto.ContactNumber).Any())
+            {
+                return new RegisterResult
+                {
+                    State = 0,
+                    UserId = null,
+                    Info = "联系电话已被注册"
+                };
+            }
+
+            // 生成唯一的用户ID
+            string userId = GenerateUniqueUserId();
+
+            // 创建用户实体
             var user = new User
             {
-                UserId = Guid.NewGuid().ToString(), // 分配唯一的用户ID
+                UserId = userId,
                 Username = userDto.Username,
                 RealName = userDto.RealName,
                 Password = userDto.Password, // 已加密密码，直接存储
                 ContactNumber = userDto.ContactNumber,
                 RegistrationDate = DateTime.Now,
-                UserType = "普通用户" // 默认类型
+                UserType = "normal", // 默认类型
+                ReservationPermission = userDto.ReservationPermission,
+                IsVip = userDto.IsVip
             };
 
+            // 添加用户到数据库
             _userRepository.Add(user);
 
             return new RegisterResult
             {
                 State = 1,
                 UserId = user.UserId,
-                Info = ""
+                Info = "注册成功"
             };
+        }
+
+        // 生成唯一的用户ID
+        private string GenerateUniqueUserId()
+        {
+            var random = new Random();
+            string userId;
+
+            do
+            {
+                userId = random.Next(100000, 999999).ToString();
+            } while (_userRepository.Find(u => u.UserId == userId).Any()); // 确保ID唯一性
+
+            return userId;
         }
 
         public LoginResult AuthenticateByUsername(string username, string password)

@@ -22,5 +22,8 @@ namespace VenueBookingSystem.Models
 
         // 导航属性：用户的预约记录 (多对多)
         public ICollection<UserReservation>? UserReservations { get; set; } // 可空，ORM 将填充
+
+         // 导航属性：团体预约成员记录 (多对多)
+        public ICollection<GroupReservationMember>? GroupReservationMembers { get; set; } 
     }
 }
