@@ -42,7 +42,9 @@ namespace VenueBookingSystem.Controllers
                 UserType = user.UserType,
                 ReservationPermission = user.ReservationPermission,
                 ViolationCount = user.ViolationCount,
-                RegistrationDate = user.RegistrationDate
+                RegistrationDate = user.RegistrationDate,
+                RealName = user.RealName,
+                IsVip = user.IsVip
             });
         }
 
@@ -117,11 +119,9 @@ namespace VenueBookingSystem.Controllers
                 else
                 {
                     // 根据不同的状态码返回更详细的错误信息
-                    string errorMessage = loginResult.Info.Contains("账号或密码错误")
-                        ? "账号或密码错误"
-                        : "登录失败，" + loginResult.Info;
+                    string errorMessage = loginResult.Info;
 
-                    return Unauthorized(new 
+                    return Ok(new 
                     { 
                         status = 0,  // 失败状态
                         message = errorMessage 

@@ -88,22 +88,19 @@ namespace VenueBookingSystem.Controllers
             if (!userGroups.Any())
             {
                 // 如果没有找到，返回一个包含空字段的 UserGroupDto 数组
-                var emptyUserGroups = new List<UserGroupDto>
-                {
-                    new UserGroupDto
-                    {
-                        GroupId = null,
-                        GroupName = null,
-                        Description = null,
-                        MemberCount = 0,
-                        CreatedDate = new DateTime(1970,1 , 1, 00, 00, 00, 00),
-                        JoinDate = new DateTime(1970,1 , 1, 00, 00, 00, 00),
-                        RoleInGroup = null
-                    }
-                };
-                return Ok(emptyUserGroups);
+                return Ok(new
+                {status = 1,
+                message ="获取成功",
+                userGroups = new List<UserGroupDto>(),
+                });
             }
-            return Ok(userGroups);
+            return Ok(new
+            {
+                status=1,
+                message = "获取成功",
+                userGroups=userGroups
+
+            });
         }
 
 
@@ -127,6 +124,5 @@ namespace VenueBookingSystem.Controllers
 
             return Ok(result);
         }
-
     }
 }

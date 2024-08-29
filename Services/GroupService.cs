@@ -125,11 +125,12 @@ namespace VenueBookingSystem.Services
             {
                 UserId = userId,
                 NotificationId = GenerateNotificationId(), // 生成唯一的通知ID
-                NotificationType = "Group Operation Notification",  // 修改为英文，避免字符集问题
-                Title = "Group Join Confirmation",  // 修改为英文，避免字符集问题
-                Content = $"Administrator [{userId}] has added you to the group [{group.GroupName}]", // 修改为英文，避免字符集问题
+                NotificationType = "团体操作通知",  // 通知类型
+                Title = "加入团体确认",  // 通知标题
+                Content = $"管理员 [{userId}] 已将您加入团体 [{group.GroupName}]",
                 NotificationTime = DateTime.UtcNow
             };
+
 
 
             Console.WriteLine(notification.Content);
@@ -138,7 +139,7 @@ namespace VenueBookingSystem.Services
             return new GroupAddResult
             {
                 State = 1,
-                Info = ""
+                Info = "加入成功"
             };
         }
 
@@ -168,13 +169,14 @@ namespace VenueBookingSystem.Services
             {
                 UserId = userId,
                 NotificationId = GenerateNotificationId(),
-                NotificationType = "Group Notification",  // Modify as needed
-                Title = "Group Exit",
+                NotificationType = "团体通知",  // 根据实际需求可以修改
+                Title = "退出团体",
                 Content = string.IsNullOrEmpty(adminId) 
-                    ? $"You have successfully exited the group [{group?.GroupName}]" 
-                    : $"You have been removed from the group [{group?.GroupName}] by the administrator [{adminId}]",
+                    ? $"您已成功退出团体 [{group?.GroupName}]" 
+                    : $"您已被管理员 [{adminId}] 移出团体 [{group?.GroupName}]",
                 NotificationTime = DateTime.UtcNow
             };
+
 
 
             _userNotificationRepository.Add(notification);
@@ -211,9 +213,9 @@ namespace VenueBookingSystem.Services
             {
                 UserId = userId,
                 NotificationId = GenerateNotificationId(),  // 生成唯一的通知ID
-                NotificationType = "Group Notification",  // 通知类型
-                Title = "Group Role Change",  // 通知标题
-                Content = $"Administrator [{adminId}] has updated your role in the group [{group?.GroupName}] to [{userRole}]",
+                NotificationType = "团体通知",  // 通知类型
+                Title = "团体角色变更",  // 通知标题
+                Content = $"管理员 [{adminId}] 已将您在团体 [{group?.GroupName}] 中的角色更新为 [{userRole}]",
                 NotificationTime = DateTime.UtcNow
             };
 
@@ -222,7 +224,7 @@ namespace VenueBookingSystem.Services
             return new GroupUpdateResult
             {
                 State = 1,
-                Info = ""
+                Info = "变更成功"
             };
         }
 

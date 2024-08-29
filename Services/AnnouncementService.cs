@@ -8,23 +8,23 @@ namespace VenueBookingSystem.Services
     public class AnnouncementService : IAnnouncementService
     {
         private readonly IRepository<Announcement> _announcementRepository;
-        private readonly IRepository<User> _userRepository;  // 新增
+        private readonly IRepository<Admin> _adminRepository;
 
         // 构造函数，注入存储库
-        public AnnouncementService(IRepository<Announcement> announcementRepository, IRepository<User> userRepository)  // 新增 userRepository 参数
+        public AnnouncementService(IRepository<Announcement> announcementRepository, IRepository<Admin> adminRepository)  // 新增 userRepository 参数
         {
+            _adminRepository = adminRepository;
             _announcementRepository = announcementRepository;
-            _userRepository = userRepository;  // 初始化 _userRepository
         }
 
         // 发布公告
         public void PublishAnnouncement(AnnouncementDto announcementDto)
         {
-            var user = _userRepository.Find(u => u.UserId == announcementDto.UserId).FirstOrDefault();
+            var admin = _adminRepository.Find(a => a.AdminId == announcementDto.AdminId).FirstOrDefault();
             
-            if (user == null)
+            if (admin == null)
             {
-                throw new ArgumentException("无效的用户ID");
+                throw new ArgumentException("无效的管理员ID");
             }
 
             var announcement = new Announcement
@@ -32,11 +32,12 @@ namespace VenueBookingSystem.Services
                 Title = announcementDto.Title,
                 Content = announcementDto.Content,
                 PublishedDate = DateTime.Now,
-                User = user  // 设置必需的 User 属性
+                AdminId = announcementDto.AdminId // 使用 AdminId 关联公告与管理员
             };
 
             _announcementRepository.Add(announcement);
         }
+
 
         // 获取所有公告
         public IEnumerable<AnnouncementDto> GetAllAnnouncements()
@@ -46,7 +47,8 @@ namespace VenueBookingSystem.Services
             {
                 Title = a.Title,
                 Content = a.Content,
-                PublishDate = a.PublishedDate
+                PublishDate = a.PublishedDate,
+                AdminId = a.AdminId
             });
         }
     }
