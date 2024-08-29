@@ -16,16 +16,63 @@ namespace VenueBookingSystem.Services
     public class UserService : IUserService
     {
         private readonly IRepository<User> _userRepository;
-        private readonly IRepository<Admin> _adminRepository;
+        private readonly IRepository<GroupUser> _groupUserRepository;
+        private readonly IRepository<UserNotification> _userNotificationRepository;
+        private readonly IRepository<Group> _groupRepository;
         private readonly IConfiguration _configuration;
 
 
         // 构造函数，注入存储库和配置
-        public UserService(IRepository<User> userRepository, IRepository<Admin> adminRepository, IConfiguration configuration)
+        public UserService(IRepository<User> userRepository, IRepository<GroupUser> groupUserRepository, IRepository<Group> groupRepository, IRepository<UserNotification> userNotificationRepository, IConfiguration configuration)
         {
             _userRepository = userRepository;
-            _adminRepository = adminRepository;
+            _groupUserRepository = groupUserRepository;
+            _groupRepository = groupRepository;
+            _userNotificationRepository = userNotificationRepository;
             _configuration = configuration;
+        }
+
+        public User GetUserById(string userId)
+        {
+            return _userRepository.Find(u => u.UserId == userId).FirstOrDefault();
+        }
+
+        public UserGroupInfoDto GetUserGroupInfo(string userId)
+        {
+            var groupUser = _groupUserRepository.Find(gu => gu.UserId == userId).FirstOrDefault();
+            if (groupUser == null)
+            {
+                return null; // 或者返回一个表示没有找到的DTO
+            }
+
+            var group = _groupRepository.Find(g => g.GroupId == groupUser.GroupId).FirstOrDefault();
+            if (group == null)
+            {
+                return null; // 或者返回一个表示没有找到的DTO
+            }
+
+            return new UserGroupInfoDto
+            {
+                JoinDate = groupUser.JoinDate,
+                RoleInGroup = groupUser.RoleInGroup,
+                GroupId = group.GroupId,
+                GroupName = group.GroupName
+            };
+        }
+
+        public IEnumerable<UserNotificationDto> GetUserNotifications(string userId)
+        {
+            var notifications = _userNotificationRepository.Find(n => n.UserId == userId)
+                .Select(n => new UserNotificationDto
+                {
+                    NotificationId = n.NotificationId,
+                    NotificationType = n.NotificationType,
+                    Title = n.Title,
+                    Content = n.Content,
+                    NotificationTime = n.NotificationTime
+                }).ToList();
+
+            return notifications;
         }
 
         // 注册用户

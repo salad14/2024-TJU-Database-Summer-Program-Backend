@@ -10,5 +10,10 @@ namespace VenueBookingSystem.Services
         LoginResult AuthenticateByUserId(string userId, string password);
 
         public string GenerateJwtToken(string userId, string userName, string userType);
+
+        User GetUserById(string userId);
+        UserGroupInfoDto GetUserGroupInfo(string userId);
+
+        IEnumerable<UserNotificationDto> GetUserNotifications(string userId);
     }
 }

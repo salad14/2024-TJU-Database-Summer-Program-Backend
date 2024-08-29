@@ -14,4 +14,21 @@ namespace VenueBookingSystem.Models
         public required string RealName { get; set; }  // 真实姓名
         public DateTime RegistrationDate { get; set; } = DateTime.UtcNow; // 注册时间
     }
+
+    public class UserGroupInfoDto
+    {
+        public DateTime JoinDate { get; set; } // 加入时间
+        public string RoleInGroup { get; set; } // 团体中的地位
+        public string GroupId { get; set; } // 团体ID
+        public string GroupName { get; set; } // 团体名称
+    }
+
+    public class UserNotificationDto
+    {
+        public string NotificationId { get; set; } // 通知ID
+        public string NotificationType { get; set; } // 通知类型
+        public string Title { get; set; } // 通知标题
+        public string Content { get; set; } // 通知内容
+        public DateTime NotificationTime { get; set; } // 通知时间
+    }
 }

@@ -26,4 +26,25 @@ namespace VenueBookingSystem.Dto
         public string Info { get; set; } = "";  // 创建结果的说明
     }
 
+    //用户加入团体结果
+    public class GroupAddResult
+    {
+        public int State { get; set; }  // 0为加入失败，1为加入成功
+        public string Info { get; set; }  // 加入结果的说明
+    }
+    //用户退出团体结果
+    public class GroupRemoveResult
+    {
+        public int State { get; set; }  // 0为删除失败，1为删除成功
+        public string Info { get; set; }  // 删除结果的说明
+    }
+
+        public class GroupUpdateResult
+    {
+        public int State { get; set; }  // 状态：0表示失败，1表示成功
+        public string Info { get; set; }  // 信息：成功时为空字符串，失败时包含错误信息
+    }
+
+
+
 }

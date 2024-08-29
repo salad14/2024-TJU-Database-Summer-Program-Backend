@@ -23,8 +23,12 @@ namespace VenueBookingSystem.Models
 
           // 导航属性：用户所属的团体
         public ICollection<GroupUser> GroupUsers { get; set; } = new List<GroupUser>();
+
         //用户的预约记录
          public ICollection<UserReservation> UserReservations { get; set; } = new List<UserReservation>();
+
+         // 导航属性：用户的通知记录
+        public ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
     }
 
     public class Admin
@@ -32,6 +36,9 @@ namespace VenueBookingSystem.Models
         public required string AdminId { get; set; }
         public required string Username { get; set; }
         public required string Password { get; set; }
+
+        // 导航属性：管理员的通知记录
+        public ICollection<AdminNotification> AdminNotifications { get; set; } = new List<AdminNotification>();
     }
 
 }

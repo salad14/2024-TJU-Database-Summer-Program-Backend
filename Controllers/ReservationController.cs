@@ -5,7 +5,7 @@ using VenueBookingSystem.Services;
 
 namespace VenueBookingSystem.Controllers
 {
-    [EnableCors("_allowSpecificOrigins")]
+    [EnableCors("AllowSpecificOrigins")]
     public class ReservationController : Controller
     {
         private readonly IReservationService _reservationService;

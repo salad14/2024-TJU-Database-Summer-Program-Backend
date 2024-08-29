@@ -6,7 +6,7 @@ using sports_management.Models;
 namespace sports_management.Controllers;
 
 
-[EnableCors("_allowSpecificOrigins")]
+[EnableCors("AllowSpecificOrigins")]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;

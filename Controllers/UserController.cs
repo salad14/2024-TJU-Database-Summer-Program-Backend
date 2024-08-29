@@ -11,7 +11,7 @@ namespace VenueBookingSystem.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [EnableCors("_allowSpecificOrigins")]
+    [EnableCors("AllowSpecificOrigins")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -23,7 +23,41 @@ namespace VenueBookingSystem.Controllers
             _userService = userService;
             _userRepository = userRepository;
         }
+        
+        // 查找某一用户的所有信息
+        [HttpGet("{userId}/info")]
+        public IActionResult GetUserInfo(string userId)
+        {
+            var user = _userService.GetUserById(userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "用户未找到" });
+            }
 
+            return Ok(new 
+            {
+                UserId = user.UserId,
+                Username = user.Username,
+                ContactNumber = user.ContactNumber,
+                UserType = user.UserType,
+                ReservationPermission = user.ReservationPermission,
+                ViolationCount = user.ViolationCount,
+                RegistrationDate = user.RegistrationDate
+            });
+        }
+
+        // 查找某一用户相关的团体信息
+        [HttpGet("{userId}/groups")]
+        public IActionResult GetUserGroupInfo(string userId)
+        {
+            var userGroupInfo = _userService.GetUserGroupInfo(userId);
+            if (userGroupInfo == null)
+            {
+                return NotFound(new { message = "未找到用户的团体信息" });
+            }
+
+            return Ok(userGroupInfo);
+        }
         // 注册用户
         [HttpPost("register")]
         public IActionResult Register([FromBody] UserDto userDto)
@@ -111,6 +145,21 @@ namespace VenueBookingSystem.Controllers
                     error = ex.Message 
                 });
             }
+        }
+
+        // 查找某一用户的通知
+        [HttpGet("{userId}/notifications")]
+        public IActionResult GetUserNotifications(string userId)
+        {
+            var notifications = _userService.GetUserNotifications(userId);
+
+            if (notifications == null || !notifications.Any())
+            {
+                // 如果没有找到通知，返回空的通知列表
+                return Ok(new List<UserNotificationDto>());
+            }
+            
+            return Ok(notifications);
         }
 
         // 其他用户相关操作...

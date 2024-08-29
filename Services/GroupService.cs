@@ -2,7 +2,8 @@ using VenueBookingSystem.Models;
 using VenueBookingSystem.Data;
 using System.Collections.Generic;
 using System.Linq;
-using VenueBookingSystem.Dto;  // 确保导入正确的命名空间
+using VenueBookingSystem.Dto;
+using Microsoft.EntityFrameworkCore;
 
 namespace VenueBookingSystem.Services
 {
@@ -11,13 +12,19 @@ namespace VenueBookingSystem.Services
         private readonly IRepository<Group> _groupRepository;
         private readonly IRepository<GroupUser> _groupUserRepository;
         private readonly IRepository<User> _userRepository;
+        private readonly IRepository<UserNotification> _userNotificationRepository;
 
-        public GroupService(IRepository<Group> groupRepository, IRepository<GroupUser> groupUserRepository, IRepository<User> userRepository)
+        private readonly ApplicationDbContext _context;
+        public GroupService(IRepository<Group> groupRepository, IRepository<GroupUser> groupUserRepository, IRepository<User> userRepository, IRepository<UserNotification> userNotificationRepository, ApplicationDbContext context)
         {
             _groupRepository = groupRepository;
             _groupUserRepository = groupUserRepository;
             _userRepository = userRepository;
+            _userNotificationRepository = userNotificationRepository;
+            _context = context;
         }
+
+
 
         // 修改 CreateGroup 方法以返回 GroupCreateResult
         public GroupCreateResult CreateGroup(GroupDto groupDto)
@@ -56,7 +63,6 @@ namespace VenueBookingSystem.Services
             };
         }
 
-
         public Group GetGroupById(string groupId)
         {
             return _groupRepository.Find(g => g.GroupId == groupId).FirstOrDefault();
@@ -67,40 +73,183 @@ namespace VenueBookingSystem.Services
             return _groupRepository.GetAll().ToList();
         }
 
-        public void AddUserToGroup(string groupId, string userId)
+        public GroupAddResult AddUserToGroup(string groupId, string userId, DateTime joinDate, string roleInGroup)
         {
             var group = _groupRepository.Find(g => g.GroupId == groupId).FirstOrDefault();
             var user = _userRepository.Find(u => u.UserId == userId).FirstOrDefault();
-            if (group != null && user != null)
+
+            if (group == null)
             {
-                var groupUser = new GroupUser { GroupId = groupId, UserId = userId, Group = group, User = user };
-                _groupUserRepository.Add(groupUser);
-                group.MemberCount++;
-                _groupRepository.Update(group); // 更新成员数量
+                return new GroupAddResult
+                {
+                    State = 0,
+                    Info = "未找到指定的团体"
+                };
             }
+
+            if (user == null)
+            {
+                return new GroupAddResult
+                {
+                    State = 0,
+                    Info = "未找到指定的用户"
+                };
+            }
+
+            var existingMembership = _groupUserRepository.Find(gu => gu.GroupId == groupId && gu.UserId == userId).FirstOrDefault();
+            if (existingMembership != null)
+            {
+                return new GroupAddResult
+                {
+                    State = 0,
+                    Info = "用户已加入该团体"
+                };
+            }
+
+            var groupUser = new GroupUser 
+            { 
+                GroupId = groupId, 
+                UserId = userId, 
+                Group = group, 
+                User = user,
+                JoinDate = joinDate,
+                RoleInGroup = roleInGroup
+            };
+
+            _groupUserRepository.Add(groupUser);
+            group.MemberCount++;
+            _groupRepository.Update(group); // 更新成员数量
+
+            // 生成通知
+            var notification = new UserNotification
+            {
+                UserId = userId,
+                NotificationId = GenerateNotificationId(), // 生成唯一的通知ID
+                NotificationType = "Group Operation Notification",  // 修改为英文，避免字符集问题
+                Title = "Group Join Confirmation",  // 修改为英文，避免字符集问题
+                Content = $"Administrator [{userId}] has added you to the group [{group.GroupName}]", // 修改为英文，避免字符集问题
+                NotificationTime = DateTime.UtcNow
+            };
+
+
+            Console.WriteLine(notification.Content);
+            _userNotificationRepository.Add(notification);
+
+            return new GroupAddResult
+            {
+                State = 1,
+                Info = ""
+            };
         }
 
-        public void RemoveUserFromGroup(string groupId, string userId)
+        public GroupRemoveResult RemoveUserFromGroup(string groupId, string userId, string adminId)
         {
             var groupUser = _groupUserRepository.Find(gu => gu.GroupId == groupId && gu.UserId == userId).FirstOrDefault();
-            if (groupUser != null)
+            if (groupUser == null)
             {
-                _groupUserRepository.Delete(groupUser);
-                var group = _groupRepository.Find(g => g.GroupId == groupId).FirstOrDefault();
-                if (group != null)
+                return new GroupRemoveResult
                 {
-                    group.MemberCount--;
-                    _groupRepository.Update(group); // 更新成员数量
-                }
+                    State = 0,
+                    Info = "未找到该用户的团体记录"
+                };
             }
+
+            _groupUserRepository.Delete(groupUser);
+
+            var group = _groupRepository.Find(g => g.GroupId == groupId).FirstOrDefault();
+            if (group != null)
+            {
+                group.MemberCount--;
+                _groupRepository.Update(group); // 更新成员数量
+            }
+
+            // 生成通知
+            var notification = new UserNotification
+            {
+                UserId = userId,
+                NotificationId = GenerateNotificationId(),
+                NotificationType = "Group Notification",  // Modify as needed
+                Title = "Group Exit",
+                Content = string.IsNullOrEmpty(adminId) 
+                    ? $"You have successfully exited the group [{group?.GroupName}]" 
+                    : $"You have been removed from the group [{group?.GroupName}] by the administrator [{adminId}]",
+                NotificationTime = DateTime.UtcNow
+            };
+
+
+            _userNotificationRepository.Add(notification);
+
+            return new GroupRemoveResult
+            {
+                State = 1,
+                Info = ""
+            };
+        }
+
+        public GroupUpdateResult UpdateUserRoleInGroup(string groupId, string userId, string userRole, string adminId)
+        {
+            var groupUser = _groupUserRepository.Find(gu => gu.GroupId == groupId && gu.UserId == userId).FirstOrDefault();
+
+            if (groupUser == null)
+            {
+                return new GroupUpdateResult
+                {
+                    State = 0,
+                    Info = "未找到指定的用户或团体记录"
+                };
+            }
+
+            // 更新用户团体地位
+            groupUser.RoleInGroup = userRole;
+            _groupUserRepository.Update(groupUser);
+
+            // 获取团体信息
+            var group = _groupRepository.Find(g => g.GroupId == groupId).FirstOrDefault();
+
+            // 生成通知
+            var notification = new UserNotification
+            {
+                UserId = userId,
+                NotificationId = GenerateNotificationId(),  // 生成唯一的通知ID
+                NotificationType = "Group Notification",  // 通知类型
+                Title = "Group Role Change",  // 通知标题
+                Content = $"Administrator [{adminId}] has updated your role in the group [{group?.GroupName}] to [{userRole}]",
+                NotificationTime = DateTime.UtcNow
+            };
+
+            _userNotificationRepository.Add(notification);
+
+            return new GroupUpdateResult
+            {
+                State = 1,
+                Info = ""
+            };
         }
 
         // 查找某一用户归属的所有团体
-        public IEnumerable<Group> UserAllGroups(string userId)
+        public IEnumerable<UserGroupDto> UserAllGroups(string userId)
         {
-            var groupIds = _groupUserRepository.Find(gu => gu.UserId == userId).Select(gu => gu.GroupId).ToList();
-            return _groupRepository.Find(g => groupIds.Contains(g.GroupId)).ToList();
+            var groupUsers = _context.GroupUsers
+            .Include(gu => gu.Group) // 使用 Include 加载 Group 实体
+            .Where(gu => gu.UserId == userId)
+            .ToList();
+
+            var userGroups = groupUsers
+                .Where(gu => gu.Group != null)
+                .Select(gu => new UserGroupDto
+                {
+                    GroupId = gu.GroupId,
+                    GroupName = gu.Group.GroupName,
+                    Description = gu.Group.Description,
+                    MemberCount = gu.Group.MemberCount,
+                    CreatedDate = gu.Group.CreatedDate,
+                    JoinDate = gu.JoinDate,
+                    RoleInGroup = gu.RoleInGroup
+                }).ToList();
+
+            return userGroups;
         }
+
 
         // 查找所有不同ID的团体
         public IEnumerable<Group> SelectGroups()
@@ -121,5 +270,23 @@ namespace VenueBookingSystem.Services
 
             return groupId;
         }
+
+        // 生成唯一的通知ID
+        private string GenerateNotificationId()
+        {
+            // 获取当前数据库中最大的通知ID
+            var maxNotificationId = _userNotificationRepository.GetAll()
+                .Select(n => Convert.ToInt32(n.NotificationId))
+                .DefaultIfEmpty(0) // 如果没有记录，则返回0
+                .Max();
+
+            // 生成下一个通知ID
+            int newNotificationId = maxNotificationId + 1;
+
+            // 返回新的通知ID，转换为字符串
+            return newNotificationId.ToString();
+        }
+
+
     }
 }

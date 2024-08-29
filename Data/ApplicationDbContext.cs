@@ -12,11 +12,13 @@ namespace VenueBookingSystem.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Venue> Venues { get; set; }
+        public DbSet<Admin> Admins { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Announcement> Announcements { get; set; }
-        public DbSet<Event> Events { get; set; }
         public DbSet<Group> Groups { get; set; }  // 添加 Group 实体
         public DbSet<GroupUser> GroupUsers { get; set; }  // 添加 GroupUser 实体
+        public DbSet<UserNotification> UserNotifications { get; set; }
+        public DbSet<AdminNotification> AdminNotifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,20 +51,6 @@ namespace VenueBookingSystem.Data
                 .HasOne(va => va.Announcement)
                 .WithMany(a => a.VenueAnnouncements)
                 .HasForeignKey(va => va.AnnouncementId);
-
-            // 配置 VenueEvent 的复合主键
-            modelBuilder.Entity<VenueEvent>()
-                .HasKey(ve => new { ve.VenueId, ve.EventId });
-
-            modelBuilder.Entity<VenueEvent>()
-                .HasOne(ve => ve.Venue)
-                .WithMany(v => v.VenueEvents)
-                .HasForeignKey(ve => ve.VenueId);
-
-            modelBuilder.Entity<VenueEvent>()
-                .HasOne(ve => ve.Event)
-                .WithMany(e => e.VenueEvents)
-                .HasForeignKey(ve => ve.EventId);
 
             // 配置 User 和 Reservation 之间的多对多关系
             modelBuilder.Entity<UserReservation>()
@@ -114,6 +102,28 @@ namespace VenueBookingSystem.Data
             // 配置 VenueAvailability 的主键
             modelBuilder.Entity<VenueAvailability>()
                 .HasKey(va => va.AvailabilityId); // 配置主键
+
+            // 配置 Admin 的主键
+            modelBuilder.Entity<Admin>()
+                .HasKey(a => a.AdminId); // 定义主键
+
+            // 配置 AdminNotification 的主键和外键
+            modelBuilder.Entity<AdminNotification>()
+                .HasKey(an => an.NotificationId); // 定义主键
+
+            modelBuilder.Entity<AdminNotification>()
+                .HasOne(an => an.Admin) // 定义外键关系
+                .WithMany(a => a.AdminNotifications)
+                .HasForeignKey(an => an.AdminId);
+
+            // 配置 UserNotification 的主键和外键
+            modelBuilder.Entity<UserNotification>()
+                .HasKey(un => un.NotificationId); // 定义主键
+
+            modelBuilder.Entity<UserNotification>()
+                .HasOne(un => un.User) // 定义外键关系
+                .WithMany(u => u.UserNotifications)
+                .HasForeignKey(un => un.UserId);
 
             // 这里可以添加其他实体的配置，例如关系、约束等
         }

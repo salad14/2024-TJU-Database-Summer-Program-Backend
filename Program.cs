@@ -65,11 +65,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 // 注册应用程序的服务和存储库
-builder.Services.AddScoped<IRepository<User>, Repository<User>>();
-builder.Services.AddScoped<IRepository<Group>, Repository<Group>>();
-builder.Services.AddScoped<IRepository<GroupUser>, Repository<GroupUser>>();
-builder.Services.AddScoped<IRepository<Admin>, Repository<Admin>>();
-builder.Services.AddScoped<IRepository<Venue>, Repository<Venue>>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>)); 
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGroupService, GroupService>();

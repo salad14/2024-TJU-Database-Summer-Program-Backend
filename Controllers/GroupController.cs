@@ -12,7 +12,7 @@ namespace VenueBookingSystem.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [EnableCors("_allowSpecificOrigins")]
+    [EnableCors("AllowSpecificOrigins")]
     public class GroupController : ControllerBase
     {
         private readonly IGroupService _groupService;
@@ -57,37 +57,56 @@ namespace VenueBookingSystem.Controllers
             return Ok(group);
         }
 
-        [HttpGet]
-        public IActionResult GetAllGroups()
+
+        [HttpPost("{groupId}/adduser")]
+        public IActionResult AddUserToGroup(string groupId, [FromBody] UserJoinGroupDto userJoinGroupDto)
         {
-            var groups = _groupService.GetAllGroups();
-            return Ok(groups);
+            var result = _groupService.AddUserToGroup(
+                groupId, 
+                userJoinGroupDto.UserId, 
+                userJoinGroupDto.JoinDate, 
+                userJoinGroupDto.RoleInGroup
+            );
+            return Ok(result);
         }
 
-        [HttpPost("{groupId}/adduser/{userId}")]
-        public IActionResult AddUserToGroup(string groupId, string userId)
+
+        [HttpDelete("{groupId}/removeuser")]
+        public IActionResult RemoveUserFromGroup(string groupId, [FromBody] RemoveUserDto removeUserDto)
         {
-            _groupService.AddUserToGroup(groupId, userId);
-            return Ok("用户已加入团体");
+            var result = _groupService.RemoveUserFromGroup(groupId, removeUserDto.UserId, removeUserDto.AdminId);
+            return Ok(result);
         }
 
-        [HttpDelete("{groupId}/removeuser/{userId}")]
-        public IActionResult RemoveUserFromGroup(string groupId, string userId)
-        {
-            _groupService.RemoveUserFromGroup(groupId, userId);
-            return Ok("用户已从团体中移除");
-        }
 
         [HttpGet("userallGroup/{userId}")]
         public IActionResult UserAllGroups(string userId)
         {
-            var groups = _groupService.UserAllGroups(userId);
-            if (!groups.Any())
+            var userGroups = _groupService.UserAllGroups(userId);
+            
+            // 检查是否没有找到任何团体
+            if (!userGroups.Any())
             {
-                return NotFound("该用户未加入任何团体");
+                // 如果没有找到，返回一个包含空字段的 UserGroupDto 数组
+                var emptyUserGroups = new List<UserGroupDto>
+                {
+                    new UserGroupDto
+                    {
+                        GroupId = null,
+                        GroupName = null,
+                        Description = null,
+                        MemberCount = 0,
+                        CreatedDate = new DateTime(1970,1 , 1, 00, 00, 00, 00),
+                        JoinDate = new DateTime(1970,1 , 1, 00, 00, 00, 00),
+                        RoleInGroup = null
+                    }
+                };
+                return Ok(emptyUserGroups);
             }
-            return Ok(groups);
+            return Ok(userGroups);
         }
+
+
 
         [HttpGet("selectGroups")]
         public IActionResult SelectGroups()
@@ -95,5 +114,19 @@ namespace VenueBookingSystem.Controllers
             var groups = _groupService.SelectGroups();
             return Ok(groups);
         }
+
+        [HttpPost("updateUserRole")]
+        public IActionResult UpdateUserRoleInGroup([FromBody] UpdateUserRoleDto updateUserRoleDto)
+        {
+            var result = _groupService.UpdateUserRoleInGroup(
+                updateUserRoleDto.GroupId,
+                updateUserRoleDto.UserId,
+                updateUserRoleDto.UserRole,
+                updateUserRoleDto.AdminId
+            );
+
+            return Ok(result);
+        }
+
     }
 }

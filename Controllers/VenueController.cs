@@ -7,7 +7,7 @@ namespace VenueBookingSystem.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [EnableCors("_allowSpecificOrigins")]
+    [EnableCors("AllowSpecificOrigins")]
     public class VenueController : ControllerBase
     {
         private readonly IVenueService _venueService;
