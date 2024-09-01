@@ -19,8 +19,10 @@ namespace VenueBookingSystem.Data
         public DbSet<GroupUser> GroupUsers { get; set; }  // 添加 GroupUser 实体
         public DbSet<UserNotification> UserNotifications { get; set; }
         public DbSet<AdminNotification> AdminNotifications { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        public DbSet<MaintenanceRecord> MaintenanceRecords { get; set; }
+        public DbSet<Equipment> Equipments { get; set; }
+        public DbSet<VenueEquipment> VenueEquipments { get; set; }
+        public DbSet<VenueAvailability> VenueAvailabilities { get; set; }        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
@@ -124,6 +126,10 @@ namespace VenueBookingSystem.Data
                 .HasOne(un => un.User) // 定义外键关系
                 .WithMany(u => u.UserNotifications)
                 .HasForeignKey(un => un.UserId);
+
+            // 配置 VenueEquipment 的复合主键
+             modelBuilder.Entity<VenueEquipment>()
+                .HasKey(ve => new { ve.EquipmentId, ve.VenueId });
 
             // 这里可以添加其他实体的配置，例如关系、约束等
         }

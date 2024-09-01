@@ -9,10 +9,9 @@ namespace VenueBookingSystem.Models
         public required string AvailabilityId { get; set; } // 开放时间段ID
         public required string ReservationItem { get; set; } // 预约项目的描述
         public required DateTime ReservationTime { get; set; } = DateTime.UtcNow; // 预约操作时间
-        public required DateTime StartTime { get; set; } // 预约开始时间
-        public required DateTime EndTime { get; set; } // 预约结束时间
         public required decimal PaymentAmount { get; set; } // 支付金额
         public required int NumOfPeople { get; set; } // 预约人数
+        public required string ReservationType { get; set; }  
 
         // 导航属性：场地 (一对多)
         public Venue? Venue { get; set; } // 可空，ORM 将填充

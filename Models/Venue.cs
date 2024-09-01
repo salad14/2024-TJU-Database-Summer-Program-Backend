@@ -13,6 +13,8 @@ namespace VenueBookingSystem.Models
         public DateTime LastInspectionTime { get; set; } // 场地上一次检查时间
         public string? VenueImageUrl { get; set; } // 场地图片 URL
 
+        public string? VenueDescription{ get; set; } 
+
         // 导航属性：场地的预约记录
         public ICollection<Reservation>? Reservations { get; set; }
         // 导航属性：场地的保养记录
