@@ -53,7 +53,6 @@ namespace VenueBookingSystem.Services
                 AvailabilityId = reservationDto.AvailabilityId,  // 设置关联的开放时间段ID
                 ReservationItem = reservationDto.ReservationItem,  // 设置预约项目描述
                 ReservationTime = DateTime.UtcNow,  // 设置预约操作时间
-                NumOfPeople = reservationDto.NumOfPeople,  // 设置预约人数
                 ReservationType =reservationDto.ReservationType,
                 Venue = venue
             };

@@ -14,6 +14,8 @@ namespace VenueBookingSystem.Models
         public string? TargetTeam { get; set; }  // 通知内容
         public DateTime NotificationTime { get; set; }  // 通知时间
 
+        
+
         // 导航属性：关联到用户
         public User? User { get; set; }
     }

@@ -7,7 +7,7 @@ namespace VenueBookingSystem.Dto
         public string VenueId { get; set; }  
         public string AvailabilityId { get; set; }  
         public string ReservationItem { get; set; }  
-        public int NumOfPeople { get; set; } 
+        
         public required string ReservationType { get; set; }  
     }
 }
