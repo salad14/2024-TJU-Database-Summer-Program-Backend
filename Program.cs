@@ -10,6 +10,7 @@ using VenueBookingSystem.Data;
 using VenueBookingSystem.Services;
 using VenueBookingSystem.Models;
 using Microsoft.EntityFrameworkCore;
+using sports_management.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,6 +73,9 @@ builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IVenueService, VenueService>();
 builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IUserPersonalInfoService, UserPersonalInfoService>();
+builder.Services.AddScoped<IVenueMaintenanceService, VenueMaintenanceService>();
+builder.Services.AddScoped<IUserGroupInfoService, UserGroupInfoService>();
 
 var app = builder.Build();
 

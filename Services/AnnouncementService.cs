@@ -10,11 +10,14 @@ namespace VenueBookingSystem.Services
         private readonly IRepository<Announcement> _announcementRepository;
         private readonly IRepository<Admin> _adminRepository;
 
+        private readonly IRepository<Venue> _venueRepository;
+
         // 构造函数，注入存储库
-        public AnnouncementService(IRepository<Announcement> announcementRepository, IRepository<Admin> adminRepository)  // 新增 userRepository 参数
+        public AnnouncementService(IRepository<Announcement> announcementRepository, IRepository<Admin> adminRepository, IRepository<Venue> venueRepository)  // 新增 userRepository 参数
         {
             _adminRepository = adminRepository;
             _announcementRepository = announcementRepository;
+            _venueRepository = venueRepository;
         }
 
         // 发布公告
@@ -50,6 +53,43 @@ namespace VenueBookingSystem.Services
                 PublishDate = a.PublishedDate,
                 AdminId = a.AdminId
             });
+        }
+
+        public AnnouncementVenueDto GetAllAnnouncementsById(string Id)
+        {
+            var announcements = _announcementRepository.Find(x => x.AnnouncementId == Id).FirstOrDefault();
+
+            List<Venue> Venues = new List<Venue>();
+            if (announcements != null && announcements.VenueAnnouncements != null && announcements.VenueAnnouncements.Count > 0)
+            {
+                foreach (var item in announcements.VenueAnnouncements)
+                {
+                    var venue = _venueRepository.Find(x => x.VenueId == item.VenueId).FirstOrDefault();
+                    if (venue != null)
+                    {
+                        Venues.Add(venue);
+                    }
+                }
+                return new AnnouncementVenueDto
+                {
+                    Title = announcements.Title,
+                    Content = announcements.Content,
+                    PublishDate = announcements.PublishedDate.ToString(),
+                    AdminId = announcements.AdminId,
+                    Venues = Venues
+                };
+            }
+            else
+            {
+                return new AnnouncementVenueDto
+                {
+                    Title = "",
+                    Content = "",
+                    PublishDate = "",
+                    AdminId = "",
+                    Venues = Venues
+                };
+            }
         }
     }
 }

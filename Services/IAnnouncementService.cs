@@ -10,5 +10,7 @@ namespace VenueBookingSystem.Services
 
         // 获取所有公告的方法签名
         IEnumerable<AnnouncementDto> GetAllAnnouncements();
+
+        AnnouncementVenueDto GetAllAnnouncementsById(string Id);
     }
 }

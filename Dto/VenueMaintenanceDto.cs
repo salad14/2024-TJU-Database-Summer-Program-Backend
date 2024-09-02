@@ -1,8 +1,10 @@
-namespace VenueBookingSystem.Models
+﻿using VenueBookingSystem.Models;
+
+namespace sports_management.Dto
 {
-    public class VenueMaintenance
+    public class VenueMaintenanceDto
     {
-        public string VenueMaintenanceId { get; set; } // 唯一标识符
+        public required string VenueMaintenanceId { get; set; } // 唯一标识符
         public string Description { get; set; } // 保养描述
 
         public DateTime MaintenanceStartDate { get; set; } // 保养开始时间
@@ -10,6 +12,6 @@ namespace VenueBookingSystem.Models
 
         // 导航属性：关联的场地
         public string VenueId { get; set; }
-        public Venue Venue { get; set; }
+
     }
 }
