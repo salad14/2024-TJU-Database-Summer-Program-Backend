@@ -11,11 +11,13 @@ namespace VenueBookingSystem.Controllers
     public class VenueController : ControllerBase
     {
         private readonly IVenueService _venueService;
+        private readonly IVenueAnalysisService _venueAnalysisService;
 
         // 构造函数，注入场地服务
-        public VenueController(IVenueService venueService)
+        public VenueController(IVenueService venueService, IVenueAnalysisService venueAnalysisService)
         {
             _venueService = venueService;
+            _venueAnalysisService = venueAnalysisService;
         }
 
         // 获取所有场地信息
@@ -173,8 +175,57 @@ namespace VenueBookingSystem.Controllers
                     info = "An error occurred while retrieving device details: " + ex.Message 
                 });
             }
-
-            
         }
+
+        //获取指定场地类型的分析数据
+        [HttpGet("AnalyzeVenueData")]
+        public IActionResult AnalyzeVenueData([FromQuery] string venueType)
+        {
+            try
+            {
+                var analysisData = _venueAnalysisService.GetVenueAnalysisData(venueType);
+                return Ok(new
+                {
+                    state = 1,
+                    data = analysisData,
+                    info = ""
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    state = 0,
+                    data = (object)null,
+                    info = ex.Message
+                });
+            }
+        }
+
+        // 获取指定场地ID的分析数据
+        [HttpGet("AnalyzeVenueDataById")]
+        public IActionResult AnalyzeVenueDataById([FromQuery] string venueId)
+        {
+            try
+            {
+                var analysisData = _venueAnalysisService.GetSingleVenueAnalysisData(venueId);
+                return Ok(new
+                {
+                    state = 1,
+                    data = analysisData,
+                    info = ""
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    state = 0,
+                    data = (object)null,
+                    info = ex.Message
+                });
+            }
+        }
+
     }
 }

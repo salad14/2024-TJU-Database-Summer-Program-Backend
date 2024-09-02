@@ -5,7 +5,7 @@ namespace VenueBookingSystem.Models
 {
     public class VenueAvailability
     {
-        public string AvailabilityId { get; set; } = Guid.NewGuid().ToString(); // 主键
+        public string AvailabilityId { get; set; }  // 主键
         public required string VenueId { get; set; } // 场地ID，外键
         public required DateTime StartTime { get; set; } // 开始时间
         public required DateTime EndTime { get; set; } // 结束时间

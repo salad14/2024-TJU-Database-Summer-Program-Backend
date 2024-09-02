@@ -14,6 +14,7 @@ namespace VenueBookingSystem.Data
         public DbSet<Venue> Venues { get; set; }
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<UserReservation> UserReservations { get; set; }
         public DbSet<Announcement> Announcements { get; set; }
         public DbSet<Group> Groups { get; set; }  // 添加 Group 实体
         public DbSet<GroupUser> GroupUsers { get; set; }  // 添加 GroupUser 实体
