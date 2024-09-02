@@ -125,7 +125,7 @@ namespace VenueBookingSystem.Services
             {
                 UserId = userId,
                 NotificationId = GenerateNotificationId(), // 生成唯一的通知ID
-                NotificationType = "团体操作通知",  // 通知类型
+                NotificationType = "team/join",  // 通知类型
                 Title = "加入团体确认",  // 通知标题
                 Content = $"管理员 [{userId}] 已将您加入团体 [{group.GroupName}]",
                 NotificationTime = DateTime.UtcNow
@@ -169,7 +169,7 @@ namespace VenueBookingSystem.Services
             {
                 UserId = userId,
                 NotificationId = GenerateNotificationId(),
-                NotificationType = "团体通知",  // 根据实际需求可以修改
+                NotificationType = "team/quit",  // 根据实际需求可以修改
                 Title = "退出团体",
                 Content = string.IsNullOrEmpty(adminId) 
                     ? $"您已成功退出团体 [{group?.GroupName}]" 
@@ -213,7 +213,7 @@ namespace VenueBookingSystem.Services
             {
                 UserId = userId,
                 NotificationId = GenerateNotificationId(),  // 生成唯一的通知ID
-                NotificationType = "团体通知",  // 通知类型
+                NotificationType = "team/roleChange",  // 通知类型
                 Title = "团体角色变更",  // 通知标题
                 Content = $"管理员 [{adminId}] 已将您在团体 [{group?.GroupName}] 中的角色更新为 [{userRole}]",
                 NotificationTime = DateTime.UtcNow
@@ -288,6 +288,53 @@ namespace VenueBookingSystem.Services
             // 返回新的通知ID，转换为字符串
             return newNotificationId.ToString();
         }
+
+        public GroupDetailDto GetGroupDetailById(string groupId)
+        {
+            // 获取团体信息
+            var group = _groupRepository.Find(g => g.GroupId == groupId).FirstOrDefault();
+            if (group == null)
+            {
+                return null;
+            }
+
+            // 获取团体成员信息
+            var userGroupDetails = from gu in _context.GroupUsers
+                                join u in _context.Users on gu.UserId equals u.UserId
+                                where gu.GroupId == groupId
+                                select new UserGroupDetailDto
+                                {
+                                    UserId = gu.UserId,
+                                    UserRole = gu.RoleInGroup,
+                                    UserName = u.Username
+                                };
+
+            return new GroupDetailDto
+            {
+                Description = group.Description,
+                CreatedDate = group.CreatedDate,
+                Users = userGroupDetails.ToList()
+            };
+        }
+
+        public bool UpdateGroupInfo(string groupId, string groupName, string description)
+        {
+            var group = _context.Groups.FirstOrDefault(g => g.GroupId == groupId);
+            if (group == null)
+            {
+                return false; // 团体不存在，返回 false
+            }
+
+            // 更新团体信息
+            group.GroupName = groupName;
+            group.Description = description;
+
+            _context.Groups.Update(group);
+            _context.SaveChanges();
+
+            return true; // 更新成功，返回 true
+        }
+
 
 
     }

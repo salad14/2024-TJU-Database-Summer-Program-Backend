@@ -1,9 +1,18 @@
+using VenueBookingSystem.Models;
+
 namespace VenueBookingSystem.Dto
 {
     public class GroupDto
     {
         public string? GroupName { get; set; } // 团体名称
         public string Description { get; set; } // 团体描述
+    }
+
+    public class GroupDetailDto
+    {
+        public string Description { get; set; } // 团体描述
+        public DateTime CreatedDate { get; set; } // 团体创建时间
+        public List<UserGroupDetailDto> Users { get; set; } // 团队成员信息
     }
 
     public class UserGroupDto
@@ -36,6 +45,13 @@ namespace VenueBookingSystem.Dto
         public required string GroupId { get; set; }  // 团体ID
         public required string UserRole { get; set; }  // 用户团体地位
         public required string AdminId { get; set; }  // 管理员ID，可选
+    }
+
+    public class GroupUpdateDto
+    {
+        public required string GroupId { get; set; } // 团体ID
+        public string? GroupName { get; set; } // 团体名称
+        public string? Description { get; set; } // 团体描述
     }
 
 }

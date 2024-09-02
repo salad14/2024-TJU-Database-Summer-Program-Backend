@@ -23,7 +23,10 @@ namespace VenueBookingSystem.Data
         public DbSet<MaintenanceRecord> MaintenanceRecords { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<VenueEquipment> VenueEquipments { get; set; }
-        public DbSet<VenueAvailability> VenueAvailabilities { get; set; }        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        public DbSet<VenueAvailability> VenueAvailabilities { get; set; } 
+        public DbSet<VenueManagement> VenueManagements { get; set; }
+       
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
@@ -131,6 +134,9 @@ namespace VenueBookingSystem.Data
             // 配置 VenueEquipment 的复合主键
              modelBuilder.Entity<VenueEquipment>()
                 .HasKey(ve => new { ve.EquipmentId, ve.VenueId });
+            //配置VenueManagement的复合主键
+            modelBuilder.Entity<VenueManagement>()
+                .HasKey(vm => new { vm.VenueId, vm.AdminId });
 
             // 这里可以添加其他实体的配置，例如关系、约束等
         }

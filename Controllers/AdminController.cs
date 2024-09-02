@@ -3,6 +3,7 @@ using VenueBookingSystem.Services;
 using System;
 using VenueBookingSystem.Models;
 using Microsoft.AspNetCore.Cors;
+using VenueBookingSystem.Dto;
 
 namespace VenueBookingSystem.Controllers
 {
@@ -49,6 +50,26 @@ namespace VenueBookingSystem.Controllers
                 });
             }
         }
+
+        [HttpPost("register")]
+        public IActionResult RegisterAdmin([FromBody] AdminDto adminDto, [FromQuery] List<string> manageVenues)
+        {
+            try
+            {
+                var result = _adminService.RegisterAdmin(adminDto, manageVenues);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new RegisterResult
+                {
+                    State = 0,
+                    AdminId = string.Empty,
+                    Info = $"注册失败: {ex.Message}"
+                });
+            }
+        }
+
 
 
         // 其他的 Admin 相关方法可以类似于此处添加

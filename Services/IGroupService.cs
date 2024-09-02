@@ -15,6 +15,10 @@ namespace VenueBookingSystem.Services
 
         GroupUpdateResult UpdateUserRoleInGroup(string groupId, string userId, string userRole, string adminId);
 
+        GroupDetailDto GetGroupDetailById(string groupId);
+
+        bool UpdateGroupInfo(string groupId, string groupName, string description); 
+
         // 查找某一用户归属的所有团体
         IEnumerable<UserGroupDto> UserAllGroups(string userId);
 

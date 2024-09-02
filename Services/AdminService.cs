@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using VenueBookingSystem.Data;
+using VenueBookingSystem.Dto;
 using VenueBookingSystem.Models;
 
 namespace VenueBookingSystem.Services
@@ -37,7 +38,6 @@ namespace VenueBookingSystem.Services
             .Select(a => new AdminRequestDto
             {
                 AdminId = a.AdminId,
-                Username = a.Username,
                 ContactNumber = a.ContactNumber,
                 Password = a.Password
             });
@@ -60,11 +60,6 @@ namespace VenueBookingSystem.Services
             })
             .ToList();
 
-
-
-
-
-
             if (notifications == null)
             {
                 return Enumerable.Empty<object>(); // 如果没有找到通知，返回一个空的集合
@@ -73,6 +68,87 @@ namespace VenueBookingSystem.Services
             return notifications;
         }
 
+
+        public RegisterResult RegisterAdmin(AdminDto adminDto, List<string> manageVenues)
+        {
+            try
+            {
+                // 检查管理员是否已存在
+                if (_adminRepository.Find(a => a.ContactNumber == adminDto.ContactNumber).Any())
+                {
+                    return new RegisterResult
+                    {
+                        State = 0,
+                        AdminId = string.Empty,
+                        Info = "管理员已存在"
+                    };
+                }
+
+                // 生成唯一的管理员ID
+                string adminId = GenerateUniqueAdminId();
+
+                // 创建管理员实体
+                var admin = new Admin
+                {
+                    AdminId = adminId,
+                    RealName = adminDto.RealName,
+                    Password = adminDto.Password,
+                    ContactNumber = adminDto.ContactNumber,
+                    AdminType = adminDto.AdminType
+                };
+
+                // 添加管理员到数据库
+                _adminRepository.Add(admin);
+
+                // 如果 manageVenues 不为空，则为每个场地分配管理员
+                if (manageVenues != null && manageVenues.Any())
+                {
+                    foreach (var venueId in manageVenues)
+                    {
+                        var manageVenue = new VenueManagement
+                        {
+                            AdminId = adminId,
+                            VenueId = venueId
+                        };
+                        _context.VenueManagements.Add(manageVenue);
+                    }
+                }
+
+                // 保存更改到数据库
+                _context.SaveChanges();
+
+                return new RegisterResult
+                {
+                    State = 1,
+                    AdminId = adminId,
+                    Info = "注册成功"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new RegisterResult
+                {
+                    State = 0,
+                    AdminId = string.Empty,
+                    Info = $"注册失败: {ex.Message}"
+                };
+            }
+        }
+
+
+        // 生成唯一的管理员ID
+        private string GenerateUniqueAdminId()
+        {
+            var random = new Random();
+            string adminId;
+
+            do
+            {
+                adminId = random.Next(100000, 999999).ToString();
+            } while (_adminRepository.Find(a => a.AdminId == adminId).Any()); // 确保ID唯一性
+
+            return adminId;
+        }
 
 
         // 其他方法的实现...

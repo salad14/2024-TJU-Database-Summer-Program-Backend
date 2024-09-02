@@ -1,3 +1,4 @@
+using VenueBookingSystem.Dto;
 using VenueBookingSystem.Models;
 
 namespace VenueBookingSystem.Services
@@ -8,6 +9,8 @@ namespace VenueBookingSystem.Services
         Admin GetAdminById(string adminId);
         void CreateAdmin(Admin admin);
         IEnumerable<object> GetPublicNoticeData(string adminId);
+
+        RegisterResult RegisterAdmin(AdminDto adminDto, List<string> manageVenues);
         // 其他方法...
     }
 }

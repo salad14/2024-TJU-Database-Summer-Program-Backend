@@ -1,9 +1,17 @@
 namespace VenueBookingSystem.Models
 {
+
+    public class AdminDto
+    {
+        public string RealName { get; set; }  // 管理员真实姓名
+        public string Password { get; set; }  // 管理员密码（已加密）
+        public string ContactNumber { get; set; }  // 管理员联系电话
+        public string AdminType { get; set; }  // 管理员类型，如 admin-validate/system
+    }
+
     public class AdminRequestDto
     {
         public string AdminId { get; set; }
-        public string? Username { get; set; }
         public string? Password { get; set; }
         public string? ContactNumber { get; set; }
         public string? AdminType { get; set; }

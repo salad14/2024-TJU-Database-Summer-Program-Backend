@@ -3,7 +3,7 @@ namespace VenueBookingSystem.Models
     public class Admin
     {
         public required string AdminId { get; set; }
-        public required string Username { get; set; }
+        public string RealName { get; set; }
         public required string Password { get; set; }
         public required string ContactNumber { get; set; }
 

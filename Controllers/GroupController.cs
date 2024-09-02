@@ -124,5 +124,45 @@ namespace VenueBookingSystem.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet("details/{groupId}")]
+        public IActionResult GetGroupDetails(string groupId)
+        {
+            var groupDetail = _groupService.GetGroupDetailById(groupId);
+            if (groupDetail == null)
+            {
+                return NotFound(new
+                {
+                    status = 0,
+                    message = "未找到该团体"
+                });
+            }
+            return Ok(new
+            {
+                status = 1,
+                message = "获取成功",
+                data = groupDetail
+            });
+        }
+
+        [HttpPost("updateGroupInfo")]
+        public IActionResult UpdateGroupInfo([FromBody] GroupUpdateDto groupUpdateDto)
+        {
+            var result = _groupService.UpdateGroupInfo(
+                groupUpdateDto.GroupId,
+                groupUpdateDto.GroupName,
+                groupUpdateDto.Description
+            );
+
+            if (result)
+            {
+                return Ok(new { status = 1, message = "团体信息更新成功" });
+            }
+            else
+            {
+                return NotFound(new { status = 0, message = "未找到指定的团体" });
+            }
+        }
+
     }
 }

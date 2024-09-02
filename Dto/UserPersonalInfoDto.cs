@@ -8,4 +8,10 @@
         public int ViolationCount { get; set; } // 违约次数
         public string ReservationPermission { get; set; } // 预约权限
     }
+
+    public class UserIdNameDto
+    {
+        public string UserId { get; set; }
+        public string Username { get; set; }
+    }
 }

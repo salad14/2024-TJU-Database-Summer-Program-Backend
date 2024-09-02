@@ -8,6 +8,7 @@ namespace VenueBookingSystem.Services
     public interface IUserPersonalInfoService
     {
         UserPersonalInfoDto GetUserPersonalInfo(string userId);
+        List<UserIdNameDto> GetAllUserIdsAndNames();
     }
 
     public class UserPersonalInfoService : IUserPersonalInfoService
@@ -39,5 +40,18 @@ namespace VenueBookingSystem.Services
 
             return user;
         }
+
+        public List<UserIdNameDto> GetAllUserIdsAndNames()
+    {
+        var users = _userRepository.GetAll()
+            .Select(u => new UserIdNameDto
+            {
+                UserId = u.UserId,
+                Username = u.Username
+            })
+            .ToList();
+
+        return users;
+    }
     }
 }

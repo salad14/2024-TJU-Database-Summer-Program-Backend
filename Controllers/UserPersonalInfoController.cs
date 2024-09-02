@@ -28,5 +28,19 @@ namespace VenueBookingSystem.Controllers
                 return NotFound(new { Message = ex.Message });
             }
         }
+
+        [HttpGet("all-users")]
+        public ActionResult<List<UserIdNameDto>> GetAllUserIdsAndNames()
+        {
+            try
+            {
+                var users = _userPersonalInfoService.GetAllUserIdsAndNames();
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
     }
 }
