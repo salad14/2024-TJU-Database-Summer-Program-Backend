@@ -46,6 +46,13 @@ namespace VenueBookingSystem.Dto
         public string Info { get; set; }  // 信息：成功时为空字符串，失败时包含错误信息
     }
 
+    public class UpdateResult
+    {
+        public int State { get; set; }  // 0 失败，1 成功
+        public string Info { get; set; } // 信息
+    }
+
+
 
 
 }

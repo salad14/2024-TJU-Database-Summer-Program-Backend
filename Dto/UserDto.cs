@@ -38,4 +38,17 @@ namespace VenueBookingSystem.Models
         public string UserRole { get; set; } // 用户团体地位
         public string UserName { get; set; } // 用户名
     }
+
+    public class UpdateUserInfoDto
+    {
+        public string Username { get; set; }
+        public string ContactNumber { get; set; }
+        public string RealName { get; set; }
+    }
+
+    public class UpdateUserPasswordDto
+    {
+        public string NewPassword { get; set; }
+    }
+
 }

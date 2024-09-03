@@ -10,14 +10,19 @@ namespace VenueBookingSystem.Services
         private readonly IRepository<Announcement> _announcementRepository;
         private readonly IRepository<Admin> _adminRepository;
 
+        private readonly ApplicationDbContext _context;
         private readonly IRepository<Venue> _venueRepository;
 
         // 构造函数，注入存储库
-        public AnnouncementService(IRepository<Announcement> announcementRepository, IRepository<Admin> adminRepository, IRepository<Venue> venueRepository)  // 新增 userRepository 参数
+        public AnnouncementService(IRepository<Announcement> announcementRepository, 
+                                   IRepository<Admin> adminRepository, 
+                                   IRepository<Venue> venueRepository, 
+                                   ApplicationDbContext context)
         {
-            _adminRepository = adminRepository;
             _announcementRepository = announcementRepository;
+            _adminRepository = adminRepository;
             _venueRepository = venueRepository;
+            _context = context; // 注入 ApplicationDbContext
         }
 
         // 发布公告
@@ -43,53 +48,71 @@ namespace VenueBookingSystem.Services
 
 
         // 获取所有公告
-        public IEnumerable<AnnouncementDto> GetAllAnnouncements()
+        public IEnumerable<PublicNoticeDto> GetPublicNoticeData()
         {
-            var announcements = _announcementRepository.GetAll();
-            return announcements.Select(a => new AnnouncementDto
+            var notices = _announcementRepository.GetAll()
+                .Select(a => new PublicNoticeDto
+                {
+                    Id = a.AnnouncementId,
+                    Title = a.Title,
+                    Time = a.PublishedDate,
+                    AdminId = a.AdminId
+                }).ToList();
+
+            // 如果没有找到任何公告，返回一个空的集合
+            if (notices == null || !notices.Any())
             {
-                Title = a.Title,
-                Content = a.Content,
-                PublishDate = a.PublishedDate,
-                AdminId = a.AdminId
-            });
+                return new List<PublicNoticeDto>();
+            }
+
+            return notices;
         }
 
-        public AnnouncementVenueDto GetAllAnnouncementsById(string Id)
-        {
-            var announcements = _announcementRepository.Find(x => x.AnnouncementId == Id).FirstOrDefault();
 
-            List<Venue> Venues = new List<Venue>();
-            if (announcements != null && announcements.VenueAnnouncements != null && announcements.VenueAnnouncements.Count > 0)
+        public AnnouncementDetailResult GetAllAnnouncementsById(string id)
+        {
+            // 查找公告信息
+            var announcement = _announcementRepository.Find(x => x.AnnouncementId == id).FirstOrDefault();
+
+            if (announcement == null)
             {
-                foreach (var item in announcements.VenueAnnouncements)
+                return new AnnouncementDetailResult
                 {
-                    var venue = _venueRepository.Find(x => x.VenueId == item.VenueId).FirstOrDefault();
-                    if (venue != null)
-                    {
-                        Venues.Add(venue);
-                    }
-                }
-                return new AnnouncementVenueDto
-                {
-                    Title = announcements.Title,
-                    Content = announcements.Content,
-                    PublishDate = announcements.PublishedDate.ToString(),
-                    AdminId = announcements.AdminId,
-                    Venues = Venues
+                    Status = 0,
+                    Info = "未找到该公告",
+                    Data = null
                 };
             }
-            else
-            {
-                return new AnnouncementVenueDto
+
+            // 查找与公告相关的场地信息
+            var venues = _context.VenueAnnouncements
+                .Where(va => va.AnnouncementId == id)
+                .Select(va => new VenueInfoDto
                 {
-                    Title = "",
-                    Content = "",
-                    PublishDate = "",
-                    AdminId = "",
-                    Venues = Venues
-                };
-            }
+                    VenueId = va.VenueId,
+                    VenueName = _context.Venues.FirstOrDefault(v => v.VenueId == va.VenueId).Name
+                })
+                .ToList();
+
+            // 查找发布公告的管理员信息
+            var admin = _adminRepository.Find(a => a.AdminId == announcement.AdminId).FirstOrDefault();
+
+            // 生成返回的公告详情对象
+            var announcementDetails = new AnnouncementDetailsDto
+            {
+                AnnouncementId = announcement.AnnouncementId,
+                Content = announcement.Content,
+                AdminName = admin?.RealName,
+                Venues = venues
+            };
+
+            return new AnnouncementDetailResult
+            {
+                Status = 1,
+                Info = "",
+                Data = announcementDetails
+            };
         }
+
     }
 }

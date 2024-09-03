@@ -21,20 +21,19 @@ namespace VenueBookingSystem.Controllers
             _adminService = adminService;
         }
 
-        [HttpPost("publicNoticeData")]
-        public IActionResult GetPublicNoticeData([FromBody] AdminRequestDto request)
+        [HttpPost("AdminNoticeData")]
+        public IActionResult GetAdminNoticeData([FromBody] AdminRequestDto request)
         {
             try
             {
-                // 调用服务层获取公告及相关场地信息
-                var result = _adminService.GetPublicNoticeData(request.AdminId);
+                var result = _adminService.GetAdminNoticeData(request.AdminId);
 
                 if (result == null || !result.Any())
                 {
                     return Ok(new 
                     {
                         Status = 1,  // 状态为1表示成功
-                        Info = "没有公告数据",
+                        Info = "没有通知数据",
                         Data = result  // 返回空的结果集
                     });
                 }
@@ -46,7 +45,7 @@ namespace VenueBookingSystem.Controllers
                 return BadRequest(new 
                 { 
                     Status = 0, 
-                    Info = $"获取公告数据失败: {ex.Message}" 
+                    Info = $"获取通知数据失败: {ex.Message}" 
                 });
             }
         }
@@ -69,6 +68,23 @@ namespace VenueBookingSystem.Controllers
                 });
             }
         }
+
+        [HttpPut("updateAdminInfo/{adminId}")]
+        public IActionResult UpdateAdminInfo(string adminId, [FromBody] AdminUpdateDto adminUpdateDto, [FromQuery] List<string> manageVenues)
+        {
+            var result = _adminService.UpdateAdminInfo(adminId, adminUpdateDto, manageVenues);
+            return Ok(result);
+        }
+
+
+        [HttpPut("updatePassword")]
+        public IActionResult UpdateAdminPassword([FromQuery] string adminId, [FromBody] UpdateAdminPasswordDto updateDto)
+        {
+            var result = _adminService.UpdateAdminPassword(adminId, updateDto.NewPassword);
+            return Ok(result);
+        }
+
+
 
 
 

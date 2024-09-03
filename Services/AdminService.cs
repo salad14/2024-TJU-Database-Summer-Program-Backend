@@ -30,7 +30,7 @@ namespace VenueBookingSystem.Services
             _adminRepository.Add(admin);
         }
 
-        public IEnumerable<object> GetPublicNoticeData(string adminId)
+        public IEnumerable<object> GetAdminNoticeData(string adminId)
         {
             // 首先验证adminId是否存在
             var admin = _adminRepository
@@ -56,7 +56,8 @@ namespace VenueBookingSystem.Services
                 NotificationType = n.NotificationType,
                 Title = n.Title,
                 Content = n.Content,
-                NotificationTime = n.NotificationTime
+                NotificationTime = n.NotificationTime,
+                NewAdminId = n.NewAdminId
             })
             .ToList();
 
@@ -69,7 +70,7 @@ namespace VenueBookingSystem.Services
         }
 
 
-        public RegisterResult RegisterAdmin(AdminDto adminDto, List<string> manageVenues)
+        public RegisterResult RegisterAdmin(AdminDto adminDto, List<string> manageVenues,string? systemAdminId = null)
         {
             try
             {
@@ -114,6 +115,40 @@ namespace VenueBookingSystem.Services
                     }
                 }
 
+                // 检查系统管理员ID是否有效且为system类型，如果没有传递adminId，则使用默认系统管理员
+                Admin? systemAdmin = null;
+                if (!string.IsNullOrEmpty(systemAdminId))
+                {
+                    systemAdmin = _adminRepository.Find(a => a.AdminId == systemAdminId && a.AdminType == "system").FirstOrDefault();
+                }
+                if (systemAdmin == null)
+                {
+                    systemAdmin = _adminRepository.Find(a => a.AdminType == "system").FirstOrDefault();
+                    if (systemAdmin == null)
+                    {
+                        return new RegisterResult
+                        {
+                            State = 0,
+                            AdminId = string.Empty,
+                            Info = "未找到系统管理员"
+                        };
+                    }
+                }
+
+                // 创建通知实体
+                var notification = new AdminNotification
+                {
+                    AdminId = systemAdmin.AdminId,
+                    NotificationId = GenerateUniqueNotificationId(),
+                    NotificationType = "adminValidation",
+                    Title = "管理员注册申请",
+                    Content = $"管理员 [{admin.RealName}] 申请注册成为 [{admin.AdminType}]，联系电话为 {admin.ContactNumber}，申请说明为 [{adminDto.ApplyDescription}]，申请管理的场地为 {string.Join(", ", manageVenues)}",
+                    NotificationTime = DateTime.UtcNow,
+                    NewAdminId = adminId // 将新管理员ID存储到通知表中
+                };
+
+                _adminNotificationRepository.Add(notification);
+
                 // 保存更改到数据库
                 _context.SaveChanges();
 
@@ -149,6 +184,107 @@ namespace VenueBookingSystem.Services
 
             return adminId;
         }
+
+        // 生成唯一的通知ID
+        private string GenerateUniqueNotificationId()
+        {
+            // 获取当前数据库中最大的通知ID
+            var maxNotificationId = _adminNotificationRepository.GetAll()
+                .Select(n => Convert.ToInt32(n.NotificationId))
+                .DefaultIfEmpty(0) // 如果没有记录，则返回0
+                .Max();
+
+            // 生成下一个通知ID
+            int newNotificationId = maxNotificationId + 1;
+
+            // 返回新的通知ID，转换为字符串
+            return newNotificationId.ToString();
+        }
+
+        public UpdateResult UpdateAdminInfo(string adminId, AdminUpdateDto adminUpdateDto, List<string> manageVenues)
+        {
+            var admin = _adminRepository.Find(a => a.AdminId == adminId).FirstOrDefault();
+            
+            if (admin == null)
+            {
+                return new UpdateResult
+                {
+                    State = 0,
+                    Info = "管理员未找到"
+                };
+            }
+
+            // 更新管理员信息
+            admin.RealName = adminUpdateDto.RealName;
+            admin.ContactNumber = adminUpdateDto.ContactNumber;
+            admin.AdminType = adminUpdateDto.AdminType;
+            
+            _adminRepository.Update(admin);
+
+            // 管理场地的处理
+            var currentManagedVenues = _context.VenueManagements.Where(vm => vm.AdminId == adminId).ToList();
+
+            // 如果 manageVenues 为空，表示删除该管理员管理的所有场地
+            if (manageVenues == null || !manageVenues.Any())
+            {
+                _context.VenueManagements.RemoveRange(currentManagedVenues);
+            }
+            else
+            {
+                // 添加新场地管理
+                var newVenues = manageVenues.Except(currentManagedVenues.Select(vm => vm.VenueId)).ToList();
+                foreach (var venueId in newVenues)
+                {
+                    var manageVenue = new VenueManagement
+                    {
+                        AdminId = adminId,
+                        VenueId = venueId
+                    };
+                    _context.VenueManagements.Add(manageVenue);
+                }
+
+                // 删除不再管理的场地
+                var removedVenues = currentManagedVenues.Where(vm => !manageVenues.Contains(vm.VenueId)).ToList();
+                _context.VenueManagements.RemoveRange(removedVenues);
+            }
+
+            _context.SaveChanges();
+
+            return new UpdateResult
+            {
+                State = 1,
+                Info = "管理员信息更新成功"
+            };
+        }
+
+        public UpdateResult UpdateAdminPassword(string adminId, string newPassword)
+        {
+            var admin = _adminRepository.Find(a => a.AdminId == adminId).FirstOrDefault();
+            
+            if (admin == null)
+            {
+                return new UpdateResult
+                {
+                    State = 0,
+                    Info = "管理员未找到"
+                };
+            }
+
+            // 更新管理员密码
+            admin.Password = newPassword; // 假设传入的密码已经过加密
+
+            _adminRepository.Update(admin);
+            _context.SaveChanges();
+
+            return new UpdateResult
+            {
+                State = 1,
+                Info = "密码更新成功"
+            };
+        }
+
+
+
 
 
         // 其他方法的实现...

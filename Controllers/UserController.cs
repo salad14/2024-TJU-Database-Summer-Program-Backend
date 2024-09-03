@@ -162,6 +162,44 @@ namespace VenueBookingSystem.Controllers
             return Ok(notifications);
         }
 
+
+        // 修改用户信息
+        [HttpPut("{userId}/updateInfo")]
+        public IActionResult UpdateUserInfo(string userId, [FromBody] UpdateUserInfoDto updateUserInfoDto)
+        {
+            var result = _userService.UpdateUserInfo(
+                userId, 
+                updateUserInfoDto.Username, 
+                updateUserInfoDto.ContactNumber, 
+                updateUserInfoDto.RealName
+            );
+
+            if (result.State == 1)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        // 用户修改密码
+        [HttpPut("{userId}/updatePassword")]
+        public IActionResult UpdateUserPassword(string userId, [FromBody] UpdateUserPasswordDto updateUserPasswordDto)
+        {
+            var result = _userService.UpdateUserPassword(userId, updateUserPasswordDto.NewPassword);
+
+            if (result.State == 1)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
         // 其他用户相关操作...
     }
 }

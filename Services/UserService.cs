@@ -197,6 +197,56 @@ namespace VenueBookingSystem.Services
             }
         }
 
+        public UpdateResult UpdateUserInfo(string userId, string username, string contactNumber, string realName)
+        {
+            var user = _userRepository.Find(u => u.UserId == userId).FirstOrDefault();
+            if (user == null)
+            {
+                return new UpdateResult
+                {
+                    State = 0,
+                    Info = "用户未找到"
+                };
+            }
+
+            // 更新用户信息
+            user.Username = username;
+            user.ContactNumber = contactNumber;
+            user.RealName = realName;
+
+            _userRepository.Update(user);
+
+            return new UpdateResult
+            {
+                State = 1,
+                Info = "用户信息更新成功"
+            };
+        }
+
+        public UpdateResult UpdateUserPassword(string userId, string newPassword)
+        {
+            var user = _userRepository.Find(u => u.UserId == userId).FirstOrDefault();
+            if (user == null)
+            {
+                return new UpdateResult
+                {
+                    State = 0,
+                    Info = "用户未找到"
+                };
+            }
+
+            // 更新用户密码
+            user.Password = HashPassword(newPassword);
+
+            _userRepository.Update(user);
+
+            return new UpdateResult
+            {
+                State = 1,
+                Info = "用户密码更新成功"
+            };
+        }
+
 
 
         // 密码哈希处理

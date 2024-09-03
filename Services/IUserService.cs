@@ -14,6 +14,9 @@ namespace VenueBookingSystem.Services
         User GetUserById(string userId);
         UserGroupInfoDto GetUserGroupInfo(string userId);
 
+        UpdateResult UpdateUserInfo(string userId, string username, string contactNumber, string realName);
+        UpdateResult UpdateUserPassword(string userId, string newPassword);
+
         IEnumerable<UserNotificationDto> GetUserNotifications(string userId);
     }
 }

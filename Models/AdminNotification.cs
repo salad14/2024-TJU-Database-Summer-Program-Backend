@@ -6,6 +6,7 @@ namespace VenueBookingSystem.Models
     {
         public required string NotificationId { get; set; } // 通知ID
         public string AdminId { get; set; } // 管理员ID
+        public string? NewAdminId { get; set; } // 新注册的管理员ID
         public string NotificationType { get; set; } = string.Empty; // 通知类型
         public string Title { get; set; } = string.Empty; // 通知标题
         public string Content { get; set; } = string.Empty; // 通知内容

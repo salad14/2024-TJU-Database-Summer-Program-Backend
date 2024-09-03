@@ -12,4 +12,10 @@ namespace VenueBookingSystem.Models
         public string? VenueImageUrl { get; set; } // 场地图片 URL
         public string? VenueDescription{ get; set; } 
     }
+
+    public class VenueInfoDto
+    {
+        public string VenueId { get; set; }
+        public string VenueName { get; set; }
+    }
 }

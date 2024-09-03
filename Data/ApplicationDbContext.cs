@@ -16,6 +16,7 @@ namespace VenueBookingSystem.Data
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<UserReservation> UserReservations { get; set; }
         public DbSet<Announcement> Announcements { get; set; }
+        public DbSet<VenueAnnouncement> VenueAnnouncements { get; set; } 
         public DbSet<Group> Groups { get; set; }  // 添加 Group 实体
         public DbSet<GroupUser> GroupUsers { get; set; }  // 添加 GroupUser 实体
         public DbSet<UserNotification> UserNotifications { get; set; }
@@ -137,6 +138,19 @@ namespace VenueBookingSystem.Data
             //配置VenueManagement的复合主键
             modelBuilder.Entity<VenueManagement>()
                 .HasKey(vm => new { vm.VenueId, vm.AdminId });
+
+            modelBuilder.Entity<VenueAnnouncement>()
+                .HasKey(va => new { va.VenueId, va.AnnouncementId });
+
+            modelBuilder.Entity<VenueAnnouncement>()
+                .HasOne(va => va.Venue)
+                .WithMany(v => v.VenueAnnouncements)
+                .HasForeignKey(va => va.VenueId);
+
+            modelBuilder.Entity<VenueAnnouncement>()
+                .HasOne(va => va.Announcement)
+                .WithMany(a => a.VenueAnnouncements)
+                .HasForeignKey(va => va.AnnouncementId);
 
             // 这里可以添加其他实体的配置，例如关系、约束等
         }
