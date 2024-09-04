@@ -79,6 +79,9 @@ builder.Services.AddScoped<IUserGroupInfoService, UserGroupInfoService>();
 builder.Services.AddScoped<IVenueAnalysisService, VenueAnalysisService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 
+// 注册 IReservationService 接口及其实现
+builder.Services.AddScoped<IReservationService, ReservationService>();
+
 var app = builder.Build();
 
 // 配置HTTP请求管道
