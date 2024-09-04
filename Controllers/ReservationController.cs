@@ -5,33 +5,27 @@ using VenueBookingSystem.Services;
 
 namespace VenueBookingSystem.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     [EnableCors("AllowSpecificOrigins")]
-    public class ReservationController : Controller
+    public class ReservationController : ControllerBase
     {
         private readonly IReservationService _reservationService;
 
-        // 构造函数，注入预约服务
         public ReservationController(IReservationService reservationService)
         {
             _reservationService = reservationService;
         }
 
-        // 创建新预约
-        [HttpPost]
-        public IActionResult CreateReservation(ReservationDto reservationDto)
+        [HttpPost("createReservation")]
+        public IActionResult CreateReservation([FromBody] ReservationDto reservationDto,[FromQuery]string UserId)
         {
-            _reservationService.CreateReservation(reservationDto);
-            return Ok("预约创建成功");
+            var result = _reservationService.CreateReservation(reservationDto,UserId);
+            if (result.State == 1)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
         }
-
-        // 取消预约
-        [HttpPost]
-        public IActionResult CancelReservation(int reservationId)
-        {
-            _reservationService.CancelReservation(reservationId);
-            return Ok("预约取消成功");
-        }
-
-        // 其他预约相关操作...
     }
 }

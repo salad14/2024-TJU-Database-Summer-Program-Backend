@@ -24,7 +24,7 @@ namespace VenueBookingSystem.Data
         public DbSet<MaintenanceRecord> MaintenanceRecords { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<VenueEquipment> VenueEquipments { get; set; }
-        public DbSet<VenueAvailability> VenueAvailabilities { get; set; } 
+        public DbSet<VenueAvailability> VenueAvailabilities { get; set; }
         public DbSet<VenueManagement> VenueManagements { get; set; }
        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -58,6 +58,9 @@ namespace VenueBookingSystem.Data
                 .HasOne(va => va.Announcement)
                 .WithMany(a => a.VenueAnnouncements)
                 .HasForeignKey(va => va.AnnouncementId);
+            //配置Reservation的主键
+            modelBuilder.Entity<Reservation>()
+                .HasKey(r => r.ReservationId);
 
             // 配置 User 和 Reservation 之间的多对多关系
             modelBuilder.Entity<UserReservation>()

@@ -66,6 +66,13 @@ namespace VenueBookingSystem.Dto
         public string Info { get; set; } // 错误或成功信息
     }
 
+    public class ReservationResult
+    {
+        public int State { get; set; }  // 预约操作结果，0为失败，1为成功
+        public string ReservationId { get; set; }  // 预约ID
+        public string Info { get; set; }  // 结果说明
+    }
+
 
 
 

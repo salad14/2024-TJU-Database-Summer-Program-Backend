@@ -25,11 +25,12 @@ namespace VenueBookingSystem.Models
 
     public class UserNotificationDto
     {
-        public string NotificationId { get; set; } // 通知ID
-        public string NotificationType { get; set; } // 通知类型
-        public string Title { get; set; } // 通知标题
-        public string Content { get; set; } // 通知内容
-        public DateTime NotificationTime { get; set; } // 通知时间
+        public string NotificationId { get; set; }  // 通知ID
+        public string UserId { get; set; }  // 用户ID
+        public string NotificationType { get; set; }  // 通知类型 (例如 'reservation')
+        public string Title { get; set; }  // 通知标题
+        public string Content { get; set; }  // 通知内容
+        public DateTime NotificationTime { get; set; }  // 通知时间
     }
 
     public class UserGroupDetailDto

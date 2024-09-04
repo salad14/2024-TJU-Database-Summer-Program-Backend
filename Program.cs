@@ -77,6 +77,7 @@ builder.Services.AddScoped<IUserPersonalInfoService, UserPersonalInfoService>();
 builder.Services.AddScoped<IVenueMaintenanceService, VenueMaintenanceService>();
 builder.Services.AddScoped<IUserGroupInfoService, UserGroupInfoService>();
 builder.Services.AddScoped<IVenueAnalysisService, VenueAnalysisService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
 
 var app = builder.Build();
 

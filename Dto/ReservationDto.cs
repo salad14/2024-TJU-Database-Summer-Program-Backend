@@ -2,12 +2,21 @@ namespace VenueBookingSystem.Dto
 {
     public class ReservationDto
     {
-        public decimal PaymentAmount { get; set; }  
-        public string UserId { get; set; }  
-        public string VenueId { get; set; }  
-        public string AvailabilityId { get; set; }  
-        public string ReservationItem { get; set; }  
-        
-        public required string ReservationType { get; set; }  
+        public decimal PaymentAmount { get; set; }  // 支付金额
+        public string VenueId { get; set; }  // 场地ID
+        public string AvailabilityId { get; set; }  // 开放时间段ID
+        public string ReservationItem { get; set; }  // 预约项目 (比如租借的设备或场地)
+        public required string ReservationType { get; set; }  // 预约类型，必填字段
+
+        public int NumOfPeople { get; set; } 
+    }
+
+    public class UserReservationDto
+    {
+        public string UserId { get; set; }  // 用户ID
+        public string ReservationId { get; set; }  // 预约ID (来自 `Reservations` 表)
+        public int NumOfPeople { get; set; }  // 预约人数
+        public string Status { get; set; } = "已预约";  // 默认预约状态
+        public DateTime? CheckInTime { get; set; }  // 签到时间 (可以为null)
     }
 }

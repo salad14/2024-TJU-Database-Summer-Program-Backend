@@ -4,74 +4,122 @@ using VenueBookingSystem.Data;  // 引入 IRepository<T> 和 Repository<T> 所�
 
 namespace VenueBookingSystem.Services
 {
-    // 定义 IReservationService 接口
-    public interface IReservationService
-    {
-        // 创建预约的方法签名
-        void CreateReservation(ReservationDto reservationDto);
-
-        // 取消预约的方法签名
-        void CancelReservation(int reservationId);
-    }
-
     // 实现 IReservationService 接口的 ReservationService 类
     public class ReservationService : IReservationService
     {
         private readonly IRepository<Reservation> _reservationRepository;  // 预约存储库，用于与数据库交互
         private readonly IRepository<User> _userRepository;  // 用户存储库，用于查找和管理用户数据
         private readonly IRepository<Venue> _venueRepository;  // 场地存储库，用于查找和管理场地数据
+        private readonly ApplicationDbContext _context;
 
         // 构造函数，通过依赖注入初始化存储库
         public ReservationService(IRepository<Reservation> reservationRepository,
                                   IRepository<User> userRepository,
-                                  IRepository<Venue> venueRepository)
+                                  IRepository<Venue> venueRepository,
+                                  ApplicationDbContext context)
         {
             _reservationRepository = reservationRepository;
             _userRepository = userRepository;
             _venueRepository = venueRepository;
+            _context = context;
         }
 
-        // 创建预约
-        public void CreateReservation(ReservationDto reservationDto)
+        public ReservationResult CreateReservation(ReservationDto reservationDto, string userId)
         {
-            // 从数据库中获取与预约相关的 User 和 Venue 对象
-            var user = _userRepository.GetById(reservationDto.UserId);
-            var venue = _venueRepository.GetById(reservationDto.VenueId);
+            // 检查时间段的剩余容量
+            var availability = _context.VenueAvailabilities.FirstOrDefault(a => a.AvailabilityId == reservationDto.AvailabilityId);
 
-            // 如果未找到对应的用户或场地，抛出异常
-            if (user == null || venue == null)
+            if (availability == null)
             {
-                throw new ArgumentException("用户或场地未找到");
+                return new ReservationResult
+                {
+                    State = 0,
+                    ReservationId = null,
+                    Info = "未找到指定的开放时间段"
+                };
             }
 
-            // 创建新的预约对象，并设置其属性
+            // 检查剩余容量
+            if (availability.RemainingCapacity < reservationDto.NumOfPeople)
+            {
+                return new ReservationResult
+                {
+                    State = 0,
+                    ReservationId = null,
+                    Info = "剩余容量不足"
+                };
+            }
+
+            // 减少剩余容量
+            availability.RemainingCapacity -= reservationDto.NumOfPeople;
+            _context.SaveChanges();
+
+            // 生成唯一的预约ID
+            var reservationId = GenerateUniqueReservationId();
+
+            // 创建预约记录
             var reservation = new Reservation
             {
-                ReservationId = Guid.NewGuid().ToString(), // 自动生成 ReservationId
-                PaymentAmount = reservationDto.PaymentAmount,  // 设置支付金额
-                VenueId = reservationDto.VenueId,  // 设置关联的场地ID
-                AvailabilityId = reservationDto.AvailabilityId,  // 设置关联的开放时间段ID
-                ReservationItem = reservationDto.ReservationItem,  // 设置预约项目描述
-                ReservationTime = DateTime.UtcNow,  // 设置预约操作时间
-                ReservationType =reservationDto.ReservationType,
-                Venue = venue
+                ReservationId = reservationId,
+                VenueId = reservationDto.VenueId,
+                AvailabilityId = reservationDto.AvailabilityId,
+                ReservationType = reservationDto.ReservationType,
+                ReservationTime = DateTime.UtcNow,
+                PaymentAmount = reservationDto.PaymentAmount,
+                ReservationItem = reservationDto.ReservationItem
             };
 
-            // 将新的预约记录添加到数据库
-            _reservationRepository.Add(reservation);
+            _context.Reservations.Add(reservation);
+            _context.SaveChanges();
+
+            // 创建用户预约关系
+            var userReservation = new UserReservation
+            {
+                UserId = userId,
+                ReservationId = reservationId,
+                NumOfPeople = reservationDto.NumOfPeople,
+                Status = "已预约",
+                CheckInTime = null
+            };
+
+            _context.UserReservations.Add(userReservation);
+            _context.SaveChanges();
+
+            // 生成用户通知
+            var notification = new UserNotification
+            {
+                UserId = userId,
+                NotificationId = GenerateUniqueNotificationId(),
+                NotificationType = "reservation",
+                Title = "预约成功通知",
+                Content = $"您已成功预约场地 {reservationDto.VenueId}，时间段为 {availability.StartTime} - {availability.EndTime}，请按时到场",
+                NotificationTime = DateTime.UtcNow
+            };
+
+            _context.UserNotifications.Add(notification);
+            _context.SaveChanges();
+
+            return new ReservationResult
+            {
+                State = 1,
+                ReservationId = reservationId,
+                Info = ""
+            };
         }
 
-        // 取消预约
-        public void CancelReservation(int reservationId)
+
+        private string GenerateUniqueReservationId()
         {
-            // 通过预约ID从数据库中获取预约对象
-            var reservation = _reservationRepository.GetById(reservationId);
-            
-            // 如果找到对应的预约记录，删除它
-            if (reservation != null)
-            {
-                _reservationRepository.Delete(reservation);
-            }
+            // 获取当前最大的预约ID，如果没有预约记录，则从100001开始
+            var maxId = _context.Reservations.Max(r => (int?)Convert.ToInt32(r.ReservationId)) ?? 100000;
+            return (maxId + 1).ToString();
+        }
+
+        private string GenerateUniqueNotificationId()
+        {
+            // 获取当前最大的通知ID，如果没有通知记录，则从100001开始
+            var maxId = _context.UserNotifications.Max(n => (int?)Convert.ToInt32(n.NotificationId)) ?? 100000;
+            return (maxId + 1).ToString();
         }
     }
 }
