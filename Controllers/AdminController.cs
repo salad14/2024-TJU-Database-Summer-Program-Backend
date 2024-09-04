@@ -3,7 +3,10 @@ using VenueBookingSystem.Services;
 using System;
 using VenueBookingSystem.Models;
 using Microsoft.AspNetCore.Cors;
+<<<<<<< HEAD
 using VenueBookingSystem.Dto;
+=======
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
 
 namespace VenueBookingSystem.Controllers
 {
@@ -51,6 +54,7 @@ namespace VenueBookingSystem.Controllers
             }
         }
 
+<<<<<<< HEAD
         [HttpPost("register")]
         public IActionResult RegisterAdmin([FromBody] AdminDto adminDto, [FromQuery] List<string> manageVenues)
         {
@@ -71,6 +75,8 @@ namespace VenueBookingSystem.Controllers
         }
 
 
+=======
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
 
         // 其他的 Admin 相关方法可以类似于此处添加
     }

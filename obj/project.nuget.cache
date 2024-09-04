@@ -1,8 +1,14 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "Nbcj+nItCSD3Va76+sK8MkqmoVBybAk4MNSIYaxGlz0kuBdp9u4ArEuVlPyZAFn3Rf/0kzVeeMCEzjmoiWbcdQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\17132\\Desktop\\20240903\\2024-TJU-Database-Summer-Program-Backend-main\\sports_management.csproj",
+=======
+  "dgSpecHash": "cv6UcUw/9NC9El2ptmKHBeQWHHgj0ImRcq/5neWjXBjACi2elZG/bZj/7M9sbpyqIWe9LjZDZVodaWHgPb+aIQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\17132\\Desktop\\20240901161800\\2024-TJU-Database-Summer-Program-Backend-main (2)\\2024-TJU-Database-Summer-Program-Backend-main\\sports_management.csproj",
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
   "expectedPackageFiles": [
     "C:\\Users\\17132\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\17132\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",

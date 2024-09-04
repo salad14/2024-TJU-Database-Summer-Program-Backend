@@ -10,6 +10,7 @@ namespace VenueBookingSystem.Services
 
         // 添加新场地的方法签名
         void AddVenue(VenueDto venueDto);
+<<<<<<< HEAD
 
         // 获取所有不同ID的场地
         IEnumerable<VenueDto> GetAllVenueDetails();
@@ -26,5 +27,7 @@ namespace VenueBookingSystem.Services
 
         // 获取所有场地信息详情公告
         VenueAnnouncementDto GetVenueDetailsAnnouncement(string venueId);
+=======
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
     }
 }

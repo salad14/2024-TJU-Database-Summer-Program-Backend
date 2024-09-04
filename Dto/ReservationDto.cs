@@ -2,11 +2,17 @@ namespace VenueBookingSystem.Dto
 {
     public class ReservationDto
     {
+<<<<<<< HEAD
+=======
+       public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
         public decimal PaymentAmount { get; set; }  
         public string UserId { get; set; }  
         public string VenueId { get; set; }  
         public string AvailabilityId { get; set; }  
         public string ReservationItem { get; set; }  
+<<<<<<< HEAD
         
         public required string ReservationType { get; set; }  
     }
@@ -73,4 +79,8 @@ namespace VenueBookingSystem.Dto
        
     }
 
+=======
+        public int NumOfPeople { get; set; }  
+    }
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
 }

@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using VenueBookingSystem.Data;
+<<<<<<< HEAD
 using VenueBookingSystem.Dto;
+=======
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
 using VenueBookingSystem.Models;
 
 namespace VenueBookingSystem.Services
@@ -38,6 +41,10 @@ namespace VenueBookingSystem.Services
             .Select(a => new AdminRequestDto
             {
                 AdminId = a.AdminId,
+<<<<<<< HEAD
+=======
+                Username = a.Username,
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
                 ContactNumber = a.ContactNumber,
                 Password = a.Password
             });
@@ -60,6 +67,14 @@ namespace VenueBookingSystem.Services
             })
             .ToList();
 
+<<<<<<< HEAD
+=======
+
+
+
+
+
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
             if (notifications == null)
             {
                 return Enumerable.Empty<object>(); // 如果没有找到通知，返回一个空的集合
@@ -69,6 +84,7 @@ namespace VenueBookingSystem.Services
         }
 
 
+<<<<<<< HEAD
         public RegisterResult RegisterAdmin(AdminDto adminDto, List<string> manageVenues)
         {
             try
@@ -150,6 +166,8 @@ namespace VenueBookingSystem.Services
             return adminId;
         }
 
+=======
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
 
         // 其他方法的实现...
     }

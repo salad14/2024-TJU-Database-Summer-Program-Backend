@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 using System.Linq;
+=======
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
 using VenueBookingSystem.Models;
 using VenueBookingSystem.Data;
 
@@ -7,6 +10,7 @@ namespace VenueBookingSystem.Services
     public class VenueService : IVenueService
     {
         private readonly IRepository<Venue> _venueRepository;
+<<<<<<< HEAD
         private readonly ApplicationDbContext _context;
 
         // 构造函数，注入存储库和数据库上下文
@@ -14,6 +18,13 @@ namespace VenueBookingSystem.Services
         {
             _venueRepository = venueRepository;
             _context = context;
+=======
+
+        // 构造函数，注入存储库
+        public VenueService(IRepository<Venue> venueRepository)
+        {
+            _venueRepository = venueRepository;
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
         }
 
         // 获取所有场地
@@ -21,6 +32,7 @@ namespace VenueBookingSystem.Services
         {
             return _venueRepository.GetAll();
         }
+<<<<<<< HEAD
         // 获取所有场地信息
         public IEnumerable<VenueDto> GetAllVenueInfos()
         {
@@ -35,6 +47,8 @@ namespace VenueBookingSystem.Services
                 VenueImageUrl = v.VenueImageUrl
             }).ToList();
         }
+=======
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
 
         // 添加新场地
         public void AddVenue(VenueDto venueDto)
@@ -47,6 +61,7 @@ namespace VenueBookingSystem.Services
             };
             _venueRepository.Add(venue);
         }
+<<<<<<< HEAD
         // 实现：获取所有不同ID的场地
         public IEnumerable<VenueDto> GetAllVenueDetails()
         {
@@ -197,3 +212,9 @@ namespace VenueBookingSystem.Services
         // 其他场地服务逻辑...
     }
 }
+=======
+
+        // 其他场地服务逻辑...
+    }
+}
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99

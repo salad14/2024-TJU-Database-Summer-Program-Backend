@@ -24,7 +24,11 @@ namespace VenueBookingSystem.Services
         public void PublishAnnouncement(AnnouncementDto announcementDto)
         {
             var admin = _adminRepository.Find(a => a.AdminId == announcementDto.AdminId).FirstOrDefault();
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
             if (admin == null)
             {
                 throw new ArgumentException("无效的管理员ID");
@@ -90,6 +94,12 @@ namespace VenueBookingSystem.Services
                     Venues = Venues
                 };
             }
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
         }
     }
 }

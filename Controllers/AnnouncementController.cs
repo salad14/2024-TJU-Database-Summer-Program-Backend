@@ -32,6 +32,10 @@ namespace VenueBookingSystem.Controllers
             return Ok(announcements);
         }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
         // 获取某个公告下的场地
         [HttpGet]
         public IActionResult GetAllAnnouncementsById(string Id)
@@ -39,7 +43,10 @@ namespace VenueBookingSystem.Controllers
             var announcements = _announcementService.GetAllAnnouncementsById(Id);
             return Ok(announcements);
         }
+<<<<<<< HEAD
 
         // 其他公告相关操作...
+=======
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
     }
 }

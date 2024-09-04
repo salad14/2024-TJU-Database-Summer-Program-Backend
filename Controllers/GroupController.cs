@@ -124,6 +124,7 @@ namespace VenueBookingSystem.Controllers
 
             return Ok(result);
         }
+<<<<<<< HEAD
 
         [HttpGet("details/{groupId}")]
         public IActionResult GetGroupDetails(string groupId)
@@ -164,5 +165,7 @@ namespace VenueBookingSystem.Controllers
             }
         }
 
+=======
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
     }
 }

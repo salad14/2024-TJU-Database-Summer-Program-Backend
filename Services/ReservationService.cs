@@ -13,16 +13,16 @@ namespace VenueBookingSystem.Services
         // 取消预约的方法签名
         void CancelReservation(int reservationId);
 
-        //获取预约人信息的方法签名
+        // 获取预约人信息的方法签名
         IEnumerable<ReservationDetailDto> GetReservationUser(string reservationId);
 
-        //更新预约用户的方法签名
+        // 更新预约用户的方法签名
         void UpdateReservationUser(UpdateReservationUserDto req);
 
-        //获取所有预约记录的方法签名
+        // 获取所有预约记录的方法签名
         IEnumerable<ReservationListDto> GetReservationList();
 
-        //根据场地ID查找预约记录的方法签名
+        // 根据场地ID查找预约记录的方法签名
         IEnumerable<ReservationVenueListDto> GetReservationVenueList(string venueId);
     }
 
@@ -32,21 +32,19 @@ namespace VenueBookingSystem.Services
         private readonly IRepository<Reservation> _reservationRepository;  // 预约存储库，用于与数据库交互
         private readonly IRepository<User> _userRepository;  // 用户存储库，用于查找和管理用户数据
         private readonly IRepository<Venue> _venueRepository;  // 场地存储库，用于查找和管理场地数据
-
         private readonly IRepository<UserReservation> _userReservation; // 场地存储库，用于查找和管理场地数据
-
         private readonly IRepository<GroupReservationMember> _groupReservationMemberRepository;
 
         // 构造函数，通过依赖注入初始化存储库
         public ReservationService(IRepository<Reservation> reservationRepository,
                                   IRepository<User> userRepository,
-                                  IRepository<Venue> venueRepositor,
+                                  IRepository<Venue> venueRepository,
                                   IRepository<UserReservation> userReservation,
-                                  IRepository<GroupReservationMember> groupReservationMemberRepository
-                                  )
+                                  IRepository<GroupReservationMember> groupReservationMemberRepository)
         {
             _reservationRepository = reservationRepository;
             _userRepository = userRepository;
+            _venueRepository = venueRepository;
             _userReservation = userReservation;
             _groupReservationMemberRepository = groupReservationMemberRepository;
         }
@@ -68,12 +66,15 @@ namespace VenueBookingSystem.Services
             var reservation = new Reservation
             {
                 ReservationId = Guid.NewGuid().ToString(), // 自动生成 ReservationId
+                StartTime = reservationDto.StartTime,  // 设置预约开始时间
+                EndTime = reservationDto.EndTime,  // 设置预约结束时间
                 PaymentAmount = reservationDto.PaymentAmount,  // 设置支付金额
                 VenueId = reservationDto.VenueId,  // 设置关联的场地ID
                 AvailabilityId = reservationDto.AvailabilityId,  // 设置关联的开放时间段ID
                 ReservationItem = reservationDto.ReservationItem,  // 设置预约项目描述
                 ReservationTime = DateTime.UtcNow,  // 设置预约操作时间
-                ReservationType = reservationDto.ReservationType,
+                ReservationType = reservationDto.ReservationType,  // 设置预约类型
+                NumOfPeople = reservationDto.NumOfPeople,  // 设置预约人数
                 Venue = venue
             };
 
@@ -97,7 +98,6 @@ namespace VenueBookingSystem.Services
         // 获取预约人的信息
         public IEnumerable<ReservationDetailDto> GetReservationUser(string reservationId)
         {
-
             var reservation = _userReservation.GetAll().Where(x => x.ReservationId == reservationId).Select(y =>
                 new ReservationDetailDto
                 {
@@ -108,11 +108,10 @@ namespace VenueBookingSystem.Services
                     RealName = y.User.RealName
                 });
 
-            // 如果找到对应的预约记录，删除它
             return reservation;
         }
 
-        //更新预约用户
+        // 更新预约用户
         public void UpdateReservationUser(UpdateReservationUserDto req)
         {
             // 通过预约ID从数据库中获取预约对象
@@ -127,7 +126,7 @@ namespace VenueBookingSystem.Services
             }
         }
 
-        //查找所有预约记录
+        // 查找所有预约记录
         public IEnumerable<ReservationListDto> GetReservationList()
         {
             var reservations = _reservationRepository.GetAll().Select(x => new ReservationListDto
@@ -146,14 +145,11 @@ namespace VenueBookingSystem.Services
                     GroupId = t.GroupId,
                     GroupName = t.Group.GroupName
                 }).ToList(),
-
-
-
             });
             return reservations;
         }
 
-        //根据场地ID查找预约记录
+        // 根据场地ID查找预约记录
         public IEnumerable<ReservationVenueListDto> GetReservationVenueList(string venueId)
         {
             var reservations = _reservationRepository.GetAll().Where(x => x.VenueId == venueId).Select(x => new ReservationVenueListDto
@@ -170,7 +166,5 @@ namespace VenueBookingSystem.Services
             });
             return reservations;
         }
-
-
     }
 }

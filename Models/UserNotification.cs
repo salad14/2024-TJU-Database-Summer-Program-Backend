@@ -9,6 +9,7 @@ namespace VenueBookingSystem.Models
         public string NotificationType { get; set; }  // 通知类型
         public string Title { get; set; }  // 通知标题
         public string Content { get; set; }  // 通知内容
+<<<<<<< HEAD
 
         public string? TargetUser { get; set; }  // 通知内容
         public string? TargetTeam { get; set; }  // 通知内容
@@ -16,6 +17,10 @@ namespace VenueBookingSystem.Models
 
         
 
+=======
+        public DateTime NotificationTime { get; set; }  // 通知时间
+
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
         // 导航属性：关联到用户
         public User? User { get; set; }
     }

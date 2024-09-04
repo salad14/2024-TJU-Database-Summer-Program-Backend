@@ -31,6 +31,7 @@ namespace VenueBookingSystem.Models
         public string Content { get; set; } // 通知内容
         public DateTime NotificationTime { get; set; } // 通知时间
     }
+<<<<<<< HEAD
 
     public class UserGroupDetailDto
     {
@@ -38,4 +39,6 @@ namespace VenueBookingSystem.Models
         public string UserRole { get; set; } // 用户团体地位
         public string UserName { get; set; } // 用户名
     }
+=======
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
 }

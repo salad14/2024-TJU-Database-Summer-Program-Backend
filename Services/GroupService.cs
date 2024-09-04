@@ -125,7 +125,11 @@ namespace VenueBookingSystem.Services
             {
                 UserId = userId,
                 NotificationId = GenerateNotificationId(), // 生成唯一的通知ID
+<<<<<<< HEAD
                 NotificationType = "team/join",  // 通知类型
+=======
+                NotificationType = "团体操作通知",  // 通知类型
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
                 Title = "加入团体确认",  // 通知标题
                 Content = $"管理员 [{userId}] 已将您加入团体 [{group.GroupName}]",
                 NotificationTime = DateTime.UtcNow
@@ -169,7 +173,11 @@ namespace VenueBookingSystem.Services
             {
                 UserId = userId,
                 NotificationId = GenerateNotificationId(),
+<<<<<<< HEAD
                 NotificationType = "team/quit",  // 根据实际需求可以修改
+=======
+                NotificationType = "团体通知",  // 根据实际需求可以修改
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
                 Title = "退出团体",
                 Content = string.IsNullOrEmpty(adminId) 
                     ? $"您已成功退出团体 [{group?.GroupName}]" 
@@ -213,7 +221,11 @@ namespace VenueBookingSystem.Services
             {
                 UserId = userId,
                 NotificationId = GenerateNotificationId(),  // 生成唯一的通知ID
+<<<<<<< HEAD
                 NotificationType = "team/roleChange",  // 通知类型
+=======
+                NotificationType = "团体通知",  // 通知类型
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
                 Title = "团体角色变更",  // 通知标题
                 Content = $"管理员 [{adminId}] 已将您在团体 [{group?.GroupName}] 中的角色更新为 [{userRole}]",
                 NotificationTime = DateTime.UtcNow
@@ -289,6 +301,7 @@ namespace VenueBookingSystem.Services
             return newNotificationId.ToString();
         }
 
+<<<<<<< HEAD
         public GroupDetailDto GetGroupDetailById(string groupId)
         {
             // 获取团体信息
@@ -336,6 +349,8 @@ namespace VenueBookingSystem.Services
         }
 
 
+=======
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
 
     }
 }

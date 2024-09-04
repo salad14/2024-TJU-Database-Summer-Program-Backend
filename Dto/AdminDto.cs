@@ -1,5 +1,6 @@
 namespace VenueBookingSystem.Models
 {
+<<<<<<< HEAD
 
     public class AdminDto
     {
@@ -15,6 +16,14 @@ namespace VenueBookingSystem.Models
         public string? Password { get; set; }
         public string? ContactNumber { get; set; }
         public string? AdminType { get; set; }
+=======
+    public class AdminRequestDto
+    {
+        public string AdminId { get; set; }
+        public string? Username { get; set; }
+        public string? Password { get; set; }
+        public string? ContactNumber { get; set; }
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
     }
 
     public class AdminNotificationDto

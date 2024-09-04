@@ -5,7 +5,10 @@ namespace VenueBookingSystem.Dto
     {
         public int State { get; set; }
         public string? UserId { get; set; }
+<<<<<<< HEAD
         public string? AdminId { get; set; }
+=======
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
         public string? Info { get; set; }
     }
 

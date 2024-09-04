@@ -67,7 +67,7 @@ builder.Services.AddAuthentication(options =>
 
 // 注册应用程序的服务和存储库
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>)); 
-
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IVenueService, VenueService>();
@@ -80,6 +80,8 @@ builder.Services.AddScoped<IVenueAnalysisService, VenueAnalysisService>();
 builder.Services.AddScoped<IVenueAvailabilityServices, VenueAvailabilityService>();
 builder.Services.AddScoped<IUserReservationService, UserReservationService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddScoped<IVenueMaintenanceService, VenueMaintenanceService>();
+
 var app = builder.Build();
 
 // 配置HTTP请求管道

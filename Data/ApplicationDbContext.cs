@@ -12,24 +12,50 @@ namespace VenueBookingSystem.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Venue> Venues { get; set; }
+<<<<<<< HEAD
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<UserReservation> UserReservations { get; set; }
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+        public DbSet<Admin> Admins { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
         public DbSet<Announcement> Announcements { get; set; }
         public DbSet<Group> Groups { get; set; }  // 添加 Group 实体
         public DbSet<GroupUser> GroupUsers { get; set; }  // 添加 GroupUser 实体
         public DbSet<UserNotification> UserNotifications { get; set; }
         public DbSet<AdminNotification> AdminNotifications { get; set; }
+<<<<<<< HEAD
         public DbSet<MaintenanceRecord> MaintenanceRecords { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<VenueEquipment> VenueEquipments { get; set; }
         public DbSet<VenueAvailability> VenueAvailabilities { get; set; } 
         public DbSet<VenueManagement> VenueManagements { get; set; }
        
+=======
+=======
+        public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<Announcement> Announcements { get; set; }
+        public DbSet<Event> Events { get; set; }
+>>>>>>> 6124219dafaa70ec3e921df99c0e4f6746323204
+=======
+        public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<Announcement> Announcements { get; set; }
+        public DbSet<Event> Events { get; set; }
+>>>>>>> 6124219dafaa70ec3e921df99c0e4f6746323204
+
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
             // 配置 Group 和 User 之间的多对多关系
             modelBuilder.Entity<GroupUser>()
                 .HasKey(gu => new { gu.UserId, gu.GroupId });
@@ -131,6 +157,7 @@ namespace VenueBookingSystem.Data
                 .WithMany(u => u.UserNotifications)
                 .HasForeignKey(un => un.UserId);
 
+<<<<<<< HEAD
             // 配置 VenueEquipment 的复合主键
              modelBuilder.Entity<VenueEquipment>()
                 .HasKey(ve => new { ve.EquipmentId, ve.VenueId });
@@ -139,6 +166,15 @@ namespace VenueBookingSystem.Data
                 .HasKey(vm => new { vm.VenueId, vm.AdminId });
 
             // 这里可以添加其他实体的配置，例如关系、约束等
+=======
+            // 这里可以添加其他实体的配置，例如关系、约束等
+=======
+            // 这里可以添加实体配置，例如关系、约束等
+>>>>>>> 6124219dafaa70ec3e921df99c0e4f6746323204
+=======
+            // 这里可以添加实体配置，例如关系、约束等
+>>>>>>> 6124219dafaa70ec3e921df99c0e4f6746323204
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
         }
     }
 }

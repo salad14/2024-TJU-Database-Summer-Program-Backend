@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 using VenueBookingSystem.Models;
 
+=======
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
 namespace VenueBookingSystem.Dto
 {
     public class GroupDto
@@ -8,6 +11,7 @@ namespace VenueBookingSystem.Dto
         public string Description { get; set; } // 团体描述
     }
 
+<<<<<<< HEAD
     public class GroupDetailDto
     {
         public string Description { get; set; } // 团体描述
@@ -15,6 +19,8 @@ namespace VenueBookingSystem.Dto
         public List<UserGroupDetailDto> Users { get; set; } // 团队成员信息
     }
 
+=======
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
     public class UserGroupDto
     {
         public string? GroupId { get; set; } // 团体ID
@@ -47,6 +53,7 @@ namespace VenueBookingSystem.Dto
         public required string AdminId { get; set; }  // 管理员ID，可选
     }
 
+<<<<<<< HEAD
     public class GroupUpdateDto
     {
         public required string GroupId { get; set; } // 团体ID
@@ -54,4 +61,6 @@ namespace VenueBookingSystem.Dto
         public string? Description { get; set; } // 团体描述
     }
 
+=======
+>>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
 }
