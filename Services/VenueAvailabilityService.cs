@@ -1,4 +1,4 @@
-﻿using VenueBookingSystem.Data;
+using VenueBookingSystem.Data;
 using VenueBookingSystem.Models;
 
 namespace sports_management.Services
@@ -30,6 +30,6 @@ namespace sports_management.Services
                 }
             }
             return vaList;
-        }
+        } 
     }
 }
