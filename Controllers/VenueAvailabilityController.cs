@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using sports_management.Services;
@@ -27,7 +27,7 @@ namespace sports_management.Controllers
             {
                 return NotFound("未找到符合要求的场地");
             }
-            return Ok(group);
+            return Ok(group); 
         }
     }
 }
