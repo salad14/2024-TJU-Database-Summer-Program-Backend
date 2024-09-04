@@ -10,6 +10,8 @@ namespace VenueBookingSystem.Services
         void CreateAdmin(Admin admin);
         IEnumerable<object> GetAdminNoticeData(string adminId);
 
+        AdminManagedItemsResultDto GetAdminManagedVenuesAndEquipment(string adminId);
+
         UpdateResult UpdateAdminInfo(string adminId, AdminUpdateDto adminUpdateDto, List<string> manageVenues);
         
         UpdateResult UpdateAdminPassword(string adminId, string newPassword);

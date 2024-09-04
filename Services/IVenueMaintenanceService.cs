@@ -1,5 +1,4 @@
-﻿using sports_management.Dto;
-using VenueBookingSystem.Models;
+﻿using VenueBookingSystem.Models;
 
 namespace sports_management.Services
 {

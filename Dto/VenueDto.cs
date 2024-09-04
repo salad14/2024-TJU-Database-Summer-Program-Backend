@@ -3,6 +3,7 @@ namespace VenueBookingSystem.Models
     // 定义 VenueDto 类
     public class VenueDto
     {
+        public string? VenueId { get; set; }  // 场地名称
         public required string Name { get; set; }  // 场地名称
         public required string Type { get; set; }  // 场地类型
         public int Capacity { get; set; }  // 场地容纳人数
@@ -18,4 +19,6 @@ namespace VenueBookingSystem.Models
         public string VenueId { get; set; }
         public string VenueName { get; set; }
     }
+
+    
 }

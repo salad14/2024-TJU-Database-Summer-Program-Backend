@@ -27,6 +27,8 @@ namespace VenueBookingSystem.Data
         public DbSet<VenueAvailability> VenueAvailabilities { get; set; }
         public DbSet<VenueManagement> VenueManagements { get; set; }
         public DbSet<GroupReservationMember> GroupReservationMembers { get; set; }
+        public DbSet<VenueMaintenance> VenueMaintenances { get; set; }
+        public DbSet<VenueMaintenance> VenueMaintenancesDto { get; set; }
        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -59,6 +61,7 @@ namespace VenueBookingSystem.Data
                 .HasOne(va => va.Announcement)
                 .WithMany(a => a.VenueAnnouncements)
                 .HasForeignKey(va => va.AnnouncementId);
+                
             //配置Reservation的主键
             modelBuilder.Entity<Reservation>()
                 .HasKey(r => r.ReservationId);
@@ -139,6 +142,7 @@ namespace VenueBookingSystem.Data
             // 配置 VenueEquipment 的复合主键
              modelBuilder.Entity<VenueEquipment>()
                 .HasKey(ve => new { ve.EquipmentId, ve.VenueId });
+
             //配置VenueManagement的复合主键
             modelBuilder.Entity<VenueManagement>()
                 .HasKey(vm => new { vm.VenueId, vm.AdminId });
@@ -155,6 +159,8 @@ namespace VenueBookingSystem.Data
                 .HasOne(va => va.Announcement)
                 .WithMany(a => a.VenueAnnouncements)
                 .HasForeignKey(va => va.AnnouncementId);
+
+            
 
             // 这里可以添加其他实体的配置，例如关系、约束等
         }

@@ -1,3 +1,5 @@
+using VenueBookingSystem.Models;
+
 namespace VenueBookingSystem.Dto
 {
     // 注册结果类
@@ -73,8 +75,76 @@ namespace VenueBookingSystem.Dto
         public string Info { get; set; }  // 结果说明
     }
 
+    public class AddAvailabilityResult
+    {
+        public int State { get; set; } // 0为添加失败，1为添加成功
+        public string AvailabilityId { get; set; } // 开放时间段ID，失败时为空
+        public string Info { get; set; } // 返回操作结果的说明
+    }
 
+    public class AddDeviceResult
+    {
+        public int State { get; set; } // 0为添加失败，1为添加成功
+        public string DeviceId { get; set; } // 设备ID，失败时为空
+        public string Info { get; set; } // 添加结果的说明，成功时为空，失败时说明失败原因
+    }
 
+    public class AddMaintenanceResult
+    {
+        public int State { get; set; } // 0为添加失败，1为添加成功
+        public string MaintenanceId { get; set; } // 保养记录ID，失败时为空
+        public string Info { get; set; } // 返回操作结果的说明
+    }
+
+    public class AddRepairResult
+    {
+        public int State { get; set; } // 0为添加失败，1为添加成功
+        public string RepairId { get; set; } // 维修记录ID，失败时为空
+        public string Info { get; set; } // 返回操作结果的说明
+    }
+
+    public class DeleteAvailabilityResult
+    {
+        public int State { get; set; } // 0为删除失败，1为删除成功
+        public string Info { get; set; } // 返回操作结果的说明
+    }
+
+    public class EditAvailabilityResult
+    {
+        public int State { get; set; } // 0为修改失败，1为修改成功
+        public string Info { get; set; } // 返回操作结果的说明
+    }
+
+    public class EditDeviceResult
+    {
+        public int State { get; set; } // 0为修改失败，1为修改成功
+        public string Info { get; set; } // 返回操作结果的说明
+    }
+
+    public class EditMaintenanceResult
+    {
+        public int State { get; set; } // 0为修改失败，1为修改成功
+        public string Info { get; set; } // 返回操作结果的说明
+    }
+
+    public class EditRepairResult
+    {
+        public int State { get; set; } // 0为修改失败，1为修改成功
+        public string Info { get; set; } // 返回操作结果的说明
+    }
+
+    public class DeleteAnnouncementResult
+    {
+        public int State { get; set; }
+        public string Info { get; set; }
+    }
+
+    public class AdminManagedItemsResultDto
+    {
+        public int State { get; set; } // 状态：1 成功，0 失败
+        public string Info { get; set; } // 错误信息
+        public AdminManagedItemsDto Data { get; set; } // 场地和设备信息
+    }
 
 
 }

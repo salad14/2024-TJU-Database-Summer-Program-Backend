@@ -9,6 +9,7 @@ namespace VenueBookingSystem.Models
         public string Status { get; set; } // 场地状态
         public IEnumerable<VenueAvailabilityDto> OpenTime { get; set; } // 开放时间信息
         public IEnumerable<EquipmentDto> VenueDevices { get; set; } // 设备信息
+        public IEnumerable<VenueMaintenanceDto> MaintenanceRecords { get; set; } // 保养记录
     }
 
     public class VenueAvailabilityDto

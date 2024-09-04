@@ -69,6 +69,67 @@ namespace VenueBookingSystem.Services
             return notifications;
         }
 
+        public AdminManagedItemsResultDto GetAdminManagedVenuesAndEquipment(string adminId)
+        {
+            try
+            {
+                // 验证管理员ID是否存在
+                var admin = _adminRepository.Find(a => a.AdminId == adminId).FirstOrDefault();
+                if (admin == null)
+                {
+                    return new AdminManagedItemsResultDto
+                    {
+                        State = 0,
+                        Info = "无效的管理员ID",
+                        Data = null
+                    };
+                }
+
+                // 获取管理员管理的场地
+                var managedVenues = _context.VenueManagements
+                    .Where(vm => vm.AdminId == adminId)
+                    .Select(vm => new VenueDto
+                    {
+                        VenueId = vm.VenueId,
+                        Name = _context.Venues.FirstOrDefault(v => v.VenueId == vm.VenueId).Name,
+                        Type = _context.Venues.FirstOrDefault(v => v.VenueId == vm.VenueId).Type
+                    })
+                    .ToList();
+
+                // 获取管理员管理的设备
+                var managedEquipment = _context.Equipments
+                    .Where(e => e.AdminId == adminId)
+                    .Select(e => new EquipmentDto
+                    {
+                        EquipmentId = e.EquipmentId,
+                        EquipmentName = e.EquipmentName
+                    })
+                    .ToList();
+
+                // 返回结果
+                return new AdminManagedItemsResultDto
+                {
+                    State = 1,  // 成功状态
+                    Info = "获取成功",
+                    Data = new AdminManagedItemsDto
+                    {
+                        ManagedVenues = managedVenues,
+                        ManagedEquipment = managedEquipment
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AdminManagedItemsResultDto
+                {
+                    State = 0,
+                    Info = $"获取数据失败: {ex.Message}",
+                    Data = null
+                };
+            }
+        }
+
+
 
         public RegisterResult RegisterAdmin(AdminDto adminDto, List<string> manageVenues,string? systemAdminId = null)
         {
@@ -179,7 +240,7 @@ namespace VenueBookingSystem.Services
 
             do
             {
-                adminId = random.Next(100000, 999999).ToString();
+                adminId = random.Next(10000, 99999).ToString();
             } while (_adminRepository.Find(a => a.AdminId == adminId).Any()); // 确保ID唯一性
 
             return adminId;
@@ -282,6 +343,8 @@ namespace VenueBookingSystem.Services
                 Info = "密码更新成功"
             };
         }
+
+
 
 
 

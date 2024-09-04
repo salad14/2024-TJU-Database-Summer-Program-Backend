@@ -51,5 +51,11 @@ namespace VenueBookingSystem.Models
         public List<string> NoticeVenues { get; set; }  // 场地ID列表
     }
 
+    public class DeleteAnnouncementRequest
+    {
+        public string AnnouncementId { get; set; }
+    }
+
+
 
 }

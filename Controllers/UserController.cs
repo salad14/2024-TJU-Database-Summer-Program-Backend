@@ -99,13 +99,12 @@ namespace VenueBookingSystem.Controllers
 
                 if (!string.IsNullOrEmpty(loginDto.Username))
                 {
-                    loginResult = _userService.AuthenticateByUsername(loginDto.Username, loginDto.Password);
+                    loginResult = _userService.AuthenticateUser("name", loginDto.Username, loginDto.Password);
                 }
                 else
                 {
-                    loginResult = _userService.AuthenticateByUserId(loginDto.UserId, loginDto.Password);
+                    loginResult = _userService.AuthenticateUser("id", loginDto.UserId, loginDto.Password);
                 }
-
                 if (loginResult.State == 1)
                 {
                     var token = _userService.GenerateJwtToken(loginResult.UserId, loginResult.UserName, loginResult.UserType);

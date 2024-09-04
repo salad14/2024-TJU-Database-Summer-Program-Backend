@@ -81,7 +81,6 @@ namespace VenueBookingSystem.Controllers
             return Ok(result);
         }
 
-
         [HttpGet("userallGroup/{userId}")]
         public IActionResult UserAllGroups(string userId)
         {

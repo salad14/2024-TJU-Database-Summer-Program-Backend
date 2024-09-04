@@ -250,6 +250,41 @@ namespace VenueBookingSystem.Services
             };
         }
 
+        public DeleteAnnouncementResult DeleteAnnouncement(string announcementId)
+        {
+            var announcement = _announcementRepository.Find(a => a.AnnouncementId == announcementId).FirstOrDefault();
+            
+            if (announcement == null)
+            {
+                return new DeleteAnnouncementResult
+                {
+                    State = 0,
+                    Info = "公告未找到"
+                };
+            }
+
+            _announcementRepository.Delete(announcement);
+            
+            try
+            {
+                _context.SaveChanges();
+                return new DeleteAnnouncementResult
+                {
+                    State = 1,
+                    Info = "公告删除成功"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new DeleteAnnouncementResult
+                {
+                    State = 0,
+                    Info = $"删除公告时发生错误：{ex.Message}"
+                };
+            }
+        }
+
+
 
 
         private string GenerateUniqueAnnouncementId()

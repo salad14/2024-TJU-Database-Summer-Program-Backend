@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using sports_management.Dto;
 using sports_management.Services;
 using VenueBookingSystem.Data;
 using VenueBookingSystem.Models;

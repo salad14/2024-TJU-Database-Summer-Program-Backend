@@ -6,8 +6,9 @@ namespace VenueBookingSystem.Services
     public interface IUserService
     {
         RegisterResult Register(UserDto userDto);
-        LoginResult AuthenticateByUsername(string username, string password);
-        LoginResult AuthenticateByUserId(string userId, string password);
+        // LoginResult AuthenticateByUsername(string username, string password);
+        // LoginResult AuthenticateByUserId(string userId, string password);
+        LoginResult AuthenticateUser(string mode, string userInfo, string password);
 
         public string GenerateJwtToken(string userId, string userName, string userType);
 

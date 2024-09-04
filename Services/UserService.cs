@@ -20,16 +20,18 @@ namespace VenueBookingSystem.Services
         private readonly IRepository<UserNotification> _userNotificationRepository;
         private readonly IRepository<Group> _groupRepository;
         private readonly IConfiguration _configuration;
+        private readonly IRepository<Admin> _adminRepository;
 
 
         // 构造函数，注入存储库和配置
-        public UserService(IRepository<User> userRepository, IRepository<GroupUser> groupUserRepository, IRepository<Group> groupRepository, IRepository<UserNotification> userNotificationRepository, IConfiguration configuration)
+        public UserService(IRepository<User> userRepository, IRepository<GroupUser> groupUserRepository, IRepository<Group> groupRepository, IRepository<UserNotification> userNotificationRepository, IRepository<Admin> adminRepository, IConfiguration configuration)
         {
             _userRepository = userRepository;
             _groupUserRepository = groupUserRepository;
             _groupRepository = groupRepository;
             _userNotificationRepository = userNotificationRepository;
             _configuration = configuration;
+            _adminRepository = adminRepository;
         }
 
         public User GetUserById(string userId)
@@ -70,8 +72,8 @@ namespace VenueBookingSystem.Services
                     Title = n.Title,
                     Content = n.Content,
                     NotificationTime = n.NotificationTime,
-                    TargetUser = n.TargetUser, 
-                    TargetTeam =n.TargetTeam
+                    TargetUser = n.TargetUser,
+                    TargetTeam = n.TargetTeam
                 }).ToList();
 
             return notifications;
@@ -171,33 +173,121 @@ namespace VenueBookingSystem.Services
             }
         }
 
-        public LoginResult AuthenticateByUserId(string userId, string password)
+        public LoginResult AuthenticateUser(string mode, string userInfo, string password)
         {
-            var user = _userRepository.Find(u => u.UserId == userId).FirstOrDefault();
-
-            if (user != null && user.Password == password)
+            User? user = null;
+            if (mode == "id")
             {
-                return new LoginResult
-                {
-                    State = 1,
-                    UserId = user.UserId,
-                    UserName = user.Username,
-                    UserType = user.UserType,
-                    Info = ""
-                };
+                user = _userRepository.Find(u => u.UserId == userInfo).FirstOrDefault();
+            }
+            else if (mode == "name")
+            {
+                user = _userRepository.Find(u => u.Username == userInfo).FirstOrDefault();
             }
             else
             {
                 return new LoginResult
                 {
                     State = 0,
-                    UserId = string.Empty,
-                    UserName = string.Empty,
-                    UserType = string.Empty,
-                    Info = "账号或密码错误"
+                    UserId = "",
+                    UserName = "",
+                    UserType = "",
+                    Info = "mode参数无效",
                 };
             }
+            if (user != null)
+            {
+                if (user.Password == password)
+                {
+                    return new LoginResult
+                    {
+                        State = 1,
+                        UserId = user.UserId,
+                        UserName = user.Username,
+                        UserType = "normal",
+                        Info = ""
+                    };
+                }
+                else
+                {
+                    return new LoginResult
+                    {
+                        State = 0,
+                        UserId = string.Empty,
+                        UserName = string.Empty,
+                        UserType = string.Empty,
+                        Info = "账号或密码错误"
+                    };
+                }
+            }
+            Admin? admin = null;
+            if (mode == "id")
+            {
+                admin = _adminRepository.Find(u => u.AdminId == userInfo).FirstOrDefault();
+            }
+            else if (mode == "name")
+            {
+                admin = _adminRepository.Find(u => u.RealName == userInfo).FirstOrDefault();
+            }
+            if (admin != null && admin.Password == password)
+            {
+                if (admin.AdminType.StartsWith("team/validate"))
+                {
+                    return new LoginResult
+                    {
+                        State = 0,
+                        UserId = string.Empty,
+                        UserName = string.Empty,
+                        UserType = string.Empty,
+                        Info = "管理员账号审核中"
+                    };
+                }
+                return new LoginResult
+                {
+                    State = 1,
+                    UserId = admin.AdminId,
+                    UserName = admin.RealName,
+                    UserType = admin.AdminType,
+                    Info = ""
+                };
+            }
+            return new LoginResult
+            {
+                State = 0,
+                UserId = string.Empty,
+                UserName = string.Empty,
+                UserType = string.Empty,
+                Info = "账号或密码错误"
+            };
         }
+
+        // public LoginResult AuthenticateByUserId(string userId, string password)
+        // {
+        //     var user = _userRepository.Find(u => u.UserId == userId).FirstOrDefault();
+
+        //     if (user != null && user.Password == password)
+        //     {
+        //         return new LoginResult
+        //         {
+        //             State = 1,
+        //             UserId = user.UserId,
+        //             UserName = user.Username,
+        //             UserType = user.UserType,
+        //             Info = ""
+        //         };
+        //     }
+        //     else
+        //     {
+        //         return new LoginResult
+        //         {
+        //             State = 0,
+        //             UserId = string.Empty,
+        //             UserName = string.Empty,
+        //             UserType = string.Empty,
+        //             Info = "账号或密码错误"
+        //         };
+        //     }
+        // }
 
         public UpdateResult UpdateUserInfo(string userId, string username, string contactNumber, string realName)
         {

@@ -50,6 +50,29 @@ namespace VenueBookingSystem.Controllers
             }
         }
 
+        [HttpGet("{adminId}/managedItems")]
+        public IActionResult GetAdminManagedVenuesAndEquipment(string adminId)
+        {
+            try
+            {
+                var result = _adminService.GetAdminManagedVenuesAndEquipment(adminId);
+                return Ok(new
+                {
+                    Status = 1,
+                    Data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Status = 0,
+                    Info = $"获取管理员管理的场地和设备失败: {ex.Message}"
+                });
+            }
+        }
+
+
         [HttpPost("register")]
         public IActionResult RegisterAdmin([FromBody] AdminDto adminDto, [FromQuery] List<string> manageVenues)
         {
@@ -83,6 +106,7 @@ namespace VenueBookingSystem.Controllers
             var result = _adminService.UpdateAdminPassword(adminId, updateDto.NewPassword);
             return Ok(result);
         }
+
 
 
 

@@ -35,9 +35,15 @@ namespace VenueBookingSystem.Models
         public string AdminType { get; set; } // 管理员类型
     }
 
-        public class UpdateAdminPasswordDto
+    public class UpdateAdminPasswordDto
     {
         public string NewPassword { get; set; } // 新的管理员密码
+    }
+
+    public class AdminManagedItemsDto
+    {
+        public IEnumerable<VenueDto> ManagedVenues { get; set; }
+        public IEnumerable<EquipmentDto> ManagedEquipment { get; set; }
     }
 
 

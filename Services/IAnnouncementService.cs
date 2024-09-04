@@ -13,6 +13,10 @@ namespace VenueBookingSystem.Services
         //管理员添加公告
         AddAnnouncementResult AddAnnouncement(AddAnnouncementDto announcementDto);
 
+        //管理员删除公告
+        DeleteAnnouncementResult DeleteAnnouncement(string announcementId);
+
+
         UpdateAnnouncementResult UpdateAnnouncement(UpdateAnnouncementDto announcementDto);
     }
 }

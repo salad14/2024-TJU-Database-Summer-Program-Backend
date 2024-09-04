@@ -95,6 +95,22 @@ namespace VenueBookingSystem.Controllers
             return Ok(new { Status = 1, AnnouncementId = result.AnnouncementId, Info = result.Info });
         }
 
+        // 管理员删除公告
+        [HttpPost("deleteAnnouncement")]
+        public IActionResult DeleteAnnouncement([FromBody] DeleteAnnouncementRequest request)
+        {
+            var result = _announcementService.DeleteAnnouncement(request.AnnouncementId);
+
+            if (result.State == 0)
+            {
+                return BadRequest(new { Status = 0, Info = result.Info });
+            }
+
+            return Ok(new { Status = 1, Info = result.Info });
+        }
+
+
+
         // 更新公告信息的接口
         [HttpPut("updateAnnouncement")]
         public IActionResult UpdateAnnouncement([FromBody] UpdateAnnouncementDto announcementDto)
