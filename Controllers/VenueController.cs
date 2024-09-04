@@ -177,6 +177,65 @@ namespace VenueBookingSystem.Controllers
                 });
             }
         }
+        // 添加设备信息
+        [HttpPost("AddDevice")]
+        public IActionResult AddDevice([FromBody] AddDeviceRequest request)
+        {
+            var result = _venueService.AddDevice(request.AdminId, request.EquipmentName, request.VenueId, request.InstallationTime);
 
-    }    
+            return Ok(result);
+        }
+       // 编辑设备信息
+        [HttpPut("EditDevice")]
+        public IActionResult EditDevice([FromBody] EditDeviceRequest request)
+        {
+            var result = _venueService.EditDevice(request.EquipmentId, request.EquipmentName, request.VenueId);
+
+            return Ok(result);
+        }
+         // 添加维修信息
+        [HttpPost("AddRepair")]
+        public IActionResult AddRepair([FromBody] AddRepairRequest request)
+        {
+            var result = _venueService.AddRepair(request.EquipmentId, request.MaintenanceStartTime, request.MaintenanceEndTime, request.MaintenanceDetails);
+
+            return Ok(result);
+        }
+        // 编辑维修信息
+        [HttpPut("EditRepair")]
+        public IActionResult EditRepair([FromBody] EditRepairRequest request)
+        {
+            var result = _venueService.EditRepair(request.RepairId, request.MaintenanceStartTime, request.MaintenanceEndTime, request.MaintenanceDetails);
+
+            return Ok(result);
+        }
+
+    }   
+    public class AddDeviceRequest
+    {
+        public string AdminId { get; set; } // 管理员ID
+        public string EquipmentName { get; set; } // 设备名称
+        public string VenueId { get; set; } // 场地ID（可为空）
+        public DateTime? InstallationTime { get; set; } // 设备引进时间（可为空）
+    } 
+    public class EditDeviceRequest
+    {
+        public string EquipmentId { get; set; } // 设备ID
+        public string EquipmentName { get; set; } // 设备名称
+        public string VenueId { get; set; } // 场地ID
+    }
+    public class AddRepairRequest
+    {
+        public string EquipmentId { get; set; } // 设备ID
+        public DateTime MaintenanceStartTime { get; set; } // 维修开始时间
+        public DateTime MaintenanceEndTime { get; set; } // 维修结束时间
+        public string MaintenanceDetails { get; set; } // 维修描述
+    }
+    public class EditRepairRequest
+    {
+        public string RepairId { get; set; } // 维修记录ID
+        public DateTime MaintenanceStartTime { get; set; } // 维修开始时间
+        public DateTime MaintenanceEndTime { get; set; } // 维修结束时间
+        public string MaintenanceDetails { get; set; } // 维修描述
+    }
 }
