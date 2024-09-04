@@ -13,11 +13,11 @@ namespace VenueBookingSystem.Services
 
         GroupRemoveResult RemoveUserFromGroup(string groupId, string userId, string adminId);
 
-        GroupUpdateResult UpdateUserRoleInGroup(string groupId, string userId, string userRole, string adminId);
+        GroupUpdateResult UpdateUserRoleInGroup(string groupId, string userId, string userRole, string adminId, string notificationType);
 
         GroupDetailDto GetGroupDetailById(string groupId);
 
-        bool UpdateGroupInfo(string groupId, string groupName, string description); 
+        bool UpdateGroupInfo(string groupId, string groupName, string description);
 
         // 查找某一用户归属的所有团体
         IEnumerable<UserGroupDto> UserAllGroups(string userId);

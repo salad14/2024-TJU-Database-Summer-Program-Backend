@@ -14,4 +14,13 @@ namespace VenueBookingSystem.Models
     // 导航属性：场地公告关系
     public ICollection<VenueAnnouncement> VenueAnnouncements { get; set; }
     }
+
+    public class AddAnnouncementDto
+    {
+        public string Title { get; set; } // 公告标题
+        public string Content { get; set; } // 公告内容
+        public string AdminId { get; set; } // 发布管理员ID
+        public List<string> NoticeVenues { get; set; } // 场地ID数组
+    }
+
 }

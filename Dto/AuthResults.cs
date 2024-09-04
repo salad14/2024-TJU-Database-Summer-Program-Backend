@@ -52,6 +52,21 @@ namespace VenueBookingSystem.Dto
         public string Info { get; set; } // 信息
     }
 
+    public class AddAnnouncementResult
+    {
+        public int State { get; set; } // 0为失败，1为成功
+        public string AnnouncementId { get; set; } // 返回生成的公告ID
+        public string Info { get; set; } // 成功时为空字符串，失败时返回原因
+    }
+
+    public class UpdateAnnouncementResult
+    {
+        public int State { get; set; } // 0 表示失败，1 表示成功
+        public string AnnouncementId { get; set; } // 更新的公告ID
+        public string Info { get; set; } // 错误或成功信息
+    }
+
+
 
 
 

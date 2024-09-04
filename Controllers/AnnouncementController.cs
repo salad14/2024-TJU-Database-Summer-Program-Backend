@@ -81,6 +81,57 @@ namespace VenueBookingSystem.Controllers
 
             return Ok(result);
         }
+        //管理员添加公告
+        [HttpPost("addAnnouncement")]
+        public IActionResult AddAnnouncement([FromBody] AddAnnouncementDto announcementDto)
+        {
+            var result = _announcementService.AddAnnouncement(announcementDto);
+
+            if (result.State == 0)
+            {
+                return BadRequest(new { Status = 0, Info = result.Info });
+            }
+
+            return Ok(new { Status = 1, AnnouncementId = result.AnnouncementId, Info = result.Info });
+        }
+
+        // 更新公告信息的接口
+        [HttpPut("updateAnnouncement")]
+        public IActionResult UpdateAnnouncement([FromBody] UpdateAnnouncementDto announcementDto)
+        {
+            try
+            {
+                // 调用服务层进行公告的更新
+                var result = _announcementService.UpdateAnnouncement(announcementDto);
+                
+                if (result.State == 1)
+                {
+                    return Ok(new
+                    {
+                        Status = 1,
+                        Info = result.Info,
+                        AnnouncementId = result.AnnouncementId
+                    });
+                }
+                else
+                {
+                    return BadRequest(new
+                    {
+                        Status = 0,
+                        Info = result.Info
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Status = 0,
+                    Info = $"服务器错误: {ex.Message}"
+                });
+            }
+        }
+
 
 
 

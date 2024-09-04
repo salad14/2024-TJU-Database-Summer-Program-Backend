@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq; // 必需的命名空间，用于 LINQ 操作
 using VenueBookingSystem.Data;
+using VenueBookingSystem.Dto;
 using VenueBookingSystem.Models;
 
 namespace VenueBookingSystem.Services
@@ -9,7 +10,6 @@ namespace VenueBookingSystem.Services
     {
         private readonly IRepository<Announcement> _announcementRepository;
         private readonly IRepository<Admin> _adminRepository;
-
         private readonly ApplicationDbContext _context;
         private readonly IRepository<Venue> _venueRepository;
 
@@ -113,6 +113,164 @@ namespace VenueBookingSystem.Services
                 Data = announcementDetails
             };
         }
+
+        public AddAnnouncementResult AddAnnouncement(AddAnnouncementDto announcementDto)
+        {
+            // 检查管理员是否存在
+            var admin = _adminRepository.Find(a => a.AdminId == announcementDto.AdminId).FirstOrDefault();
+            if (admin == null)
+            {
+                return new AddAnnouncementResult
+                {
+                    State = 0,
+                    Info = "管理员ID无效"
+                };
+            }
+
+            // 生成唯一公告ID
+            string announcementId = GenerateUniqueAnnouncementId();
+
+            // 创建并保存公告
+            var announcement = new Announcement
+            {
+                AnnouncementId = announcementId,
+                Title = announcementDto.Title,
+                Content = announcementDto.Content,
+                AdminId = announcementDto.AdminId,
+                PublishedDate = DateTime.UtcNow
+            };
+            _announcementRepository.Add(announcement);
+
+            // 添加场地公告
+            if (announcementDto.NoticeVenues != null && announcementDto.NoticeVenues.Any())
+            {
+                foreach (var venueId in announcementDto.NoticeVenues)
+                {
+                    // 检查场地是否存在
+                    var venue = _context.Venues.FirstOrDefault(v => v.VenueId == venueId);
+                    if (venue == null)
+                    {
+                        return new AddAnnouncementResult
+                        {
+                            State = 0,
+                            Info = $"场地ID {venueId} 不存在"
+                        };
+                    }
+
+                    var venueAnnouncement = new VenueAnnouncement
+                    {
+                        AnnouncementId = announcementId,
+                        VenueId = venueId
+                    };
+                    _context.VenueAnnouncements.Add(venueAnnouncement);
+                }
+            }
+
+            // 保存数据库更改
+            _context.SaveChanges();
+
+            return new AddAnnouncementResult
+            {
+                State = 1,
+                AnnouncementId = announcementId,
+                Info = "公告添加成功"
+            };
+        }
+
+        public UpdateAnnouncementResult UpdateAnnouncement(UpdateAnnouncementDto announcementDto)
+        {
+            // 1. 查找公告
+            var announcement = _announcementRepository.Find(a => a.AnnouncementId == announcementDto.AnnouncementId).FirstOrDefault();
+            if (announcement == null)
+            {
+                return new UpdateAnnouncementResult
+                {
+                    State = 0,
+                    Info = "公告ID无效,未找到对应公告"
+                };
+            }
+
+            // 2. 更新公告的基本信息
+            announcement.Title = announcementDto.Title;
+            announcement.Content = announcementDto.Content;
+            announcement.PublishedDate = DateTime.UtcNow;
+            _announcementRepository.Update(announcement);
+
+            // 3. 处理场地公告关系
+            // 查找现有的场地公告关系
+            var currentVenueAnnouncements = _context.VenueAnnouncements
+                .Where(va => va.AnnouncementId == announcementDto.AnnouncementId)
+                .ToList();
+
+            // 如果前端传递的 noticeVenues 数组为空，删除所有关联
+            if (announcementDto.NoticeVenues == null || !announcementDto.NoticeVenues.Any())
+            {
+                _context.VenueAnnouncements.RemoveRange(currentVenueAnnouncements);
+            }
+            else
+            {
+                // 处理要保留的场地公告关系
+                var venuesToKeep = announcementDto.NoticeVenues.Intersect(currentVenueAnnouncements.Select(va => va.VenueId)).ToList();
+
+                // 删除不存在于 noticeVenues 中的场地公告
+                var venuesToRemove = currentVenueAnnouncements.Where(va => !venuesToKeep.Contains(va.VenueId)).ToList();
+                _context.VenueAnnouncements.RemoveRange(venuesToRemove);
+
+                // 添加新的场地公告
+                foreach (var venueId in announcementDto.NoticeVenues.Except(venuesToKeep))
+                {
+                    // 检查场地是否存在
+                    var venue = _context.Venues.FirstOrDefault(v => v.VenueId == venueId);
+                    if (venue == null)
+                    {
+                        return new UpdateAnnouncementResult
+                        {
+                            State = 0,
+                            Info = $"场地ID {venueId} 不存在"
+                        };
+                    }
+
+                    var venueAnnouncement = new VenueAnnouncement
+                    {
+                        AnnouncementId = announcement.AnnouncementId,
+                        VenueId = venueId
+                    };
+                    _context.VenueAnnouncements.Add(venueAnnouncement);
+                }
+            }
+
+            // 4. 保存所有更改
+            _context.SaveChanges();
+
+            return new UpdateAnnouncementResult
+            {
+                State = 1,
+                AnnouncementId = announcement.AnnouncementId,
+                Info = "公告更新成功"
+            };
+        }
+
+
+        private string GenerateUniqueAnnouncementId()
+        {
+            // 查找数据库中最大的公告ID
+            var maxId = _announcementRepository.GetAll()
+                .OrderByDescending(a => a.AnnouncementId)
+                .Select(a => a.AnnouncementId)
+                .FirstOrDefault();
+
+            // 如果数据库中没有任何公告，则从 100001 开始
+            int newId = 100001;
+            if (int.TryParse(maxId, out int currentMaxId))
+            {
+                newId = currentMaxId + 1;
+            }
+
+            return newId.ToString();
+        }
+
+
+
 
     }
 }

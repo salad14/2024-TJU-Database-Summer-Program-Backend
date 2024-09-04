@@ -1,3 +1,4 @@
+using VenueBookingSystem.Dto;
 using VenueBookingSystem.Models;
 
 namespace VenueBookingSystem.Services
@@ -9,5 +10,9 @@ namespace VenueBookingSystem.Services
          void PublishAnnouncement(AnnouncementDto announcementDto);
         IEnumerable<PublicNoticeDto> GetPublicNoticeData();
         AnnouncementDetailResult GetAllAnnouncementsById(string id);
+        //管理员添加公告
+        AddAnnouncementResult AddAnnouncement(AddAnnouncementDto announcementDto);
+
+        UpdateAnnouncementResult UpdateAnnouncement(UpdateAnnouncementDto announcementDto);
     }
 }

@@ -106,11 +106,11 @@ namespace VenueBookingSystem.Services
                 };
             }
 
-            var groupUser = new GroupUser 
-            { 
-                GroupId = groupId, 
-                UserId = userId, 
-                Group = group, 
+            var groupUser = new GroupUser
+            {
+                GroupId = groupId,
+                UserId = userId,
+                Group = group,
                 User = user,
                 JoinDate = joinDate,
                 RoleInGroup = roleInGroup
@@ -171,8 +171,8 @@ namespace VenueBookingSystem.Services
                 NotificationId = GenerateNotificationId(),
                 NotificationType = "team/quit",  // 根据实际需求可以修改
                 Title = "退出团体",
-                Content = string.IsNullOrEmpty(adminId) 
-                    ? $"您已成功退出团体 [{group?.GroupName}]" 
+                Content = string.IsNullOrEmpty(adminId)
+                    ? $"您已成功退出团体 [{group?.GroupName}]"
                     : $"您已被管理员 [{adminId}] 移出团体 [{group?.GroupName}]",
                 NotificationTime = DateTime.UtcNow
             };
@@ -188,7 +188,7 @@ namespace VenueBookingSystem.Services
             };
         }
 
-        public GroupUpdateResult UpdateUserRoleInGroup(string groupId, string userId, string userRole, string adminId)
+        public GroupUpdateResult UpdateUserRoleInGroup(string groupId, string userId, string userRole, string adminId, string notificationType)
         {
             var groupUser = _groupUserRepository.Find(gu => gu.GroupId == groupId && gu.UserId == userId).FirstOrDefault();
 
@@ -208,14 +208,18 @@ namespace VenueBookingSystem.Services
             // 获取团体信息
             var group = _groupRepository.Find(g => g.GroupId == groupId).FirstOrDefault();
 
+            var notificationContent = notificationType == "roleChange" ?
+                $"管理员 [{adminId}] 已将您在团体 [{group?.GroupName}] 中的角色更新为 [{userRole}]" :
+                $"您已成功加入团体 [{group?.GroupName}]";
+
             // 生成通知
             var notification = new UserNotification
             {
                 UserId = userId,
                 NotificationId = GenerateNotificationId(),  // 生成唯一的通知ID
-                NotificationType = "team/roleChange",  // 通知类型
-                Title = "团体角色变更",  // 通知标题
-                Content = $"管理员 [{adminId}] 已将您在团体 [{group?.GroupName}] 中的角色更新为 [{userRole}]",
+                NotificationType = "team/" + notificationType,  // 通知类型
+                Title = notificationType == "roleChange" ? "团体角色变更" : "加入团体成功",  // 通知标题
+                Content = notificationContent,
                 NotificationTime = DateTime.UtcNow
             };
 
@@ -300,14 +304,14 @@ namespace VenueBookingSystem.Services
 
             // 获取团体成员信息
             var userGroupDetails = from gu in _context.GroupUsers
-                                join u in _context.Users on gu.UserId equals u.UserId
-                                where gu.GroupId == groupId
-                                select new UserGroupDetailDto
-                                {
-                                    UserId = gu.UserId,
-                                    UserRole = gu.RoleInGroup,
-                                    UserName = u.Username
-                                };
+                                   join u in _context.Users on gu.UserId equals u.UserId
+                                   where gu.GroupId == groupId
+                                   select new UserGroupDetailDto
+                                   {
+                                       UserId = gu.UserId,
+                                       UserRole = gu.RoleInGroup,
+                                       UserName = u.Username
+                                   };
 
             return new GroupDetailDto
             {

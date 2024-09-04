@@ -43,4 +43,13 @@ namespace VenueBookingSystem.Models
         public AnnouncementDetailsDto Data { get; set; }
     }
 
+    public class UpdateAnnouncementDto
+    {
+        public string AnnouncementId { get; set; }  // 公告ID
+        public string Title { get; set; }  // 公告标题
+        public string Content { get; set; }  // 公告内容
+        public List<string> NoticeVenues { get; set; }  // 场地ID列表
+    }
+
+
 }

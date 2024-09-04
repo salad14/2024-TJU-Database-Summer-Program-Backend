@@ -35,11 +35,11 @@ namespace VenueBookingSystem.Controllers
             catch (Exception ex)
             {
                 // 处理团体创建时的任何异常，返回失败的 GroupCreateResult
-                return BadRequest(new GroupCreateResult 
-                { 
-                    State = 0, 
-                    GroupId = null, 
-                    Info = $"团体创建失败: {ex.Message}" 
+                return BadRequest(new GroupCreateResult
+                {
+                    State = 0,
+                    GroupId = null,
+                    Info = $"团体创建失败: {ex.Message}"
                 });
             }
         }
@@ -62,9 +62,9 @@ namespace VenueBookingSystem.Controllers
         public IActionResult AddUserToGroup(string groupId, [FromBody] UserJoinGroupDto userJoinGroupDto)
         {
             var result = _groupService.AddUserToGroup(
-                groupId, 
-                userJoinGroupDto.UserId, 
-                userJoinGroupDto.JoinDate, 
+                groupId,
+                userJoinGroupDto.UserId,
+                userJoinGroupDto.JoinDate,
                 userJoinGroupDto.RoleInGroup
             );
             return Ok(result);
@@ -83,22 +83,23 @@ namespace VenueBookingSystem.Controllers
         public IActionResult UserAllGroups(string userId)
         {
             var userGroups = _groupService.UserAllGroups(userId);
-            
+
             // 检查是否没有找到任何团体
             if (!userGroups.Any())
             {
                 // 如果没有找到，返回一个包含空字段的 UserGroupDto 数组
                 return Ok(new
-                {status = 1,
-                message ="获取成功",
-                userGroups = new List<UserGroupDto>(),
+                {
+                    status = 1,
+                    message = "获取成功",
+                    userGroups = new List<UserGroupDto>(),
                 });
             }
             return Ok(new
             {
-                status=1,
+                status = 1,
                 message = "获取成功",
-                userGroups=userGroups
+                userGroups = userGroups
 
             });
         }
@@ -119,7 +120,8 @@ namespace VenueBookingSystem.Controllers
                 updateUserRoleDto.GroupId,
                 updateUserRoleDto.UserId,
                 updateUserRoleDto.UserRole,
-                updateUserRoleDto.AdminId
+                updateUserRoleDto.AdminId,
+                updateUserRoleDto.NotificationType
             );
 
             return Ok(result);
