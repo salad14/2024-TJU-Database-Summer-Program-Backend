@@ -18,9 +18,10 @@ namespace VenueBookingSystem.Services
 
         // 获取所有维修记录以及相关设备和场地信息
         IEnumerable<RepairDataDto> GetAllRepairRecords();
-        // 获取指定设备的详细信息
-        DeviceDetailsDto GetDeviceDetails(string equipmentId);
+        // 获取设备详情信息
+        EquipmentDetailsDto GetEquipmentDetails(string equipmentId);
         // 获取所有场地信息的方法签名
         IEnumerable<VenueDto> GetAllVenueInfos();
+       
     }
 }
