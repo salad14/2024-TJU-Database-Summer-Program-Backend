@@ -10,7 +10,7 @@ namespace VenueBookingSystem.Controllers
     {
         private readonly IReservationService _reservationService;
 
-        // 构造函数，注入预约服务
+        // 构造函数，注入预约服务 
         public ReservationController(IReservationService reservationService)
         {
             _reservationService = reservationService;
