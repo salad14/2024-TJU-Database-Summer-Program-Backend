@@ -17,7 +17,7 @@ namespace VenueBookingSystem.Controllers
         private readonly IUserService _userService;
         private readonly IRepository<User> _userRepository;
 
-        // 构造函数，注入用户服务和用户存储库
+        // 构造函数，注入用户服务和用户存储库 
         public UserController(IUserService userService, IRepository<User> userRepository)
         {
             _userService = userService;
