@@ -22,6 +22,11 @@ namespace VenueBookingSystem.Services
         EquipmentDetailsDto GetEquipmentDetails(string equipmentId);
         // 获取所有场地信息的方法签名
         IEnumerable<VenueDto> GetAllVenueInfos();
-       
+        AddDeviceResult AddDevice(string adminId, string equipmentName, string venueId, DateTime? installationTime);
+        EditDeviceResult EditDevice(string equipmentId, string equipmentName, string venueId);
+        // 添加维修信息
+        AddRepairResult AddRepair(string equipmentId, DateTime maintenanceStartTime, DateTime maintenanceEndTime, string maintenanceDetails);
+        // 编辑维修信息
+        EditRepairResult EditRepair(string repairId, DateTime maintenanceStartTime, DateTime maintenanceEndTime, string maintenanceDetails);
     }
 }
