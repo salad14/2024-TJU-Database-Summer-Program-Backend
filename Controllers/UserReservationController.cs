@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using sports_management.Dto;
@@ -8,7 +8,7 @@ using VenueBookingSystem.Services;
 
 namespace sports_management.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]")] 
     [ApiController]
     [EnableCors("AllowSpecificOrigins")]
     public class UserReservationController : ControllerBase
