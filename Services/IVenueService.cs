@@ -28,5 +28,19 @@ namespace VenueBookingSystem.Services
         AddRepairResult AddRepair(string equipmentId, DateTime maintenanceStartTime, DateTime maintenanceEndTime, string maintenanceDetails);
         // 编辑维修信息
         EditRepairResult EditRepair(string repairId, DateTime maintenanceStartTime, DateTime maintenanceEndTime, string maintenanceDetails);
+        // 查询场地的开放时间段
+        IEnumerable<AvailabilityDto> GetVenueAvailabilityByDate(string venueId, DateTime date);
+        // 添加保养信息
+        AddMaintenanceResult AddMaintenance(string venueId, DateTime maintenanceStartDate, DateTime maintenanceEndDate, string description);
+        // 修改保养信息
+        EditMaintenanceResult EditMaintenance(string maintenanceId, DateTime maintenanceStartDate, DateTime maintenanceEndDate, string description);
+        // 修改开放时间段信息
+        EditAvailabilityResult EditAvailability(string availabilityId, DateTime startTime, DateTime endTime, decimal price, int remainingCapacity);
+        // 添加开放时间段信息
+        AddAvailabilityResult AddAvailability(string venueId, DateTime startTime, DateTime endTime, decimal price, int remainingCapacity);
+        // 删除开放时间段
+        DeleteAvailabilityResult DeleteAvailability(string availabilityId);
+
+
     }
 }
