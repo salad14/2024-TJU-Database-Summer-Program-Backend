@@ -1,4 +1,4 @@
-using VenueBookingSystem.Dto;  // 引入 ReservationDto 所在的命名空间
+using VenueBookingSystem.Dto;  // 引入 ReservationDto 所在的命名空间 
 using VenueBookingSystem.Models;
 using VenueBookingSystem.Data;  // 引入 IRepository<T> 和 Repository<T> 所在的命名空间
 
@@ -13,16 +13,16 @@ namespace VenueBookingSystem.Services
         // 取消预约的方法签名
         void CancelReservation(int reservationId);
 
-        // 获取预约人信息的方法签名
+        //获取预约人信息的方法签名
         IEnumerable<ReservationDetailDto> GetReservationUser(string reservationId);
 
-        // 更新预约用户的方法签名
+        //更新预约用户的方法签名
         void UpdateReservationUser(UpdateReservationUserDto req);
 
-        // 获取所有预约记录的方法签名
+        //获取所有预约记录的方法签名
         IEnumerable<ReservationListDto> GetReservationList();
 
-        // 根据场地ID查找预约记录的方法签名
+        //根据场地ID查找预约记录的方法签名
         IEnumerable<ReservationVenueListDto> GetReservationVenueList(string venueId);
     }
 
@@ -73,8 +73,8 @@ namespace VenueBookingSystem.Services
                 AvailabilityId = reservationDto.AvailabilityId,  // 设置关联的开放时间段ID
                 ReservationItem = reservationDto.ReservationItem,  // 设置预约项目描述
                 ReservationTime = DateTime.UtcNow,  // 设置预约操作时间
-                ReservationType = reservationDto.ReservationType,  // 设置预约类型
                 NumOfPeople = reservationDto.NumOfPeople,  // 设置预约人数
+                ReservationType = reservationDto.ReservationType,
                 Venue = venue
             };
 
@@ -87,7 +87,6 @@ namespace VenueBookingSystem.Services
         {
             // 通过预约ID从数据库中获取预约对象
             var reservation = _reservationRepository.GetById(reservationId);
-
             // 如果找到对应的预约记录，删除它
             if (reservation != null)
             {
@@ -111,13 +110,13 @@ namespace VenueBookingSystem.Services
             return reservation;
         }
 
-        // 更新预约用户
+        //更新预约用户
         public void UpdateReservationUser(UpdateReservationUserDto req)
         {
             // 通过预约ID从数据库中获取预约对象
             var userreservation = _userReservation.GetAll().Where(x => x.ReservationId == req.ReservationId && x.UserId == req.UserId).FirstOrDefault();
 
-            // 如果找到对应的预约记录，删除它
+            // 如果找到对应的预约记录，更新它
             if (userreservation != null)
             {
                 userreservation.CheckInTime = req.CheckInTime;
@@ -126,7 +125,7 @@ namespace VenueBookingSystem.Services
             }
         }
 
-        // 查找所有预约记录
+        //查找所有预约记录
         public IEnumerable<ReservationListDto> GetReservationList()
         {
             var reservations = _reservationRepository.GetAll().Select(x => new ReservationListDto
@@ -149,7 +148,7 @@ namespace VenueBookingSystem.Services
             return reservations;
         }
 
-        // 根据场地ID查找预约记录
+        //根据场地ID查找预约记录
         public IEnumerable<ReservationVenueListDto> GetReservationVenueList(string venueId)
         {
             var reservations = _reservationRepository.GetAll().Where(x => x.VenueId == venueId).Select(x => new ReservationVenueListDto
