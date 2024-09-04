@@ -23,6 +23,9 @@ namespace VenueBookingSystem.Data
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<VenueEquipment> VenueEquipments { get; set; }
         public DbSet<VenueAvailability> VenueAvailabilities { get; set; }
+        public DbSet<VenueMaintenance> VenueMaintenances { get; set; }
+        public DbSet<VenueMaintenance> VenueMaintenancesDto { get; set; }
+
 
 
 
