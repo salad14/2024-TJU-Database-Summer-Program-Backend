@@ -297,7 +297,6 @@ namespace VenueBookingSystem.Services
                 }
 
             };
-
             return result;
         }
     }
