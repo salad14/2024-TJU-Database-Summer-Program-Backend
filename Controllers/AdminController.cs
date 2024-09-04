@@ -3,10 +3,7 @@ using VenueBookingSystem.Services;
 using System;
 using VenueBookingSystem.Models;
 using Microsoft.AspNetCore.Cors;
-<<<<<<< HEAD
 using VenueBookingSystem.Dto;
-=======
->>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
 
 namespace VenueBookingSystem.Controllers
 {
@@ -24,20 +21,19 @@ namespace VenueBookingSystem.Controllers
             _adminService = adminService;
         }
 
-        [HttpPost("publicNoticeData")]
-        public IActionResult GetPublicNoticeData([FromBody] AdminRequestDto request)
+        [HttpPost("AdminNoticeData")]
+        public IActionResult GetAdminNoticeData([FromBody] AdminRequestDto request)
         {
             try
             {
-                // 调用服务层获取公告及相关场地信息
-                var result = _adminService.GetPublicNoticeData(request.AdminId);
+                var result = _adminService.GetAdminNoticeData(request.AdminId);
 
                 if (result == null || !result.Any())
                 {
                     return Ok(new 
                     {
                         Status = 1,  // 状态为1表示成功
-                        Info = "没有公告数据",
+                        Info = "没有通知数据",
                         Data = result  // 返回空的结果集
                     });
                 }
@@ -49,12 +45,11 @@ namespace VenueBookingSystem.Controllers
                 return BadRequest(new 
                 { 
                     Status = 0, 
-                    Info = $"获取公告数据失败: {ex.Message}" 
+                    Info = $"获取通知数据失败: {ex.Message}" 
                 });
             }
         }
 
-<<<<<<< HEAD
         [HttpPost("register")]
         public IActionResult RegisterAdmin([FromBody] AdminDto adminDto, [FromQuery] List<string> manageVenues)
         {
@@ -74,9 +69,24 @@ namespace VenueBookingSystem.Controllers
             }
         }
 
+        [HttpPut("updateAdminInfo/{adminId}")]
+        public IActionResult UpdateAdminInfo(string adminId, [FromBody] AdminUpdateDto adminUpdateDto, [FromQuery] List<string> manageVenues)
+        {
+            var result = _adminService.UpdateAdminInfo(adminId, adminUpdateDto, manageVenues);
+            return Ok(result);
+        }
 
-=======
->>>>>>> 888958e29fe44c188a51fa8e735f1492dd40ae99
+
+        [HttpPut("updatePassword")]
+        public IActionResult UpdateAdminPassword([FromQuery] string adminId, [FromBody] UpdateAdminPasswordDto updateDto)
+        {
+            var result = _adminService.UpdateAdminPassword(adminId, updateDto.NewPassword);
+            return Ok(result);
+        }
+
+
+
+
 
         // 其他的 Admin 相关方法可以类似于此处添加
     }
