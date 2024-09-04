@@ -81,22 +81,14 @@ namespace VenueBookingSystem.Services
 
             return repairData.ToList(); // 将查询结果转换为列表返回
         }
-         // 获取指定场地的详细信息
+         // 获取场地的详细信息
         public VenueDetailsDto GetVenueDetails(string venueId)
         {
+            // 查找场地信息
             var venue = _context.Venues.FirstOrDefault(v => v.VenueId == venueId);
             if (venue == null) return null;
 
-            var openTime = _context.VenueAvailabilities
-                .Where(va => va.VenueId == venueId)
-                .Select(va => new VenueAvailabilityDto
-                {
-                    StartTime = va.StartTime.ToString("HH:mm"),
-                    EndTime = va.EndTime.ToString("HH:mm"),
-                    RemainingCapacity = va.RemainingCapacity,
-                    Price = va.Price
-                }).ToList();
-
+            // 查找设备信息
             var venueDevices = _context.Equipments
                 .Join(_context.VenueEquipments, e => e.EquipmentId, ve => ve.EquipmentId, (e, ve) => new { e, ve })
                 .Where(joined => joined.ve.VenueId == venueId)
@@ -106,6 +98,18 @@ namespace VenueBookingSystem.Services
                     EquipmentName = joined.e.EquipmentName
                 }).ToList();
 
+            // 查找保养记录
+            var maintenanceRecords = _context.VenueMaintenances
+                .Where(vm => vm.VenueId == venueId)
+                .Select(vm => new VenueMaintenanceDto
+                {
+                    VenueMaintenanceId = vm.VenueMaintenanceId,
+                    MaintenanceStartDate = vm.MaintenanceStartDate,
+                    MaintenanceEndDate = vm.MaintenanceEndDate,
+                    Description = vm.Description
+                }).ToList();
+
+            // 返回场地详细信息
             return new VenueDetailsDto
             {
                 VenueId = venue.VenueId,
@@ -113,8 +117,8 @@ namespace VenueBookingSystem.Services
                 Type = venue.Type,
                 Capacity = venue.Capacity,
                 Status = venue.Status,
-                OpenTime = openTime,
-                VenueDevices = venueDevices
+                VenueDevices = venueDevices,
+                MaintenanceRecords = maintenanceRecords
             };
         }
          // 获取设备的详细信息
@@ -341,6 +345,238 @@ namespace VenueBookingSystem.Services
                 {
                     State = 0,
                     Info = $"更新维修记录时出错：{ex.Message}"
+                };
+            }
+        }
+        // 根据日期查询场地的开放时间段
+        public IEnumerable<AvailabilityDto> GetVenueAvailabilityByDate(string venueId, DateTime date)
+        {
+            var availabilities = _context.VenueAvailabilities
+                .Where(va => va.VenueId == venueId && va.StartTime.Date == date.Date)
+                .Select(va => new AvailabilityDto
+                {
+                    AvailabilityId = va.AvailabilityId,
+                    StartTime = va.StartTime,
+                    EndTime = va.EndTime,
+                    Price = va.Price,
+                    RemainingCapacity = va.RemainingCapacity
+                }).ToList();
+
+            return availabilities;
+        }
+        // 添加保养信息
+        public AddMaintenanceResult AddMaintenance(string venueId, DateTime maintenanceStartDate, DateTime maintenanceEndDate, string description)
+        {
+            // 生成唯一的保养记录ID
+            string newMaintenanceId = Guid.NewGuid().ToString();
+
+            // 检查场地是否存在
+            var venue = _context.Venues.FirstOrDefault(v => v.VenueId == venueId);
+            if (venue == null)
+            {
+                return new AddMaintenanceResult
+                {
+                    State = 0,
+                    MaintenanceId = "",
+                    Info = "场地未找到"
+                };
+            }
+
+            // 添加保养记录
+            var venueMaintenance = new VenueMaintenance
+            {
+                VenueMaintenanceId = newMaintenanceId,
+                VenueId = venueId,
+                MaintenanceStartDate = maintenanceStartDate,
+                MaintenanceEndDate = maintenanceEndDate,
+                Description = description
+            };
+
+            _context.VenueMaintenances.Add(venueMaintenance);
+
+            // 保存更改并返回结果
+            try
+            {
+                _context.SaveChanges();
+                return new AddMaintenanceResult
+                {
+                    State = 1,
+                    MaintenanceId = newMaintenanceId,
+                    Info = ""
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AddMaintenanceResult
+                {
+                    State = 0,
+                    MaintenanceId = "",
+                    Info = $"添加保养记录时出错：{ex.Message}"
+                };
+            }
+        }
+         // 修改保养信息
+        public EditMaintenanceResult EditMaintenance(string maintenanceId, DateTime maintenanceStartDate, DateTime maintenanceEndDate, string description)
+        {
+            // 查找保养记录
+            var venueMaintenance = _context.VenueMaintenances.FirstOrDefault(vm => vm.VenueMaintenanceId == maintenanceId);
+            if (venueMaintenance == null)
+            {
+                return new EditMaintenanceResult
+                {
+                    State = 0,
+                    Info = "未找到保养记录"
+                };
+            }
+
+            // 更新保养记录的字段
+            venueMaintenance.MaintenanceStartDate = maintenanceStartDate;
+            venueMaintenance.MaintenanceEndDate = maintenanceEndDate;
+            venueMaintenance.Description = description;
+
+            // 保存修改并返回结果
+            try
+            {
+                _context.SaveChanges();
+                return new EditMaintenanceResult
+                {
+                    State = 1,
+                    Info = "保养记录更新成功"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new EditMaintenanceResult
+                {
+                    State = 0,
+                    Info = $"更新保养记录时出错：{ex.Message}"
+                };
+            }
+        }
+        // 修改开放时间段信息
+        public EditAvailabilityResult EditAvailability(string availabilityId, DateTime startTime, DateTime endTime, decimal price, int remainingCapacity)
+        {
+            // 查找开放时间段记录
+            var availability = _context.VenueAvailabilities.FirstOrDefault(va => va.AvailabilityId == availabilityId);
+            if (availability == null)
+            {
+                return new EditAvailabilityResult
+                {
+                    State = 0,
+                    Info = "未找到开放时间段记录"
+                };
+            }
+
+            // 更新开放时间段记录的字段
+            availability.StartTime = startTime;
+            availability.EndTime = endTime;
+            availability.Price = price;
+            availability.RemainingCapacity = remainingCapacity;
+
+            // 保存修改并返回结果
+            try
+            {
+                _context.SaveChanges();
+                return new EditAvailabilityResult
+                {
+                    State = 1,
+                    Info = "开放时间段记录更新成功"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new EditAvailabilityResult
+                {
+                    State = 0,
+                    Info = $"更新开放时间段记录时出错：{ex.Message}"
+                };
+            }
+        }
+         // 添加开放时间段
+        public AddAvailabilityResult AddAvailability(string venueId, DateTime startTime, DateTime endTime, decimal price, int remainingCapacity)
+        {
+            // 生成唯一的开放时间段ID
+            string newAvailabilityId = Guid.NewGuid().ToString();
+
+            // 检查场地是否存在
+            var venue = _context.Venues.FirstOrDefault(v => v.VenueId == venueId);
+            if (venue == null)
+            {
+                return new AddAvailabilityResult
+                {
+                    State = 0,
+                    AvailabilityId = "",
+                    Info = "场地未找到"
+                };
+            }
+
+            // 添加开放时间段记录
+            var venueAvailability = new VenueAvailability
+            {
+                AvailabilityId = newAvailabilityId,
+                VenueId = venueId,
+                StartTime = startTime,
+                EndTime = endTime,
+                Price = price,
+                RemainingCapacity = remainingCapacity
+            };
+
+            _context.VenueAvailabilities.Add(venueAvailability);
+
+            // 保存更改并返回结果
+            try
+            {
+                _context.SaveChanges();
+                return new AddAvailabilityResult
+                {
+                    State = 1,
+                    AvailabilityId = newAvailabilityId,
+                    Info = ""
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AddAvailabilityResult
+                {
+                    State = 0,
+                    AvailabilityId = "",
+                    Info = $"添加开放时间段时出错：{ex.Message}"
+                };
+            }
+        }
+         // 删除开放时间段
+        public DeleteAvailabilityResult DeleteAvailability(string availabilityId)
+        {
+            // 查找开放时间段记录
+            var availability = _context.VenueAvailabilities.FirstOrDefault(va => va.AvailabilityId == availabilityId);
+            if (availability == null)
+            {
+                return new DeleteAvailabilityResult
+                {
+                    State = 0,
+                    Info = "未找到开放时间段记录"
+                };
+            }
+
+            // 删除记录
+            _context.VenueAvailabilities.Remove(availability);
+
+            // 保存修改并返回结果
+            try
+            {
+                _context.SaveChanges();
+                return new DeleteAvailabilityResult
+                {
+                    State = 1,
+                    Info = "开放时间段记录删除成功"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new DeleteAvailabilityResult
+                {
+                    State = 0,
+                    Info = $"删除开放时间段记录时出错：{ex.Message}"
                 };
             }
         }
