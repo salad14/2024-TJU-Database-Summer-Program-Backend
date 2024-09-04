@@ -18,5 +18,7 @@ namespace VenueBookingSystem.Services
         UpdateResult UpdateUserPassword(string userId, string newPassword);
 
         IEnumerable<UserNotificationDto> GetUserNotifications(string userId);
+
+        UpdateResult DeleteUserNotification(string noticeId);
     }
 }

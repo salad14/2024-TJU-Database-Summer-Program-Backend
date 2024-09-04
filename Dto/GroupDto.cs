@@ -31,6 +31,9 @@ namespace VenueBookingSystem.Dto
         public required string UserId { get; set; }  // 用户ID
         public DateTime JoinDate { get; set; }  // 用户加入时间
         public required string RoleInGroup { get; set; }  // 用户团体地位
+        public string? AdminId { get; set; }
+        public required string NotificationType { get; set; }
+        public string? UserName { get; set; }
     }
 
     public class RemoveUserDto
@@ -45,7 +48,7 @@ namespace VenueBookingSystem.Dto
         public required string GroupId { get; set; }  // 团体ID
         public required string UserRole { get; set; }  // 用户团体地位
         public string? AdminId { get; set; }  // 管理员ID，可选
-        public required string NotificationType { get; set; } // 通知类型
+        public string? NotificationType { get; set; }
     }
 
     public class GroupUpdateDto

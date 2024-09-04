@@ -20,7 +20,7 @@ namespace VenueBookingSystem.Models
         public DateTime JoinDate { get; set; } // 加入时间
         public string RoleInGroup { get; set; } // 团体中的地位
         public string GroupId { get; set; } // 团体ID
-        public string GroupName { get; set; } // 团体名称
+        public string? GroupName { get; set; } // 团体名称
     }
 
     public class UserNotificationDto
@@ -31,6 +31,11 @@ namespace VenueBookingSystem.Models
         public string Title { get; set; }  // 通知标题
         public string Content { get; set; }  // 通知内容
         public DateTime NotificationTime { get; set; }  // 通知时间
+
+        public string TargetTeam { get; set; }
+
+        public string TargetUser { get; set; }
+
     }
 
     public class UserGroupDetailDto

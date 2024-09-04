@@ -23,7 +23,7 @@ namespace VenueBookingSystem.Controllers
             _userService = userService;
             _userRepository = userRepository;
         }
-        
+
         // 查找某一用户的所有信息
         [HttpGet("{userId}/info")]
         public IActionResult GetUserInfo(string userId)
@@ -34,7 +34,7 @@ namespace VenueBookingSystem.Controllers
                 return NotFound(new { message = "用户未找到" });
             }
 
-            return Ok(new 
+            return Ok(new
             {
                 UserId = user.UserId,
                 Username = user.Username,
@@ -78,11 +78,11 @@ namespace VenueBookingSystem.Controllers
             catch (Exception ex)
             {
                 // 处理注册时的任何异常，返回失败的 RegisterResult
-                return BadRequest(new RegisterResult 
-                { 
-                    State = 0, 
-                    UserId = null, 
-                    Info = $"注册失败: {ex.Message}" 
+                return BadRequest(new RegisterResult
+                {
+                    State = 0,
+                    UserId = null,
+                    Info = $"注册失败: {ex.Message}"
                 });
             }
         }
@@ -109,10 +109,10 @@ namespace VenueBookingSystem.Controllers
                 if (loginResult.State == 1)
                 {
                     var token = _userService.GenerateJwtToken(loginResult.UserId, loginResult.UserName, loginResult.UserType);
-                    return Ok(new 
-                    { 
+                    return Ok(new
+                    {
                         status = 1,  // 成功状态
-                        token, 
+                        token,
                         loginResult  // 返回所有 loginResult 信息
                     });
                 }
@@ -121,28 +121,28 @@ namespace VenueBookingSystem.Controllers
                     // 根据不同的状态码返回更详细的错误信息
                     string errorMessage = loginResult.Info;
 
-                    return Ok(new 
-                    { 
+                    return Ok(new
+                    {
                         status = 0,  // 失败状态
-                        message = errorMessage 
+                        message = errorMessage
                     });
                 }
             }
             catch (UnauthorizedAccessException)
             {
-                return Unauthorized(new 
-                { 
+                return Unauthorized(new
+                {
                     status = 0,  // 失败状态
-                    message = "无效的凭据" 
+                    message = "无效的凭据"
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new 
-                { 
+                return BadRequest(new
+                {
                     status = 0,  // 失败状态
-                    message = "登录失败", 
-                    error = ex.Message 
+                    message = "登录失败",
+                    error = ex.Message
                 });
             }
         }
@@ -158,19 +158,26 @@ namespace VenueBookingSystem.Controllers
                 // 如果没有找到通知，返回空的通知列表
                 return Ok(new List<UserNotificationDto>());
             }
-            
+
             return Ok(notifications);
         }
 
+        // 删除用户通知
+        [HttpDelete("deleteNotice/{noticeId}")]
+        public IActionResult DeleteUserNotification(string noticeId)
+        {
+            UpdateResult deleteRes = _userService.DeleteUserNotification(noticeId);
+            return Ok(deleteRes);
+        }
 
         // 修改用户信息
         [HttpPut("{userId}/updateInfo")]
         public IActionResult UpdateUserInfo(string userId, [FromBody] UpdateUserInfoDto updateUserInfoDto)
         {
             var result = _userService.UpdateUserInfo(
-                userId, 
-                updateUserInfoDto.Username, 
-                updateUserInfoDto.ContactNumber, 
+                userId,
+                updateUserInfoDto.Username,
+                updateUserInfoDto.ContactNumber,
                 updateUserInfoDto.RealName
             );
 

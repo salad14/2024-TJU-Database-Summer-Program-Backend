@@ -26,6 +26,19 @@ namespace VenueBookingSystem.Services
 
         public ReservationResult CreateReservation(ReservationDto reservationDto, string userId)
         {
+
+            var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
+    
+            if (user == null)
+            {
+                return new ReservationResult
+                {
+                    State = 0,
+                    ReservationId = null,
+                    Info = "无效的用户ID,未找到该用户"
+                };
+            }
+
             // 检查时间段的剩余容量
             var availability = _context.VenueAvailabilities.FirstOrDefault(a => a.AvailabilityId == reservationDto.AvailabilityId);
 
@@ -106,6 +119,130 @@ namespace VenueBookingSystem.Services
                 Info = ""
             };
         }
+
+        public ReservationResult CreateGroupReservation(GroupReservationDto groupReservationDto)
+        {
+
+            // 检查团体是否存在
+            var group = _context.Groups.FirstOrDefault(g => g.GroupId == groupReservationDto.GroupId && g.GroupName == groupReservationDto.GroupName);
+            
+            if (group == null)
+            {
+                return new ReservationResult
+                {
+                    State = 0,
+                    ReservationId = null,
+                    Info = "团体信息有误，未找到指定的团体"
+                };
+            }
+
+            // 检查用户ID是否存在
+            var existingUserIds = _context.Users
+                .Where(u => groupReservationDto.UserIds.Contains(u.UserId))
+                .Select(u => u.UserId)
+                .ToList();
+
+            var missingUserIds = groupReservationDto.UserIds.Except(existingUserIds).ToList();
+
+            if (missingUserIds.Any())
+            {
+                return new ReservationResult
+                {
+                    State = 0,
+                    ReservationId = null,
+                    Info = $"部分用户不存在,缺少的用户ID: {string.Join(", ", missingUserIds)}"
+                };
+            }
+                    // 检查时间段的剩余容量
+            var availability = _context.VenueAvailabilities.FirstOrDefault(a => a.AvailabilityId == groupReservationDto.AvailabilityId);
+
+            if (availability == null)
+            {
+                return new ReservationResult
+                {
+                    State = 0,
+                    ReservationId = null,
+                    Info = "未找到指定的开放时间段"
+                };
+            }
+
+            // 检查剩余容量
+            if (availability.RemainingCapacity < groupReservationDto.UserIds.Count)
+            {
+                return new ReservationResult
+                {
+                    State = 0,
+                    ReservationId = null,
+                    Info = "剩余容量不足"
+                };
+            }
+
+            // 减少剩余容量
+            availability.RemainingCapacity -= groupReservationDto.UserIds.Count;
+            _context.SaveChanges();
+
+            // 生成唯一的预约ID
+            var reservationId = GenerateUniqueReservationId();
+
+            // 创建预约记录
+            var reservation = new Reservation
+            {
+                ReservationId = reservationId,
+                VenueId = groupReservationDto.VenueId,
+                AvailabilityId = groupReservationDto.AvailabilityId,
+                ReservationType = groupReservationDto.ReservationType,
+                ReservationTime = DateTime.UtcNow,
+                PaymentAmount = groupReservationDto.PaymentAmount,
+                ReservationItem = groupReservationDto.ReservationItem
+            };
+
+            _context.Reservations.Add(reservation);
+            _context.SaveChanges();
+
+            // 创建团体预约成员记录
+            var groupReservationMember = new GroupReservationMember
+            {
+                ReservationId = reservationId,
+                GroupId = groupReservationDto.GroupId
+            };
+            _context.GroupReservationMembers.Add(groupReservationMember);
+
+            // 创建用户预约关系
+            foreach (var userId in groupReservationDto.UserIds)
+            {
+                var userReservation = new UserReservation
+                {
+                    UserId = userId,
+                    ReservationId = reservationId,
+                    NumOfPeople = 1,  // 团体预约人数设置为1
+                    Status = "已预约",
+                    CheckInTime = null  // 设置签到时间为 null
+                };
+                _context.UserReservations.Add(userReservation);
+
+                // 生成用户通知
+                var notification = new UserNotification
+                {
+                    UserId = userId,
+                    NotificationId = GenerateUniqueNotificationId(),
+                    NotificationType = "reservation",
+                    Title = "团体预约成功通知",
+                    Content = $"您的团体 {groupReservationDto.GroupName} 已成功预约场地 {groupReservationDto.VenueId}，时间段为 {availability.StartTime} - {availability.EndTime}，请按时到场",
+                    NotificationTime = DateTime.UtcNow
+                };
+                _context.UserNotifications.Add(notification);
+            }
+
+            _context.SaveChanges();
+
+            return new ReservationResult
+            {
+                State = 1,
+                ReservationId = reservationId,
+                Info = ""
+            };
+        }
+
 
 
         private string GenerateUniqueReservationId()

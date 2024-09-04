@@ -73,7 +73,8 @@ namespace VenueBookingSystem.Services
             return _groupRepository.GetAll().ToList();
         }
 
-        public GroupAddResult AddUserToGroup(string groupId, string userId, DateTime joinDate, string roleInGroup)
+        public GroupAddResult AddUserToGroup(string groupId, string userId, DateTime joinDate, string roleInGroup,
+        string notificationType, string? AdminId, string? UserName)
         {
             var group = _groupRepository.Find(g => g.GroupId == groupId).FirstOrDefault();
             var user = _userRepository.Find(u => u.UserId == userId).FirstOrDefault();
@@ -120,15 +121,38 @@ namespace VenueBookingSystem.Services
             group.MemberCount++;
             _groupRepository.Update(group); // 更新成员数量
 
+            if (notificationType == "")
+            {
+                return new GroupAddResult
+                {
+                    State = 1,
+                    Info = "加入成功"
+                };
+            }
+            else if (AdminId == null || UserName == null)
+            {
+                return new GroupAddResult
+                {
+                    State = 0,
+                    Info = "缺少通知参数"
+                };
+            }
+
+            var notificationContent =
+            notificationType == "adminCheck" ? $"用户 [{userId}]（用户名 [{UserName}] 申请加入团体 [{group.GroupName}]" :
+            $"管理员 [{AdminId}]（用户名[{UserName}] 邀请您加入团体 [{group.GroupName}]）";
+
             // 生成通知
             var notification = new UserNotification
             {
-                UserId = userId,
+                UserId = notificationType == "adminCheck" ? AdminId : userId,
                 NotificationId = GenerateNotificationId(), // 生成唯一的通知ID
-                NotificationType = "team/join",  // 通知类型
+                NotificationType = "team/" + notificationType,  // 通知类型
                 Title = "加入团体确认",  // 通知标题
-                Content = $"管理员 [{userId}] 已将您加入团体 [{group.GroupName}]",
-                NotificationTime = DateTime.UtcNow
+                Content = notificationContent,
+                NotificationTime = DateTime.UtcNow,
+                TargetUser = userId,
+                TargetTeam = groupId,
             };
 
 

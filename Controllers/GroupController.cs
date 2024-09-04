@@ -65,13 +65,16 @@ namespace VenueBookingSystem.Controllers
                 groupId,
                 userJoinGroupDto.UserId,
                 userJoinGroupDto.JoinDate,
-                userJoinGroupDto.RoleInGroup
+                userJoinGroupDto.RoleInGroup,
+                userJoinGroupDto.NotificationType,
+                userJoinGroupDto.AdminId,
+                userJoinGroupDto.UserName
             );
             return Ok(result);
         }
 
 
-        [HttpDelete("{groupId}/removeuser")]
+        [HttpPost("{groupId}/removeuser")]
         public IActionResult RemoveUserFromGroup(string groupId, [FromBody] RemoveUserDto removeUserDto)
         {
             var result = _groupService.RemoveUserFromGroup(groupId, removeUserDto.UserId, removeUserDto.AdminId);

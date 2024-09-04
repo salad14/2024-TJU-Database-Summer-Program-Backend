@@ -251,6 +251,7 @@ namespace VenueBookingSystem.Services
         }
 
 
+
         private string GenerateUniqueAnnouncementId()
         {
             // 查找数据库中最大的公告ID

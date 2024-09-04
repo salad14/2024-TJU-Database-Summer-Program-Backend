@@ -69,7 +69,9 @@ namespace VenueBookingSystem.Services
                     NotificationType = n.NotificationType,
                     Title = n.Title,
                     Content = n.Content,
-                    NotificationTime = n.NotificationTime
+                    NotificationTime = n.NotificationTime,
+                    TargetUser = n.TargetUser, 
+                    TargetTeam =n.TargetTeam
                 }).ToList();
 
             return notifications;
@@ -147,24 +149,24 @@ namespace VenueBookingSystem.Services
 
             if (user != null && user.Password == password)
             {
-                return new LoginResult 
-                { 
-                    State = 1, 
-                    UserId = user.UserId, 
-                    UserName = user.Username, 
+                return new LoginResult
+                {
+                    State = 1,
+                    UserId = user.UserId,
+                    UserName = user.Username,
                     UserType = user.UserType,
-                    Info = "" 
+                    Info = ""
                 };
             }
             else
             {
-                return new LoginResult 
-                { 
-                    State = 0, 
-                    UserId = string.Empty, 
-                    UserName = string.Empty, 
-                    UserType = string.Empty, 
-                    Info = "账号或密码错误" 
+                return new LoginResult
+                {
+                    State = 0,
+                    UserId = string.Empty,
+                    UserName = string.Empty,
+                    UserType = string.Empty,
+                    Info = "账号或密码错误"
                 };
             }
         }
@@ -175,24 +177,24 @@ namespace VenueBookingSystem.Services
 
             if (user != null && user.Password == password)
             {
-                return new LoginResult 
-                { 
-                    State = 1, 
-                    UserId = user.UserId, 
-                    UserName = user.Username, 
+                return new LoginResult
+                {
+                    State = 1,
+                    UserId = user.UserId,
+                    UserName = user.Username,
                     UserType = user.UserType,
-                    Info = "" 
+                    Info = ""
                 };
             }
             else
             {
-                return new LoginResult 
-                { 
-                    State = 0, 
-                    UserId = string.Empty, 
-                    UserName = string.Empty, 
-                    UserType = string.Empty, 
-                    Info = "账号或密码错误" 
+                return new LoginResult
+                {
+                    State = 0,
+                    UserId = string.Empty,
+                    UserName = string.Empty,
+                    UserType = string.Empty,
+                    Info = "账号或密码错误"
                 };
             }
         }
@@ -319,5 +321,23 @@ namespace VenueBookingSystem.Services
         }
 
         // 其他用户服务逻辑...
+        public UpdateResult DeleteUserNotification(string noticeId)
+        {
+            var notification = _userNotificationRepository.Find(n => n.NotificationId == noticeId).FirstOrDefault();
+            if (notification == null)
+            {
+                return new UpdateResult
+                {
+                    State = 0,
+                    Info = "通知不存在"
+                };
+            }
+            _userNotificationRepository.Delete(notification);
+            return new UpdateResult
+            {
+                State = 1,
+                Info = "删除成功"
+            };
+        }
     }
 }

@@ -26,6 +26,7 @@ namespace VenueBookingSystem.Data
         public DbSet<VenueEquipment> VenueEquipments { get; set; }
         public DbSet<VenueAvailability> VenueAvailabilities { get; set; }
         public DbSet<VenueManagement> VenueManagements { get; set; }
+        public DbSet<GroupReservationMember> GroupReservationMembers { get; set; }
        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

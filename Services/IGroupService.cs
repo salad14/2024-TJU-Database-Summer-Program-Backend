@@ -9,7 +9,8 @@ namespace VenueBookingSystem.Services
         GroupCreateResult CreateGroup(GroupDto groupDto);
         Group GetGroupById(string groupId);
         IEnumerable<Group> GetAllGroups();
-        GroupAddResult AddUserToGroup(string groupId, string userId, DateTime joinDate, string roleInGroup);
+        GroupAddResult AddUserToGroup(string groupId, string userId, DateTime joinDate, string roleInGroup,
+        string notificationType, string? AdminId, string? UserName);
 
         GroupRemoveResult RemoveUserFromGroup(string groupId, string userId, string adminId);
 

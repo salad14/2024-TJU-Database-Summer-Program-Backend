@@ -17,7 +17,7 @@ namespace VenueBookingSystem.Controllers
             _reservationService = reservationService;
         }
 
-        [HttpPost("createReservation")]
+        [HttpPost("createUserReservation")]
         public IActionResult CreateReservation([FromBody] ReservationDto reservationDto,[FromQuery]string UserId)
         {
             var result = _reservationService.CreateReservation(reservationDto,UserId);
@@ -27,5 +27,17 @@ namespace VenueBookingSystem.Controllers
             }
             return BadRequest(result);
         }
+
+        [HttpPost("createGroupReservation")]
+        public IActionResult CreateGroupReservation([FromBody] GroupReservationDto groupReservationDto)
+        {
+            var result = _reservationService.CreateGroupReservation(groupReservationDto);
+            if (result.State == 1)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+
     }
 }
