@@ -47,11 +47,12 @@ namespace VenueBookingSystem.Services
             };
             _venueRepository.Add(venue);
         }
-        // 实现：获取所有不同ID的场地
+       // 获取所有不同ID的场地
         public IEnumerable<VenueDto> GetAllVenueDetails()
         {
             return _context.Venues.Select(v => new VenueDto
             {
+                VenueId = v.VenueId, // 确保场地ID被返回
                 Name = v.Name,
                 Type = v.Type,
                 Capacity = v.Capacity,
@@ -116,7 +117,8 @@ namespace VenueBookingSystem.Services
                 VenueDevices = venueDevices
             };
         }
-        public DeviceDetailsDto GetDeviceDetails(string equipmentId)
+         // 获取设备的详细信息
+        public EquipmentDetailsDto GetEquipmentDetails(string equipmentId)
         {
             var equipment = _context.Equipments.FirstOrDefault(e => e.EquipmentId == equipmentId);
             if (equipment == null) return null;
@@ -134,18 +136,18 @@ namespace VenueBookingSystem.Services
                     MaintenanceDetails = mr.MaintenanceDetails
                 }).ToList();
 
-            return new DeviceDetailsDto
+            return new EquipmentDetailsDto
             {
                 EquipmentId = equipment.EquipmentId,
                 EquipmentName = equipment.EquipmentName,
-                Status = "Active", // 假设状态为“Active”，可根据实际需求修改
-                EquipmentIntroTime = venueEquipment?.InstallationTime ?? DateTime.MinValue,
+                EquipmentStatus = venueEquipment != null ? "Active" : "Inactive", // 假设状态根据是否有场地来定义
+                EquipmentIntroTime = venueEquipment != null ? venueEquipment.InstallationTime : DateTime.MinValue,
                 VenueId = venue?.VenueId,
                 VenueName = venue?.Name,
                 RepairRecords = repairRecords
             };
         }
-
+        
         // 其他场地服务逻辑...
     }
 }
