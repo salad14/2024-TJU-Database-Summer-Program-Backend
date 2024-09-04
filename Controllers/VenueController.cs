@@ -12,7 +12,6 @@ namespace VenueBookingSystem.Controllers
     {
         private readonly IVenueService _venueService;
 
-        // 构造函数，注入场地服务
         public VenueController(IVenueService venueService)
         {
             _venueService = venueService;
@@ -25,6 +24,7 @@ namespace VenueBookingSystem.Controllers
             var venues = _venueService.GetAllVenues();
             return Ok(venues);
         }
+
         // 获取所有场地信息
         [HttpGet("GetAllVenueInfos")]
         public IActionResult GetAllVenueInfos()
@@ -58,7 +58,7 @@ namespace VenueBookingSystem.Controllers
             return Ok("场地添加成功");
         }
 
-        // 新增：获取所有不同ID的场地信息
+        // 获取所有不同ID的场地信息
         [HttpGet("GetAllVenueDetails")]
         public IActionResult GetAllVenueDetails()
         {
@@ -78,7 +78,7 @@ namespace VenueBookingSystem.Controllers
                 { 
                     state = 0, 
                     data = (object)null, 
-                    info = "An error occurred while retrieving data: " + ex.Message 
+                    info = "An error occurred while retrieving venue details: " + ex.Message 
                 });
             }
         }
@@ -109,6 +109,7 @@ namespace VenueBookingSystem.Controllers
                 });
             }
         }
+
         // 获取指定场地的详细信息
         [HttpGet("GetVenueDetails")]
         public IActionResult GetVenueDetails([FromQuery] string venueId)
@@ -142,26 +143,27 @@ namespace VenueBookingSystem.Controllers
                 });
             }
         }
-        // 获取指定设备的详细信息
-        [HttpGet("GetDeviceDetails")]
-        public IActionResult GetDeviceDetails([FromQuery] string equipmentId)
+
+        // 获取设备的详细信息
+        [HttpGet("GetEquipmentDetails")]
+        public IActionResult GetEquipmentDetails([FromQuery] string equipmentId)
         {
             try
             {
-                var deviceDetails = _venueService.GetDeviceDetails(equipmentId);
-                if (deviceDetails == null)
+                var equipmentDetails = _venueService.GetEquipmentDetails(equipmentId);
+                if (equipmentDetails == null)
                 {
                     return Ok(new 
                     { 
                         state = 0, 
                         data = (object)null, 
-                        info = "Device not found" 
+                        info = "Equipment not found" 
                     });
                 }
                 return Ok(new 
                 { 
                     state = 1, 
-                    data = deviceDetails, 
+                    data = equipmentDetails, 
                     info = "" 
                 });
             }
@@ -171,9 +173,10 @@ namespace VenueBookingSystem.Controllers
                 { 
                     state = 0, 
                     data = (object)null, 
-                    info = "An error occurred while retrieving device details: " + ex.Message 
+                    info = "An error occurred while retrieving equipment details: " + ex.Message 
                 });
             }
         }
-    }
+
+    }    
 }
