@@ -15,7 +15,7 @@ using sports_management.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.ClearProviders();
-builder.Logging.AddConsole();  // 添加控制台日志记录
+builder.Logging.AddConsole();  // 添加控制台日志记录 
 
 // 定义 CORS 策略名称
 var AllowSpecificOrigins = "AllowSpecificOrigins";
