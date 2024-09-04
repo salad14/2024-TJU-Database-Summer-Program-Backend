@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using sports_management.Dto;
 using sports_management.Services;
@@ -54,8 +54,8 @@ namespace sports_management.Controllers
                 return Ok(new { state = 0, RepairId = "", info = "添加失败" });
             }
             
-        }         
-        // 更改保养          
+        }
+        // 更改保养           
         [HttpPost]
         public IActionResult UpdateVenueMaintenance(VenueMaintenanceDto venueMaintenanceDto)
         {
