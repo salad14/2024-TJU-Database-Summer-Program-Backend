@@ -1,11 +1,25 @@
-public class ReservationDto
+namespace VenueBookingSystem.Dto
 {
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
-    public decimal PaymentAmount { get; set; }  // 支付金额
-    public int UserId { get; set; }  // 用户ID
-    public string VenueId { get; set; }  // 场地ID
-    public string AvailabilityId { get; set; }  // 开放时间段ID
-    public string ReservationItem { get; set; }  // 预约项目描述
-    public int NumOfPeople { get; set; }  // 预约人数
+    public class ReservationDto
+    {
+        public decimal PaymentAmount { get; set; }  
+        public string UserId { get; set; }  
+        public string VenueId { get; set; }  
+        public string AvailabilityId { get; set; }  
+        public string ReservationItem { get; set; }  
+        
+        public required string ReservationType { get; set; }  
+    }
+
+
+
+    public class UserReservationInfoDto
+    {
+        public string UserId { get; set; } // 用户ID
+        public string Username { get; set; } // 用户名
+        public string RealName { get; set; } // 真实姓名
+        public DateTime? CheckInTime { get; set; } // 签到时间
+        public string Status { get; set; } // 预约状态
+    }
+
 }

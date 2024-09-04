@@ -12,6 +12,9 @@ namespace VenueBookingSystem.Services
 
         // 取消预约的方法签名
         void CancelReservation(int reservationId);
+
+        //预约记录界面查询成员预约信息
+        List<UserReservationInfoDto> GetGroupReservationMembers(string reservationId);
     }
 
     // 实现 IReservationService 接口的 ReservationService 类
@@ -20,15 +23,18 @@ namespace VenueBookingSystem.Services
         private readonly IRepository<Reservation> _reservationRepository;  // 预约存储库，用于与数据库交互
         private readonly IRepository<User> _userRepository;  // 用户存储库，用于查找和管理用户数据
         private readonly IRepository<Venue> _venueRepository;  // 场地存储库，用于查找和管理场地数据
+        private readonly IRepository<UserReservation> _userReservationRepository;
 
         // 构造函数，通过依赖注入初始化存储库
         public ReservationService(IRepository<Reservation> reservationRepository,
                                   IRepository<User> userRepository,
+                                   IRepository<UserReservation> userReservationRepository,
                                   IRepository<Venue> venueRepository)
         {
             _reservationRepository = reservationRepository;
             _userRepository = userRepository;
             _venueRepository = venueRepository;
+            _userReservationRepository = userReservationRepository;
         }
 
         // 创建预约
@@ -48,15 +54,12 @@ namespace VenueBookingSystem.Services
             var reservation = new Reservation
             {
                 ReservationId = Guid.NewGuid().ToString(), // 自动生成 ReservationId
-                StartTime = reservationDto.StartTime,  // 设置预约开始时间
-                EndTime = reservationDto.EndTime,  // 设置预约结束时间
                 PaymentAmount = reservationDto.PaymentAmount,  // 设置支付金额
                 VenueId = reservationDto.VenueId,  // 设置关联的场地ID
                 AvailabilityId = reservationDto.AvailabilityId,  // 设置关联的开放时间段ID
                 ReservationItem = reservationDto.ReservationItem,  // 设置预约项目描述
                 ReservationTime = DateTime.UtcNow,  // 设置预约操作时间
-                NumOfPeople = reservationDto.NumOfPeople,  // 设置预约人数
-                                                           // 初始化导航属性
+                ReservationType =reservationDto.ReservationType,
                 Venue = venue
             };
 
@@ -75,6 +78,35 @@ namespace VenueBookingSystem.Services
             {
                 _reservationRepository.Delete(reservation);
             }
+        }
+
+        // 查找团体预约每个成员的预约信息
+        public List<UserReservationInfoDto> GetGroupReservationMembers(string reservationId)
+        {
+            // 获取用户预约关系表中的记录
+            var userReservations = _userReservationRepository
+                .Find(ur => ur.ReservationId == reservationId).ToList();
+
+            // 创建结果列表
+            var memberDetails = new List<UserReservationInfoDto>();
+
+            foreach (var userReservation in userReservations)
+            {
+                // 查找每个用户的详细信息
+                var user = _userRepository.GetById(userReservation.UserId);
+
+                // 将结果加入到列表
+                memberDetails.Add(new UserReservationInfoDto
+                {
+                    UserId = user.UserId,
+                    Username = user.Username,
+                    RealName = user.RealName,
+                    CheckInTime = userReservation.CheckInTime,
+                    Status = userReservation.Status
+                });
+            }
+
+            return memberDetails;
         }
     }
 }
