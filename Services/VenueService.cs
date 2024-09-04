@@ -147,7 +147,204 @@ namespace VenueBookingSystem.Services
                 RepairRecords = repairRecords
             };
         }
-        
+         // 添加设备信息
+        public AddDeviceResult AddDevice(string adminId, string equipmentName, string venueId, DateTime? installationTime)
+        {
+            // 生成唯一的设备ID
+            string newEquipmentId = Guid.NewGuid().ToString();
+
+            // 添加设备到设备表
+            var equipment = new Equipment
+            {
+                EquipmentId = newEquipmentId,
+                EquipmentName = equipmentName,
+                AdminId = adminId
+            };
+
+            _context.Equipments.Add(equipment);
+
+            // 如果场地ID不为空，则添加设备和场地的关系
+            if (!string.IsNullOrEmpty(venueId))
+            {
+                var venueEquipment = new VenueEquipment
+                {
+                    VenueId = venueId,
+                    EquipmentId = newEquipmentId,
+                    InstallationTime = installationTime ?? DateTime.Now
+                };
+                _context.VenueEquipments.Add(venueEquipment);
+            }
+
+            // 保存更改并返回结果
+            try
+            {
+                _context.SaveChanges();
+                return new AddDeviceResult
+                {
+                    State = 1,
+                    DeviceId = newEquipmentId,
+                    Info = ""
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AddDeviceResult
+                {
+                    State = 0,
+                    DeviceId = "",
+                    Info = $"Failed to add device: {ex.Message}"
+                };
+            }
+        }
+         // 编辑设备信息
+        public EditDeviceResult EditDevice(string equipmentId, string equipmentName, string venueId)
+        {
+            // 查找设备
+            var equipment = _context.Equipments.FirstOrDefault(e => e.EquipmentId == equipmentId);
+            if (equipment == null)
+            {
+                return new EditDeviceResult
+                {
+                    State = 0,
+                    Info = "设备未找到"
+                };
+            }
+
+            // 更新设备名称
+            equipment.EquipmentName = equipmentName;
+
+            // 如果场地ID不为空，则更新场地设备关系表
+            if (!string.IsNullOrEmpty(venueId))
+            {
+                var venueEquipment = _context.VenueEquipments.FirstOrDefault(ve => ve.EquipmentId == equipmentId);
+                if (venueEquipment != null)
+                {
+                    // 更新场地ID和设备引进时间
+                    venueEquipment.VenueId = venueId;
+                    venueEquipment.InstallationTime = DateTime.Now; // 设置为当前时间
+                }
+                else
+                {
+                    // 如果没有场地设备关系，创建新的关联
+                    venueEquipment = new VenueEquipment
+                    {
+                        EquipmentId = equipmentId,
+                        VenueId = venueId,
+                        InstallationTime = DateTime.Now
+                    };
+                    _context.VenueEquipments.Add(venueEquipment);
+                }
+            }
+
+            // 保存修改并返回结果
+            try
+            {
+                _context.SaveChanges();
+                return new EditDeviceResult
+                {
+                    State = 1,
+                    Info = "设备信息更新成功"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new EditDeviceResult
+                {
+                    State = 0,
+                    Info = $"修改设备信息时出错：{ex.Message}"
+                };
+            }
+        }
+        // 添加维修信息
+        public AddRepairResult AddRepair(string equipmentId, DateTime maintenanceStartTime, DateTime maintenanceEndTime, string maintenanceDetails)
+        {
+            // 生成唯一的维修记录ID
+            string newRepairId = Guid.NewGuid().ToString();
+
+            // 检查设备是否存在
+            var equipment = _context.Equipments.FirstOrDefault(e => e.EquipmentId == equipmentId);
+            if (equipment == null)
+            {
+                return new AddRepairResult
+                {
+                    State = 0,
+                    RepairId = "",
+                    Info = "设备未找到"
+                };
+            }
+
+            // 添加维修记录
+            var maintenanceRecord = new MaintenanceRecord
+            {
+                MaintenanceRecordId = newRepairId,
+                EquipmentId = equipmentId,
+                MaintenanceStartTime = maintenanceStartTime,
+                MaintenanceEndTime = maintenanceEndTime,
+                MaintenanceDetails = maintenanceDetails
+            };
+
+            _context.MaintenanceRecords.Add(maintenanceRecord);
+
+            // 保存更改并返回结果
+            try
+            {
+                _context.SaveChanges();
+                return new AddRepairResult
+                {
+                    State = 1,
+                    RepairId = newRepairId,
+                    Info = ""
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AddRepairResult
+                {
+                    State = 0,
+                    RepairId = "",
+                    Info = $"添加维修记录时出错：{ex.Message}"
+                };
+            }
+        }
+         // 编辑维修信息
+        public EditRepairResult EditRepair(string repairId, DateTime maintenanceStartTime, DateTime maintenanceEndTime, string maintenanceDetails)
+        {
+            // 查找维修记录
+            var maintenanceRecord = _context.MaintenanceRecords.FirstOrDefault(m => m.MaintenanceRecordId == repairId);
+            if (maintenanceRecord == null)
+            {
+                return new EditRepairResult
+                {
+                    State = 0,
+                    Info = "未找到维修记录"
+                };
+            }
+
+            // 更新维修记录的字段
+            maintenanceRecord.MaintenanceStartTime = maintenanceStartTime;
+            maintenanceRecord.MaintenanceEndTime = maintenanceEndTime;
+            maintenanceRecord.MaintenanceDetails = maintenanceDetails;
+
+            // 保存修改并返回结果
+            try
+            {
+                _context.SaveChanges();
+                return new EditRepairResult
+                {
+                    State = 1,
+                    Info = "维修记录更新成功"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new EditRepairResult
+                {
+                    State = 0,
+                    Info = $"更新维修记录时出错：{ex.Message}"
+                };
+            }
+        }
+
         // 其他场地服务逻辑...
     }
 }
