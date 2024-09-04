@@ -1,4 +1,4 @@
-﻿using sports_management.Dto;
+using sports_management.Dto;
 using System.Text.RegularExpressions;
 using VenueBookingSystem.Data;
 using VenueBookingSystem.Models;
@@ -19,7 +19,7 @@ namespace sports_management.Services
         {
             var venueMaintenance1 = new VenueMaintenance
             {
-                VenueMaintenanceId = Guid.NewGuid().ToString(), // 使用 Guid 生成唯一的 ID
+                VenueMaintenanceId = GenerateVenueMaintenanceId(), // 生成新的场地保养ID
                 Description = venueMaintenanceDto.Description,
                 MaintenanceStartDate = venueMaintenanceDto.MaintenanceStartDate,
                 MaintenanceEndDate = venueMaintenanceDto.MaintenanceEndDate,
@@ -27,6 +27,22 @@ namespace sports_management.Services
             };
             _venueMaintenanceRepository.Add(venueMaintenance1);
             return venueMaintenance1;
+        }
+
+        // 生成新的场地保养ID
+        private string GenerateVenueMaintenanceId()
+        {
+            // 获取当前数据库中最大的 VenueMaintenanceId
+            var maxVenueMaintenanceId = _venueMaintenanceRepository.GetAll()
+                .Select(v => Convert.ToInt32(v.VenueMaintenanceId))
+                .DefaultIfEmpty(0) // 如果没有记录，则返回0
+                .Max();
+
+            // 生成下一个 VenueMaintenanceId
+            int newVenueMaintenanceId = maxVenueMaintenanceId + 1;
+
+            // 返回新的 VenueMaintenanceId，转换为字符串
+            return newVenueMaintenanceId.ToString();
         }
 
         // 获取所有的场地保养记录
