@@ -11,9 +11,13 @@ namespace VenueBookingSystem.Controllers
     public class VenueController : ControllerBase
     {
         private readonly IVenueService _venueService;
+        // 构造函数，注入场地服务
+        public VenueController(IVenueService venueService)
+        {
+            _venueService = venueService;
         private readonly IVenueAnalysisService _venueAnalysisService;
 
-        // 构造函数，注入场地服务和场地分析服务
+        // 构造函数，注入场地服务
         public VenueController(IVenueService venueService, IVenueAnalysisService venueAnalysisService)
         {
             _venueService = venueService;
@@ -35,24 +39,23 @@ namespace VenueBookingSystem.Controllers
             try
             {
                 var venueInfos = _venueService.GetAllVenueInfos();
-                return Ok(new
-                {
-                    state = 1,
-                    data = venueInfos,
-                    info = ""
+                return Ok(new 
+                { 
+                    state = 1, 
+                    data = venueInfos, 
+                    info = "" 
                 });
             }
             catch (Exception ex)
             {
-                return Ok(new
-                {
-                    state = 0,
-                    data = (object)null,
-                    info = "An error occurred while retrieving venue information: " + ex.Message
+                return Ok(new 
+                { 
+                    state = 0, 
+                    data = (object)null, 
+                    info = "An error occurred while retrieving venue information: " + ex.Message 
                 });
             }
         }
-
         // 添加新场地
         [HttpPost("AddVenue")]
         public IActionResult AddVenue(VenueDto venueDto)
@@ -61,26 +64,27 @@ namespace VenueBookingSystem.Controllers
             return Ok("场地添加成功");
         }
 
+        // 其他场地相关操作...
         [HttpGet("GetAllVenueDetails")]
         public IActionResult GetAllVenueDetails()
         {
             try
             {
                 var venueDetails = _venueService.GetAllVenueDetails();
-                return Ok(new
-                {
-                    state = 1,
-                    data = venueDetails,
-                    info = ""
+                return Ok(new 
+                { 
+                    state = 1, 
+                    data = venueDetails, 
+                    info = "" 
                 });
             }
             catch (Exception ex)
             {
-                return Ok(new
-                {
-                    state = 0,
-                    data = (object)null,
-                    info = "An error occurred while retrieving data: " + ex.Message
+                return Ok(new 
+                { 
+                    state = 0, 
+                    data = (object)null, 
+                    info = "An error occurred while retrieving data: " + ex.Message 
                 });
             }
         }
@@ -94,24 +98,23 @@ namespace VenueBookingSystem.Controllers
                 var repairRecords = _venueService.GetAllRepairRecords();
 
                 // 成功时返回
-                return Ok(new
-                {
-                    state = 1,
-                    data = repairRecords,
-                    info = ""
+                return Ok(new 
+                { 
+                    state = 1, 
+                    data = repairRecords, 
+                    info = "" 
                 });
             }
             catch (Exception ex)
             {
-                return Ok(new
-                {
-                    state = 0,
-                    data = (object)null,
-                    info = "An error occurred while retrieving data: " + ex.Message
+                return Ok(new 
+                { 
+                    state = 0, 
+                    data = (object)null, 
+                    info = "An error occurred while retrieving data: " + ex.Message 
                 });
             }
         }
-
         // 获取指定场地的详细信息
         [HttpGet("GetVenueDetails")]
         public IActionResult GetVenueDetails([FromQuery] string venueId)
@@ -121,31 +124,30 @@ namespace VenueBookingSystem.Controllers
                 var venueDetails = _venueService.GetVenueDetails(venueId);
                 if (venueDetails == null)
                 {
-                    return Ok(new
-                    {
-                        state = 0,
-                        data = (object)null,
-                        info = "Venue not found"
+                    return Ok(new 
+                    { 
+                        state = 0, 
+                        data = (object)null, 
+                        info = "Venue not found" 
                     });
                 }
-                return Ok(new
-                {
-                    state = 1,
-                    data = venueDetails,
-                    info = ""
+                return Ok(new 
+                { 
+                    state = 1, 
+                    data = venueDetails, 
+                    info = "" 
                 });
             }
             catch (Exception ex)
             {
-                return Ok(new
-                {
-                    state = 0,
-                    data = (object)null,
-                    info = "An error occurred while retrieving venue details: " + ex.Message
+                return Ok(new 
+                { 
+                    state = 0, 
+                    data = (object)null, 
+                    info = "An error occurred while retrieving venue details: " + ex.Message 
                 });
             }
         }
-
         // 获取指定设备的详细信息
         [HttpGet("GetDeviceDetails")]
         public IActionResult GetDeviceDetails([FromQuery] string equipmentId)
@@ -155,32 +157,32 @@ namespace VenueBookingSystem.Controllers
                 var deviceDetails = _venueService.GetDeviceDetails(equipmentId);
                 if (deviceDetails == null)
                 {
-                    return Ok(new
-                    {
-                        state = 0,
-                        data = (object)null,
-                        info = "Device not found"
+                    return Ok(new 
+                    { 
+                        state = 0, 
+                        data = (object)null, 
+                        info = "Device not found" 
                     });
                 }
-                return Ok(new
-                {
-                    state = 1,
-                    data = deviceDetails,
-                    info = ""
+                return Ok(new 
+                { 
+                    state = 1, 
+                    data = deviceDetails, 
+                    info = "" 
                 });
             }
             catch (Exception ex)
             {
-                return Ok(new
-                {
-                    state = 0,
-                    data = (object)null,
-                    info = "An error occurred while retrieving device details: " + ex.Message
+                return Ok(new 
+                { 
+                    state = 0, 
+                    data = (object)null, 
+                    info = "An error occurred while retrieving device details: " + ex.Message 
                 });
             }
         }
 
-        // 获取指定场地类型的分析数据
+        //获取指定场地类型的分析数据
         [HttpGet("AnalyzeVenueData")]
         public IActionResult AnalyzeVenueData([FromQuery] string venueType)
         {
@@ -230,7 +232,9 @@ namespace VenueBookingSystem.Controllers
             }
         }
 
-        // 获取场地详细信息公告
+
+
+        //获取场地详细信息
         [HttpGet("GetVenueDetailsAnnouncement")]
         public IActionResult GetVenueDetailsAnnouncement([FromQuery] string venueId)
         {
@@ -264,4 +268,4 @@ namespace VenueBookingSystem.Controllers
             }
         }
     }
-}
+} 
