@@ -11,6 +11,8 @@ namespace VenueBookingSystem.Models
         public int MaintenanceCount { get; set; } // 场地维护次数
         public DateTime LastInspectionTime { get; set; } // 场地上一次检查时间
         public string? VenueImageUrl { get; set; } // 场地图片 URL
+
+        public string VenueLocation { get; set; }
         public string? VenueDescription{ get; set; } 
     }
 

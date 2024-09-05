@@ -17,11 +17,6 @@ namespace VenueBookingSystem.Services
             _context = context;
         }
 
-        // 获取所有场地
-        public IEnumerable<Venue> GetAllVenues()
-        {
-            return _venueRepository.GetAll();
-        }
         // 获取所有场地信息
         public IEnumerable<VenueDto> GetAllVenueInfos()
         {
@@ -33,21 +28,70 @@ namespace VenueBookingSystem.Services
                 Status = v.Status,
                 MaintenanceCount = v.MaintenanceCount,
                 LastInspectionTime = v.LastInspectionTime,
+                VenueLocation = v.VenueLocation,
                 VenueImageUrl = v.VenueImageUrl
             }).ToList();
         }
 
         // 添加新场地
-        public void AddVenue(VenueDto venueDto)
+        public AddVenueResult AddVenue(VenueDto venueDto)
         {
+
+            // 检查场地名称是否已存在
+            var venueExists = _context.Venues
+                .Where(v => v.Name == venueDto.Name)
+                .Select(v => 1)
+                .FirstOrDefault() == 1;
+
+            if (venueExists)
+            {
+                return new AddVenueResult
+                {
+                    VenueId = null,
+                    Info = "场地名称已存在"
+                };
+            }
+            // 获取当前最大的场地ID并递增
+            var maxVenueId = _context.Venues
+                .OrderByDescending(v => v.VenueId)
+                .Select(v => v.VenueId)
+                .FirstOrDefault();
+
+            int newVenueId = (maxVenueId != null ? int.Parse(maxVenueId) : 100000) + 1;
+
             var venue = new Venue
             {
+                VenueId = newVenueId.ToString(),
                 Name = venueDto.Name,
                 Type = venueDto.Type,
-                Capacity = venueDto.Capacity
+                Capacity = venueDto.Capacity,
+                VenueLocation = venueDto.VenueLocation,
+                VenueImageUrl = venueDto.VenueImageUrl
             };
-            _venueRepository.Add(venue);
+
+            try
+            {
+                _context.Venues.Add(venue);
+                _context.SaveChanges();
+                
+                return new AddVenueResult
+                {
+                    VenueId = newVenueId.ToString(),
+                    Info = ""
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AddVenueResult
+                {
+                    VenueId = null,
+                    Info = $"添加场地时出错：{ex.Message}"
+                };
+            }
         }
+
+
+
         // 获取所有不同ID的场地
         public IEnumerable<VenueDto> GetAllVenueDetails()
         {
@@ -119,7 +163,9 @@ namespace VenueBookingSystem.Services
                 Capacity = venue.Capacity,
                 Status = venue.Status,
                 VenueDevices = venueDevices,
-                MaintenanceRecords = maintenanceRecords
+                MaintenanceRecords = maintenanceRecords,
+                VenueLocation = venue.VenueLocation,  // 假设场地位置在 venue.Location 中
+                VenueImageUrl = venue.VenueImageUrl   // 假设场地图像链接在 venue.ImageUrl 中
             };
         }
         // 获取设备的详细信息

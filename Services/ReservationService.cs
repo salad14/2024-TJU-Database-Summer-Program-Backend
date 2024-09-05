@@ -324,7 +324,19 @@ namespace VenueBookingSystem.Services
                 ReservationTime = x.ReservationTime,
                 PaymentAmount = x.PaymentAmount,
                 NumOfPeople = _userReservation.GetAll().Where(t => t.ReservationId == x.ReservationId).Sum(t => t.NumOfPeople),
-                GroupReservationListDto = _groupReservationMemberRepository.GetAll().Where(t => t.ReservationId != x.ReservationId).Select(t => new GroupReservationListDto
+
+                // 根据 ReservationType 判断，使用 ReservationId 关联到 UserReservations 表来返回 UserId 和 UserName
+                UserId = x.ReservationType == "User" 
+                            ? _userReservation.GetAll().Where(t => t.ReservationId == x.ReservationId).Select(t => t.UserId).FirstOrDefault() 
+                            : null,
+                UserName = x.ReservationType == "User"
+                            ? _context.Users
+                                .Where(u => u.UserId == _userReservation.GetAll().Where(t => t.ReservationId == x.ReservationId).Select(t => t.UserId).FirstOrDefault())
+                                .Select(u => u.Username)
+                                .FirstOrDefault() 
+                            : null,
+
+                GroupReservationListDto = _groupReservationMemberRepository.GetAll().Where(t => t.ReservationId == x.ReservationId).Select(t => new GroupReservationListDto
                 {
                     GroupId = t.GroupId,
                     GroupName = t.Group.GroupName

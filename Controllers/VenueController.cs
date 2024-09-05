@@ -22,14 +22,6 @@ namespace VenueBookingSystem.Controllers
         }
 
         // 获取所有场地信息
-        [HttpGet("GetAllVenues")]
-        public IActionResult GetAllVenues()
-        {
-            var venues = _venueService.GetAllVenues();
-            return Ok(venues);
-        }
-
-        // 获取所有场地信息
         [HttpGet("GetAllVenueInfos")]
         public IActionResult GetAllVenueInfos()
         {
@@ -55,35 +47,54 @@ namespace VenueBookingSystem.Controllers
         }
         // 添加新场地
         [HttpPost("AddVenue")]
-        public IActionResult AddVenue(VenueDto venueDto)
-        {
-            _venueService.AddVenue(venueDto);
-            return Ok("场地添加成功");
-        }
-
-        [HttpGet("GetAllVenueDetails")]
-        public IActionResult GetAllVenueDetails()
+        public IActionResult AddVenue([FromBody] VenueDto venueDto)
         {
             try
             {
-                var venueDetails = _venueService.GetAllVenueDetails();
+                // 调用服务层的方法添加场地，并返回分配的场地ID
+                var result = _venueService.AddVenue(venueDto);
+                
+                // 如果添加成功
+                if (!string.IsNullOrEmpty(result.VenueId))
+                {
+                    return Ok(new 
+                    { 
+                        state = 1, 
+                        info = "", 
+                        venueId = result.VenueId  // 返回分配的场地ID
+                    });
+                }
+                // 如果场地名称已存在
+                if (result.Info == "场地名称已存在")
+                {
+                    return Ok(new 
+                    { 
+                        state = 0, 
+                        info = "场地名称已存在", 
+                        venueId = (object)null
+                    });
+                }
+
+                // 添加失败时的处理
                 return Ok(new 
                 { 
-                    state = 1, 
-                    data = venueDetails, 
-                    info = "" 
+                    state = 0, 
+                    info = "场地添加失败", 
+                    venueId = (object)null
                 });
             }
             catch (Exception ex)
             {
+                // 处理异常情况
                 return Ok(new 
                 { 
                     state = 0, 
-                    data = (object)null, 
-                    info = "An error occurred while retrieving data: " + ex.Message 
+                    info = $"添加场地时发生错误：{ex.Message}", 
+                    venueId = (object)null
                 });
             }
         }
+
 
         // 获取所有维修记录及其相关设备和场地信息
         [HttpGet("GetAllRepairRecords")]
@@ -300,7 +311,6 @@ namespace VenueBookingSystem.Controllers
                 });
             }
         }
-
 
         // 添加保养信息
         [HttpPost("AddMaintenance")]

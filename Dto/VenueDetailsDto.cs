@@ -7,7 +7,9 @@ namespace VenueBookingSystem.Models
         public string Type { get; set; } // 运动类型
         public int Capacity { get; set; } // 可容纳人数
         public string Status { get; set; } // 场地状态
-        public IEnumerable<VenueAvailabilityDto> OpenTime { get; set; } // 开放时间信息
+
+        public string VenueLocation { get; set; }  
+        public string VenueImageUrl { get; set; }
         public IEnumerable<EquipmentDto> VenueDevices { get; set; } // 设备信息
         public IEnumerable<VenueMaintenanceDto> MaintenanceRecords { get; set; } // 保养记录
     }

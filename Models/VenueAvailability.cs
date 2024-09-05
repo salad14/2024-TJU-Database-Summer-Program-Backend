@@ -14,9 +14,9 @@ namespace VenueBookingSystem.Models
 
         // 导航属性：场地
         public Venue? Venue { get; set; } // 关联到场地
-
+        
         // 导航属性：与此时间段关联的预约记录
-        public ICollection<Reservation>? Reservations { get; set; }
+        public ICollection<Reservation> Reservations { get; set; }
 
     }
 }

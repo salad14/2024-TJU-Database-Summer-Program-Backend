@@ -27,4 +27,5 @@ namespace VenueBookingSystem.Models
         // 导航属性：场地的开放时间段 (一对多)
         public ICollection<VenueAvailability>? VenueAvailabilities { get; set; } // 可空，ORM 将填充
     }
+    
 }

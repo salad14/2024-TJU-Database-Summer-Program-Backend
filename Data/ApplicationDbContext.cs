@@ -119,10 +119,10 @@ namespace VenueBookingSystem.Data
 
             // 配置 Reservation 与 VenueAvailability 的关系
             modelBuilder.Entity<Reservation>()
-                .HasOne(r => r.Availability)
+                .HasOne(r => r.Availability) // 这里确保导航属性是正确的
                 .WithMany()
-                .HasForeignKey(r => r.AvailabilityId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(r => r.AvailabilityId) // 外键字段应映射到 AvailabilityId
+                .OnDelete(DeleteBehavior.Restrict); // 如果需要，设置删除行为
 
             // 配置 Admin 的主键
             modelBuilder.Entity<Admin>()
@@ -154,20 +154,13 @@ namespace VenueBookingSystem.Data
             modelBuilder.Entity<VenueManagement>()
                 .HasKey(vm => new { vm.VenueId, vm.AdminId });
 
-            modelBuilder.Entity<VenueAnnouncement>()
-                .HasKey(va => new { va.VenueId, va.AnnouncementId });
+            modelBuilder.Entity<Reservation>()
+                .Property(r => r.PaymentAmount)
+                .HasColumnType("decimal(18,2)");  // 设置小数点精度
 
-            modelBuilder.Entity<VenueAnnouncement>()
-                .HasOne(va => va.Venue)
-                .WithMany(v => v.VenueAnnouncements)
-                .HasForeignKey(va => va.VenueId);
-
-            modelBuilder.Entity<VenueAnnouncement>()
-                .HasOne(va => va.Announcement)
-                .WithMany(a => a.VenueAnnouncements)
-                .HasForeignKey(va => va.AnnouncementId);
-
-            
+            modelBuilder.Entity<VenueAvailability>()
+                .Property(va => va.Price)
+                .HasColumnType("decimal(18,2)");  // 设置小数点精度
 
             // 这里可以添加其他实体的配置，例如关系、约束等
         }

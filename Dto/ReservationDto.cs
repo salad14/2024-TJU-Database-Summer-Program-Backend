@@ -71,11 +71,13 @@ namespace VenueBookingSystem.Dto
         public  DateTime ReservationTime { get; set; } // 预约操作时间
         public  decimal PaymentAmount { get; set; } // 支付金额
 
-        public int NumOfPeople { get; set; }
+        public int NumOfPeople { get; set; } //预约人数
+
+        // 新增的字段
+        public string? UserId { get; set; }  // 用户ID，可能为空
+        public string? UserName { get; set; }  // 用户名，可能为空
 
         public string VenueName { get; set; } // 场地名称
-        public  DateTime StartTime { get; set; } // 开始时间
-        public  DateTime EndTime { get; set; } // 结束时间
         public List<GroupReservationListDto> GroupReservationListDto { get; set; }
     }
 

@@ -147,5 +147,11 @@ namespace VenueBookingSystem.Dto
         public AdminManagedItemsDto Data { get; set; } // 场地和设备信息
     }
 
+    public class AddVenueResult
+    {
+        public string VenueId { get; set; }
+        public string Info { get; set; }
+    }
+
 
 }

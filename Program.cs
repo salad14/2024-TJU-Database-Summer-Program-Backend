@@ -41,6 +41,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection"))
            .LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information)
+           .UseLoggerFactory(LoggerFactory.Create(logBuilder => logBuilder.AddConsole()))
            .EnableSensitiveDataLogging(); // 可选：启用敏感数据日志记录
 });
 

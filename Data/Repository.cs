@@ -19,7 +19,7 @@ namespace VenueBookingSystem.Data
 
         public T GetById(object id)  // 修改为object类型以支持不同类型的主键
         {
-            return _dbSet.Find(id) ?? throw new InvalidOperationException($"实体未找到，ID: {id}");
+            return _dbSet.Find(id) ?? throw new InvalidOperationException($"实体未找到,ID: {id}");
         }
 
         public IEnumerable<T> GetAll()
