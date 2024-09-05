@@ -282,9 +282,35 @@ namespace VenueBookingSystem.Services
         }
 
         // 获取预约人的信息
-        public IEnumerable<ReservationUserDetailDto> GetReservationUser(string reservationId)
+        public ReservationResponseDto GetReservationUser(string reservationId)
         {
-            var reservation = _userReservation.GetAll().Where(x => x.ReservationId == reservationId).Select(y =>
+            // 从 Reservations 表中获取预约记录
+            var reservation = _reservationRepository.GetAll().FirstOrDefault(x => x.ReservationId == reservationId);
+
+            // 检查预约记录是否存在
+            if (reservation == null)
+            {
+                return new ReservationResponseDto
+                {
+                    State = 0,
+                    Info = "预约记录不存在",
+                    Data = null
+                };
+            }
+
+            // 检查预约类型是否为 Group
+            if (reservation.ReservationType != "Group")
+            {
+                return new ReservationResponseDto
+                {
+                    State = 0,
+                    Info = "不是团队预约",
+                    Data = null
+                };
+            }
+
+            // 查询团体预约成员信息
+            var reservationUsers = _userReservation.GetAll().Where(x => x.ReservationId == reservationId).Select(y =>
                 new ReservationUserDetailDto
                 {
                     UserId = y.UserId,
@@ -292,10 +318,16 @@ namespace VenueBookingSystem.Services
                     Status = y.Status,
                     Username = y.User.Username,
                     RealName = y.User.RealName
-                });
+                }).ToList();
 
-            return reservation;
+            return new ReservationResponseDto
+            {
+                State = 1,
+                Info = "",
+                Data = reservationUsers
+            };
         }
+
 
         //预约记录修改
         public void UpdateReservationUser(UpdateReservationUserDto req)
@@ -323,27 +355,49 @@ namespace VenueBookingSystem.Services
                 ReservationType = x.ReservationType,
                 ReservationTime = x.ReservationTime,
                 PaymentAmount = x.PaymentAmount,
-                NumOfPeople = _userReservation.GetAll().Where(t => t.ReservationId == x.ReservationId).Sum(t => t.NumOfPeople),
+                NumOfPeople = _userReservation.GetAll()
+                                .Where(t => t.ReservationId == x.ReservationId)
+                                .Sum(t => t.NumOfPeople),
 
-                // 根据 ReservationType 判断，使用 ReservationId 关联到 UserReservations 表来返回 UserId 和 UserName
+                // 仅在 ReservationType 为 "User" 时获取 UserId 和 UserName
                 UserId = x.ReservationType == "User" 
-                            ? _userReservation.GetAll().Where(t => t.ReservationId == x.ReservationId).Select(t => t.UserId).FirstOrDefault() 
-                            : null,
-                UserName = x.ReservationType == "User"
-                            ? _context.Users
-                                .Where(u => u.UserId == _userReservation.GetAll().Where(t => t.ReservationId == x.ReservationId).Select(t => t.UserId).FirstOrDefault())
-                                .Select(u => u.Username)
-                                .FirstOrDefault() 
-                            : null,
+                    ? _userReservation.GetAll()
+                        .Where(t => t.ReservationId == x.ReservationId)
+                        .Select(t => t.UserId)
+                        .FirstOrDefault()
+                    : null,
 
-                GroupReservationListDto = _groupReservationMemberRepository.GetAll().Where(t => t.ReservationId == x.ReservationId).Select(t => new GroupReservationListDto
-                {
-                    GroupId = t.GroupId,
-                    GroupName = t.Group.GroupName
-                }).ToList(),
-            });
+                // 通过 UserId 获取 UserName
+                UserName = x.ReservationType == "User"
+                    ? (from u in _context.Users.AsEnumerable() // 添加 AsEnumerable()
+                    join ur in _userReservation.GetAll().AsEnumerable() // 添加 AsEnumerable()
+                    on u.UserId equals ur.UserId
+                    where ur.ReservationId == x.ReservationId
+                    select u.Username).FirstOrDefault()
+                    : null,
+
+                // 场地名称查询
+                VenueName = (from v in _context.Venues.AsEnumerable() // 查询场地名称
+                            where v.VenueId == x.VenueId
+                            select v.Name).FirstOrDefault(),
+
+                // 仅在 ReservationType 为 "Group" 时获取团队预约信息，并检查 t.Group 不为空
+                GroupReservationListDto = x.ReservationType == "Group"
+                    ? _groupReservationMemberRepository.GetAll()
+                        .Where(t => t.ReservationId == x.ReservationId && t.Group != null)
+                        .Select(t => new GroupReservationListDto
+                        {
+                            GroupId = t.GroupId,
+                            GroupName = t.Group.GroupName
+                        }).ToList()
+                    : null
+            }).ToList();
+
             return reservations;
         }
+
+
+
 
         //根据场地ID查找预约记录
         public IEnumerable<ReservationVenueListDto> GetReservationVenueList(string venueId)
@@ -403,8 +457,8 @@ namespace VenueBookingSystem.Services
                     VenueId = reservation.VenueId,
                     VenueName = reservation.Venue?.Name,
                     AvailabilityId = reservation.AvailabilityId,
-                    StartTime = reservation.Availability?.StartTime ?? DateTime.MinValue,
-                    EndTime = reservation.Availability?.EndTime ?? DateTime.MinValue,
+                    StartTime = reservation.VenueAvailability?.StartTime ?? DateTime.MinValue,
+                    EndTime = reservation.VenueAvailability?.EndTime ?? DateTime.MinValue,
                     ReservationTime = reservation.ReservationTime,
                     PaymentAmount = reservation.PaymentAmount,
                     ReservationType = reservation.ReservationType
@@ -432,7 +486,7 @@ namespace VenueBookingSystem.Services
         {
             var reservations = _context.Reservations
                 .Include(r => r.Venue)
-                .Include(r => r.Availability)
+                .Include(r => r.VenueAvailability)
                 .ToList();
 
             var reservationDetails = new List<ReservationDetailDto>();
@@ -445,8 +499,8 @@ namespace VenueBookingSystem.Services
                     VenueId = reservation.VenueId,
                     VenueName = reservation.Venue?.Name,
                     AvailabilityId = reservation.AvailabilityId,
-                    StartTime = reservation.Availability?.StartTime ?? DateTime.MinValue,
-                    EndTime = reservation.Availability?.EndTime ?? DateTime.MinValue,
+                    StartTime = reservation.VenueAvailability?.StartTime ?? DateTime.MinValue,
+                    EndTime = reservation.VenueAvailability?.EndTime ?? DateTime.MinValue,
                     ReservationTime = reservation.ReservationTime,
                     PaymentAmount = reservation.PaymentAmount,
                     ReservationType = reservation.ReservationType
@@ -476,7 +530,7 @@ namespace VenueBookingSystem.Services
             var reservations = _context.Reservations
                 .Where(r => venueIds.Contains(r.VenueId))
                 .Include(r => r.Venue)
-                .Include(r => r.Availability)
+                .Include(r => r.VenueAvailability)
                 .ToList();
 
             var reservationDetails = new List<ReservationDetailDto>();
@@ -489,8 +543,8 @@ namespace VenueBookingSystem.Services
                     VenueId = reservation.VenueId,
                     VenueName = reservation.Venue?.Name,
                     AvailabilityId = reservation.AvailabilityId,
-                    StartTime = reservation.Availability?.StartTime ?? DateTime.MinValue,
-                    EndTime = reservation.Availability?.EndTime ?? DateTime.MinValue,
+                    StartTime = reservation.VenueAvailability?.StartTime ?? DateTime.MinValue,
+                    EndTime = reservation.VenueAvailability?.EndTime ?? DateTime.MinValue,
                     ReservationTime = reservation.ReservationTime,
                     PaymentAmount = reservation.PaymentAmount,
                     ReservationType = reservation.ReservationType

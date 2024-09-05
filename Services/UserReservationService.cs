@@ -29,7 +29,7 @@ namespace sports_management.Services
                 foreach (var item in userReservation)
                 {
                     // 获取与用户预约相关的预约记录的结束时间
-                    var endtime = _reservationRepository.Find(x => x.ReservationId == item.ReservationId).FirstOrDefault()?.Availability?.EndTime;
+                    var endtime = _reservationRepository.Find(x => x.ReservationId == item.ReservationId).FirstOrDefault()?.VenueAvailability?.EndTime;
                     // 判断当前时间是否超过预约结束时间
                     if (time > endtime && (item.Status != "已签到" || item.Status != "已取消"))
                     {

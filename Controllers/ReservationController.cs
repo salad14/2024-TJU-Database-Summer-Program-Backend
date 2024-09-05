@@ -43,8 +43,8 @@ namespace VenueBookingSystem.Controllers
         [HttpGet("getReservationUser")]
         public IActionResult GetReservationUser(string reservationId)
         {
-          var userList =_reservationService.GetReservationUser(reservationId);
-            return Ok(userList);
+            var result = _reservationService.GetReservationUser(reservationId);
+            return Ok(result);
         }
 
         // 预约记录修改
@@ -115,8 +115,7 @@ namespace VenueBookingSystem.Controllers
 
             return Ok(result);  // 正常返回结果
         }
-
-
+        //可能有bug，待数据测试
         [HttpGet("GetReservationsByUserId")]
         public IActionResult GetReservationsByUserId(string userId)
         {
@@ -129,8 +128,6 @@ namespace VenueBookingSystem.Controllers
             return Ok(result);
         }
 
-
-
         [HttpGet("GetAllReservations")]
         public IActionResult GetAllReservations()
         {
@@ -138,7 +135,7 @@ namespace VenueBookingSystem.Controllers
             return Ok(result);
         }
 
-
+        //通过预约Id查找用户预约信息
         [HttpGet("GetGroupReservationMembers")]
         public IActionResult GetGroupReservationMembers(string reservationId)
         {
@@ -150,8 +147,6 @@ namespace VenueBookingSystem.Controllers
 
             return Ok(result);
         }
-
-
 
     }
 }

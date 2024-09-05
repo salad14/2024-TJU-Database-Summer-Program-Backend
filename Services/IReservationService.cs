@@ -9,7 +9,7 @@ namespace VenueBookingSystem.Services
         ReservationResult CreateGroupReservation(GroupReservationDto groupReservationDto);
 
         //获取预约人信息的方法签名
-        IEnumerable<ReservationUserDetailDto> GetReservationUser(string reservationId);
+        ReservationResponseDto GetReservationUser(string reservationId);
 
         //更新预约用户的方法签名
         void UpdateReservationUser(UpdateReservationUserDto req);

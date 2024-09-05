@@ -64,6 +64,7 @@ namespace VenueBookingSystem.Data
                 
             //配置Reservation的主键
             modelBuilder.Entity<Reservation>()
+                .ToTable("Reservations")
                 .HasKey(r => r.ReservationId);
 
             // 配置 User 和 Reservation 之间的多对多关系
@@ -119,10 +120,18 @@ namespace VenueBookingSystem.Data
 
             // 配置 Reservation 与 VenueAvailability 的关系
             modelBuilder.Entity<Reservation>()
-                .HasOne(r => r.Availability) // 这里确保导航属性是正确的
-                .WithMany()
-                .HasForeignKey(r => r.AvailabilityId) // 外键字段应映射到 AvailabilityId
-                .OnDelete(DeleteBehavior.Restrict); // 如果需要，设置删除行为
+                .HasOne(r => r.VenueAvailability)  // 定义导航属性
+                .WithMany(va => va.Reservations)   // 反向定义
+                .HasForeignKey(r => r.AvailabilityId)  // 指定外键为 AvailabilityId
+                .OnDelete(DeleteBehavior.Restrict);  // 防止删除外键数据时删除关联数据
+
+
+            modelBuilder.Entity<Reservation>()
+                .Property(r => r.AvailabilityId)
+                .HasColumnName("AvailabilityId");
+
+
+
 
             // 配置 Admin 的主键
             modelBuilder.Entity<Admin>()

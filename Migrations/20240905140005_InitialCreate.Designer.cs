@@ -12,8 +12,8 @@ using VenueBookingSystem.Data;
 namespace sports_management.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240904064644_UpdateReservationSchema")]
-    partial class UpdateReservationSchema
+    [Migration("20240905140005_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -169,7 +169,7 @@ namespace sports_management.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.ToTable("GroupReservationMember");
+                    b.ToTable("GroupReservationMembers");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.GroupUser", b =>
@@ -227,10 +227,11 @@ namespace sports_management.Migrations
 
                     b.Property<string>("AvailabilityId")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR2(450)");
+                        .HasColumnType("NVARCHAR2(450)")
+                        .HasColumnName("AvailabilityId");
 
                     b.Property<decimal>("PaymentAmount")
-                        .HasColumnType("DECIMAL(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ReservationItem")
                         .IsRequired()
@@ -258,7 +259,7 @@ namespace sports_management.Migrations
 
                     b.HasIndex("VenueId");
 
-                    b.ToTable("Reservations");
+                    b.ToTable("Reservations", (string)null);
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.User", b =>
@@ -402,6 +403,9 @@ namespace sports_management.Migrations
                     b.Property<string>("VenueImageUrl")
                         .HasColumnType("NVARCHAR2(2000)");
 
+                    b.Property<string>("VenueLocation")
+                        .HasColumnType("NVARCHAR2(2000)");
+
                     b.HasKey("VenueId");
 
                     b.ToTable("Venues");
@@ -431,7 +435,7 @@ namespace sports_management.Migrations
                         .HasColumnType("TIMESTAMP(7)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("DECIMAL(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("RemainingCapacity")
                         .HasColumnType("NUMBER(10)");
@@ -593,10 +597,10 @@ namespace sports_management.Migrations
 
             modelBuilder.Entity("VenueBookingSystem.Models.Reservation", b =>
                 {
-                    b.HasOne("VenueBookingSystem.Models.VenueAvailability", "Availability")
+                    b.HasOne("VenueBookingSystem.Models.VenueAvailability", "VenueAvailability")
                         .WithMany("Reservations")
                         .HasForeignKey("AvailabilityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("VenueBookingSystem.Models.User", null)
@@ -609,9 +613,9 @@ namespace sports_management.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Availability");
-
                     b.Navigation("Venue");
+
+                    b.Navigation("VenueAvailability");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.UserNotification", b =>

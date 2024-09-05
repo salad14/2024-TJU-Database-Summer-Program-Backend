@@ -97,9 +97,7 @@ namespace VenueBookingSystem.Dto
 
         public DateTime ReservationTime { get; set; } // 预约操作时间
         public decimal PaymentAmount { get; set; } // 支付金额
-
         public int NumOfPeople { get; set; }
-
         public string VenueName { get; set; } // 场地名称
        
     }
@@ -161,6 +159,13 @@ namespace VenueBookingSystem.Dto
         public string RealName { get; set; } // 真实姓名
         public DateTime? CheckInTime { get; set; } // 签到时间
         public string Status { get; set; } // 预约状态
+    }
+
+    public class ReservationResponseDto
+    {
+        public int State { get; set; }  // 状态，0为成功，1为失败
+        public string Info { get; set; } // 成功为空，失败为错误信息
+        public IEnumerable<ReservationUserDetailDto> Data { get; set; } // 查找到的数据
     }
 }
 

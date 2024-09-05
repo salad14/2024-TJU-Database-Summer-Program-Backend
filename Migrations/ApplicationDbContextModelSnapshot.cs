@@ -45,7 +45,7 @@ namespace sports_management.Migrations
 
                     b.HasKey("AdminId");
 
-                    b.ToTable("Admins", (string)null);
+                    b.ToTable("Admins");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.AdminNotification", b =>
@@ -79,7 +79,7 @@ namespace sports_management.Migrations
 
                     b.HasIndex("AdminId");
 
-                    b.ToTable("AdminNotifications", (string)null);
+                    b.ToTable("AdminNotifications");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.Announcement", b =>
@@ -109,7 +109,7 @@ namespace sports_management.Migrations
 
                     b.HasIndex("AdminId");
 
-                    b.ToTable("Announcements", (string)null);
+                    b.ToTable("Announcements");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.Equipment", b =>
@@ -128,7 +128,7 @@ namespace sports_management.Migrations
 
                     b.HasIndex("AdminId");
 
-                    b.ToTable("Equipments", (string)null);
+                    b.ToTable("Equipments");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.Group", b =>
@@ -151,7 +151,7 @@ namespace sports_management.Migrations
 
                     b.HasKey("GroupId");
 
-                    b.ToTable("Groups", (string)null);
+                    b.ToTable("Groups");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.GroupReservationMember", b =>
@@ -166,7 +166,7 @@ namespace sports_management.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.ToTable("GroupReservationMember", (string)null);
+                    b.ToTable("GroupReservationMembers");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.GroupUser", b =>
@@ -188,7 +188,7 @@ namespace sports_management.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.ToTable("GroupUsers", (string)null);
+                    b.ToTable("GroupUsers");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.MaintenanceRecord", b =>
@@ -214,7 +214,7 @@ namespace sports_management.Migrations
 
                     b.HasIndex("EquipmentId");
 
-                    b.ToTable("MaintenanceRecords", (string)null);
+                    b.ToTable("MaintenanceRecords");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.Reservation", b =>
@@ -224,10 +224,11 @@ namespace sports_management.Migrations
 
                     b.Property<string>("AvailabilityId")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR2(450)");
+                        .HasColumnType("NVARCHAR2(450)")
+                        .HasColumnName("AvailabilityId");
 
                     b.Property<decimal>("PaymentAmount")
-                        .HasColumnType("DECIMAL(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ReservationItem")
                         .IsRequired()
@@ -302,7 +303,7 @@ namespace sports_management.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.UserNotification", b =>
@@ -339,7 +340,7 @@ namespace sports_management.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserNotifications", (string)null);
+                    b.ToTable("UserNotifications");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.UserReservation", b =>
@@ -364,7 +365,7 @@ namespace sports_management.Migrations
 
                     b.HasIndex("ReservationId");
 
-                    b.ToTable("UserReservations", (string)null);
+                    b.ToTable("UserReservations");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.Venue", b =>
@@ -399,9 +400,12 @@ namespace sports_management.Migrations
                     b.Property<string>("VenueImageUrl")
                         .HasColumnType("NVARCHAR2(2000)");
 
+                    b.Property<string>("VenueLocation")
+                        .HasColumnType("NVARCHAR2(2000)");
+
                     b.HasKey("VenueId");
 
-                    b.ToTable("Venues", (string)null);
+                    b.ToTable("Venues");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.VenueAnnouncement", b =>
@@ -416,7 +420,7 @@ namespace sports_management.Migrations
 
                     b.HasIndex("AnnouncementId");
 
-                    b.ToTable("VenueAnnouncements", (string)null);
+                    b.ToTable("VenueAnnouncements");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.VenueAvailability", b =>
@@ -428,7 +432,7 @@ namespace sports_management.Migrations
                         .HasColumnType("TIMESTAMP(7)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("DECIMAL(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("RemainingCapacity")
                         .HasColumnType("NUMBER(10)");
@@ -444,7 +448,7 @@ namespace sports_management.Migrations
 
                     b.HasIndex("VenueId");
 
-                    b.ToTable("VenueAvailabilities", (string)null);
+                    b.ToTable("VenueAvailabilities");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.VenueEquipment", b =>
@@ -462,7 +466,7 @@ namespace sports_management.Migrations
 
                     b.HasIndex("VenueId");
 
-                    b.ToTable("VenueEquipments", (string)null);
+                    b.ToTable("VenueEquipments");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.VenueMaintenance", b =>
@@ -488,7 +492,7 @@ namespace sports_management.Migrations
 
                     b.HasIndex("VenueId");
 
-                    b.ToTable("VenueMaintenance", (string)null);
+                    b.ToTable("VenueMaintenance");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.VenueManagement", b =>
@@ -503,7 +507,7 @@ namespace sports_management.Migrations
 
                     b.HasIndex("AdminId");
 
-                    b.ToTable("VenueManagements", (string)null);
+                    b.ToTable("VenueManagements");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.AdminNotification", b =>
@@ -590,10 +594,10 @@ namespace sports_management.Migrations
 
             modelBuilder.Entity("VenueBookingSystem.Models.Reservation", b =>
                 {
-                    b.HasOne("VenueBookingSystem.Models.VenueAvailability", "Availability")
+                    b.HasOne("VenueBookingSystem.Models.VenueAvailability", "VenueAvailability")
                         .WithMany("Reservations")
                         .HasForeignKey("AvailabilityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("VenueBookingSystem.Models.User", null)
@@ -606,9 +610,9 @@ namespace sports_management.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Availability");
-
                     b.Navigation("Venue");
+
+                    b.Navigation("VenueAvailability");
                 });
 
             modelBuilder.Entity("VenueBookingSystem.Models.UserNotification", b =>

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace sports_management.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateReservationSchema : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -74,7 +74,8 @@ namespace sports_management.Migrations
                     MaintenanceCount = table.Column<int>(type: "NUMBER(10)", nullable: false),
                     LastInspectionTime = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
                     VenueImageUrl = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    VenueDescription = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true)
+                    VenueDescription = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    VenueLocation = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -203,7 +204,7 @@ namespace sports_management.Migrations
                     VenueId = table.Column<string>(type: "NVARCHAR2(450)", nullable: false),
                     StartTime = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
                     EndTime = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    Price = table.Column<decimal>(type: "DECIMAL(18, 2)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     RemainingCapacity = table.Column<int>(type: "NUMBER(10)", nullable: false)
                 },
                 constraints: table =>
@@ -341,7 +342,7 @@ namespace sports_management.Migrations
                     AvailabilityId = table.Column<string>(type: "NVARCHAR2(450)", nullable: false),
                     ReservationItem = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
                     ReservationTime = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    PaymentAmount = table.Column<decimal>(type: "DECIMAL(18, 2)", nullable: false),
+                    PaymentAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     ReservationType = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
                     UserId = table.Column<string>(type: "NVARCHAR2(450)", nullable: true)
                 },
@@ -358,7 +359,7 @@ namespace sports_management.Migrations
                         column: x => x.AvailabilityId,
                         principalTable: "VenueAvailabilities",
                         principalColumn: "AvailabilityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Reservations_Venues_VenueId",
                         column: x => x.VenueId,
@@ -368,7 +369,7 @@ namespace sports_management.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GroupReservationMember",
+                name: "GroupReservationMembers",
                 columns: table => new
                 {
                     ReservationId = table.Column<string>(type: "NVARCHAR2(450)", nullable: false),
@@ -376,15 +377,15 @@ namespace sports_management.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GroupReservationMember", x => new { x.ReservationId, x.GroupId });
+                    table.PrimaryKey("PK_GroupReservationMembers", x => new { x.ReservationId, x.GroupId });
                     table.ForeignKey(
-                        name: "FK_GroupReservationMember_Groups_GroupId",
+                        name: "FK_GroupReservationMembers_Groups_GroupId",
                         column: x => x.GroupId,
                         principalTable: "Groups",
                         principalColumn: "GroupId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GroupReservationMember_Reservations_ReservationId",
+                        name: "FK_GroupReservationMembers_Reservations_ReservationId",
                         column: x => x.ReservationId,
                         principalTable: "Reservations",
                         principalColumn: "ReservationId",
@@ -434,8 +435,8 @@ namespace sports_management.Migrations
                 column: "AdminId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GroupReservationMember_GroupId",
-                table: "GroupReservationMember",
+                name: "IX_GroupReservationMembers_GroupId",
+                table: "GroupReservationMembers",
                 column: "GroupId");
 
             migrationBuilder.CreateIndex(
@@ -506,7 +507,7 @@ namespace sports_management.Migrations
                 name: "AdminNotifications");
 
             migrationBuilder.DropTable(
-                name: "GroupReservationMember");
+                name: "GroupReservationMembers");
 
             migrationBuilder.DropTable(
                 name: "GroupUsers");
