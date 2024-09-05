@@ -52,6 +52,7 @@ namespace VenueBookingSystem.Dto
     {
         public int State { get; set; }  // 0 失败，1 成功
         public string Info { get; set; } // 信息
+        public string? OriginalPassword { get; set; } // 原始密码
     }
 
     public class AddAnnouncementResult

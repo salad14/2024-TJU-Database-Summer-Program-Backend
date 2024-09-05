@@ -78,6 +78,8 @@ builder.Services.AddScoped<IVenueMaintenanceService, VenueMaintenanceService>();
 builder.Services.AddScoped<IUserGroupInfoService, UserGroupInfoService>();
 builder.Services.AddScoped<IVenueAnalysisService, VenueAnalysisService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddScoped<IVenueAvailabilityServices, VenueAvailabilityService>();
+builder.Services.AddScoped<IUserReservationService, UserReservationService>();
 
 var app = builder.Build();
 

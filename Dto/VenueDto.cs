@@ -20,5 +20,14 @@ namespace VenueBookingSystem.Models
         public string VenueName { get; set; }
     }
 
+    public class VADto
+    {
+        public  string VenueId { get; set; }  // 场地名称
+        public  string Name { get; set; }  // 场地名称
+        public  string Type { get; set; }  // 场地类型
+        public int Capacity { get; set; }  // 场地容纳人数
+
+    }
+
     
 }

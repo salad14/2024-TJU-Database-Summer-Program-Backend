@@ -43,5 +43,7 @@ namespace VenueBookingSystem.Services
         AddAvailabilityResult AddAvailability(string venueId, DateTime startTime, DateTime endTime, decimal price, int remainingCapacity);
         // 删除开放时间段
         DeleteAvailabilityResult DeleteAvailability(string availabilityId);
+
+        VenueAnnouncementDto GetVenueDetailsAnnouncement(string venueId);
     }
 }

@@ -14,8 +14,6 @@ namespace VenueBookingSystem.Models
 
     public class VenueAvailabilityDto
     {
-        public string StartTime { get; set; } // 开始时间
-        public string EndTime { get; set; } // 结束时间
         public int RemainingCapacity { get; set; } // 剩余容量
         public decimal Price { get; set; } // 场地价格
     }
@@ -24,5 +22,28 @@ namespace VenueBookingSystem.Models
     {
         public string EquipmentId { get; set; } // 设备ID
         public string EquipmentName { get; set; } // 设备名称
+    }
+
+        public class VenueAnnouncementDto
+    {
+        public string VenueId { get; set; } // 场地ID
+        public string Name { get; set; } // 场地名称
+        public string Type { get; set; } // 运动类型
+        public string VenueDescription { get; set; } // 场地状态
+        public VenueAdminDto VenueAdminDto { get; set; } // 开放时间信息
+        public List<VenueAnnouncementVDto> VenueAnnouncementsDto { get; set; } // 设备信息
+    }
+    public class VenueAdminDto
+    {
+        public string AdminId { get; set; }
+        public string RealName { get; set; }
+    }
+
+    public class VenueAnnouncementVDto
+    {
+        public string AnnouncementId { get; set; } // 公告ID
+        public string Title { get; set; }   // 公告标题
+        public DateTime PublishedDate { get; set; } // 发布时间
+        public DateTime LastModifiedDate { get; set; } // 最近修改时间
     }
 }

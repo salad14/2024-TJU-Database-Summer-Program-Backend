@@ -327,6 +327,9 @@ namespace VenueBookingSystem.Services
                 };
             }
 
+            // 保存用户原密码
+            var originalPassword = user.Password;
+
             // 更新用户密码
             user.Password = HashPassword(newPassword);
 
@@ -335,7 +338,8 @@ namespace VenueBookingSystem.Services
             return new UpdateResult
             {
                 State = 1,
-                Info = "用户密码更新成功"
+                Info = "用户密码更新成功",
+                OriginalPassword = originalPassword
             };
         }
 

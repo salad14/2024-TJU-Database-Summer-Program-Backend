@@ -117,6 +117,13 @@ namespace VenueBookingSystem.Data
             modelBuilder.Entity<VenueAvailability>()
                 .HasKey(va => va.AvailabilityId); // 配置主键
 
+            // 配置 Reservation 与 VenueAvailability 的关系
+            modelBuilder.Entity<Reservation>()
+                .HasOne(r => r.Availability)
+                .WithMany()
+                .HasForeignKey(r => r.AvailabilityId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // 配置 Admin 的主键
             modelBuilder.Entity<Admin>()
                 .HasKey(a => a.AdminId); // 定义主键

@@ -583,6 +583,51 @@ namespace VenueBookingSystem.Services
             }
         }
 
+        public VenueAnnouncementDto GetVenueDetailsAnnouncement(string venueId)
+        {
+            var venue = _context.Venues.FirstOrDefault(v => v.VenueId == venueId);
+            if (venue == null) return null;
+
+            var vAdmin = _context.VenueManagements
+                .Where(va => va.VenueId == venueId)
+                .Select(va => new VenueAdminDto
+                {
+                    AdminId = va.AdminId,
+                    RealName = va.Admin.RealName,
+                }).FirstOrDefault();
+
+            List<VenueAnnouncementVDto> vaList = new List<VenueAnnouncementVDto>();
+            if(venue.VenueAnnouncements!=null && venue.VenueAnnouncements.Count()>0)
+            {
+                foreach(var item in venue.VenueAnnouncements)
+                {
+                    var announcements = _context.Announcements
+                        .Where(va => va.AnnouncementId == item.AnnouncementId)
+                        .Select(va => new VenueAnnouncementVDto
+                        {
+                            AnnouncementId = va.AnnouncementId,
+                            Title = va.Title,
+                            PublishedDate=va.PublishedDate,
+                            LastModifiedDate=va.LastModifiedDate 
+                        }).FirstOrDefault();
+                    if (announcements != null)
+                    {
+                        vaList.Add(announcements);
+                    }
+                }
+            }
+
+            return new VenueAnnouncementDto
+            {
+                VenueId = venue.VenueId,
+                Name = venue.Name,
+                Type = venue.Type,
+                VenueDescription = venue.VenueDescription,
+                VenueAdminDto = vAdmin,
+                VenueAnnouncementsDto = vaList
+            };
+        }
+
 
 
         // 其他场地服务逻辑...

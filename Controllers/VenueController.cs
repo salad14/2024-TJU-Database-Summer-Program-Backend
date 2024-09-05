@@ -350,5 +350,39 @@ namespace VenueBookingSystem.Controllers
 
             return Ok(result);
         }
+
+        //根据场地ID获取场地公告
+        [HttpGet("GetVenueDetailsAnnouncement")]
+        public IActionResult GetVenueDetailsAnnouncement([FromQuery] string venueId)
+        {
+            try
+            {
+                var venueDetails = _venueService.GetVenueDetailsAnnouncement(venueId);
+                if (venueDetails == null)
+                {
+                    return Ok(new
+                    {
+                        state = 0,
+                        data = (object)null,
+                        info = "Venue not found"
+                    });
+                }
+                return Ok(new
+                {
+                    state = 1,
+                    data = venueDetails,
+                    info = ""
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    state = 0,
+                    data = (object)null,
+                    info = "An error occurred while retrieving venue details: " + ex.Message
+                });
+            }
+        }
     }
 }
