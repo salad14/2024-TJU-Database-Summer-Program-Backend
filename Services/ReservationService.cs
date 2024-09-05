@@ -1,6 +1,7 @@
 using VenueBookingSystem.Dto;  // 引入 ReservationDto 所在的命名空间
 using VenueBookingSystem.Models;
 using VenueBookingSystem.Data;  // 引入 IRepository<T> 和 Repository<T> 所在的命名空间
+using Microsoft.EntityFrameworkCore;
 
 namespace VenueBookingSystem.Services
 {
@@ -12,7 +13,7 @@ namespace VenueBookingSystem.Services
         private readonly IRepository<Venue> _venueRepository;  // 场地存储库，用于查找和管理场地数据
         private readonly IRepository<UserReservation> _userReservation; 
         private readonly IRepository<GroupReservationMember> _groupReservationMemberRepository;
-
+        private readonly IRepository<UserReservation> _userReservationRepository;
         private readonly ApplicationDbContext _context;
 
         // 构造函数，通过依赖注入初始化存储库
@@ -21,6 +22,7 @@ namespace VenueBookingSystem.Services
                                   IRepository<Venue> venueRepository,
                                   IRepository<UserReservation> userReservation,
                                   IRepository<GroupReservationMember> groupReservationMemberRepository,
+                                  IRepository<UserReservation> userReservationRepository,
                                   ApplicationDbContext context)
         {
             _reservationRepository = reservationRepository;
@@ -28,6 +30,7 @@ namespace VenueBookingSystem.Services
             _venueRepository = venueRepository;
             _userReservation = userReservation;
             _groupReservationMemberRepository = groupReservationMemberRepository;
+            _userReservationRepository = userReservationRepository;
             _context = context;
         }
 
@@ -279,10 +282,10 @@ namespace VenueBookingSystem.Services
         }
 
         // 获取预约人的信息
-        public IEnumerable<ReservationDetailDto> GetReservationUser(string reservationId)
+        public IEnumerable<ReservationUserDetailDto> GetReservationUser(string reservationId)
         {
             var reservation = _userReservation.GetAll().Where(x => x.ReservationId == reservationId).Select(y =>
-                new ReservationDetailDto
+                new ReservationUserDetailDto
                 {
                     UserId = y.UserId,
                     CheckInTime = y.CheckInTime,
@@ -344,6 +347,190 @@ namespace VenueBookingSystem.Services
                 NumOfPeople = _userReservation.GetAll().Where(t => t.ReservationId == x.ReservationId).Sum(t => t.NumOfPeople),
             });
             return reservations;
+        }
+
+        public bool UpdateReservationStatus(string reservationId, string userId, DateTime checkInTime, string status)
+        {
+            // 查找用户预约记录
+            var userReservation = _context.UserReservations
+                .FirstOrDefault(ur => ur.ReservationId == reservationId && ur.UserId == userId);
+
+            if (userReservation == null)
+            {
+                // 未找到预约记录，返回false
+                return false;
+            }
+
+            // 更新签到时间和预约状态
+            userReservation.CheckInTime = checkInTime;
+            userReservation.Status = status;
+
+            // 保存更改
+            _context.SaveChanges();
+
+            return true;
+        }
+
+
+
+        public List<ReservationDetailDto> GetReservationsByUserId(string userId)
+        {
+            var userReservations = _context.UserReservations
+                .Where(ur => ur.UserId == userId)
+                .Include(ur => ur.Reservation)
+                .ToList();
+
+            var reservationDetails = new List<ReservationDetailDto>();
+
+            foreach (var userReservation in userReservations)
+            {
+                var reservation = userReservation.Reservation;
+                var reservationDetail = new ReservationDetailDto
+                {
+                    ReservationId = reservation.ReservationId,
+                    VenueId = reservation.VenueId,
+                    VenueName = reservation.Venue?.Name,
+                    AvailabilityId = reservation.AvailabilityId,
+                    StartTime = reservation.Availability?.StartTime ?? DateTime.MinValue,
+                    EndTime = reservation.Availability?.EndTime ?? DateTime.MinValue,
+                    ReservationTime = reservation.ReservationTime,
+                    PaymentAmount = reservation.PaymentAmount,
+                    ReservationType = reservation.ReservationType
+                };
+
+                if (reservation.ReservationType == "User")
+                {
+                    reservationDetail.NumOfPeople = userReservation.NumOfPeople; // 返回 NumOfPeople
+                }
+                else if (reservation.ReservationType == "Group")
+                {
+                    var groupReservation = _context.GroupReservationMembers
+                        .Where(gr => gr.ReservationId == reservation.ReservationId)
+                        .Count();
+                    reservationDetail.MemberCount = groupReservation; // 返回 MemberCount
+                }
+
+                reservationDetails.Add(reservationDetail);
+            }
+
+            return reservationDetails;
+        }
+
+        public List<ReservationDetailDto> GetAllReservations()
+        {
+            var reservations = _context.Reservations
+                .Include(r => r.Venue)
+                .Include(r => r.Availability)
+                .ToList();
+
+            var reservationDetails = new List<ReservationDetailDto>();
+
+            foreach (var reservation in reservations)
+            {
+                var reservationDetail = new ReservationDetailDto
+                {
+                    ReservationId = reservation.ReservationId,
+                    VenueId = reservation.VenueId,
+                    VenueName = reservation.Venue?.Name,
+                    AvailabilityId = reservation.AvailabilityId,
+                    StartTime = reservation.Availability?.StartTime ?? DateTime.MinValue,
+                    EndTime = reservation.Availability?.EndTime ?? DateTime.MinValue,
+                    ReservationTime = reservation.ReservationTime,
+                    PaymentAmount = reservation.PaymentAmount,
+                    ReservationType = reservation.ReservationType
+                };
+
+                if (reservation.ReservationType == "User")
+                {
+                    var userReservation = _context.UserReservations
+                        .FirstOrDefault(ur => ur.ReservationId == reservation.ReservationId);
+                    reservationDetail.NumOfPeople = userReservation?.NumOfPeople ?? 0;
+                }
+                else if (reservation.ReservationType == "Group")
+                {
+                    var groupReservationCount = _context.GroupReservationMembers
+                        .Count(gr => gr.ReservationId == reservation.ReservationId);
+                    reservationDetail.MemberCount = groupReservationCount;
+                }
+
+                reservationDetails.Add(reservationDetail);
+            }
+
+            return reservationDetails;
+        }
+
+        public List<ReservationDetailDto> GetReservationsByVenueIds(List<string> venueIds)
+        {
+            var reservations = _context.Reservations
+                .Where(r => venueIds.Contains(r.VenueId))
+                .Include(r => r.Venue)
+                .Include(r => r.Availability)
+                .ToList();
+
+            var reservationDetails = new List<ReservationDetailDto>();
+
+            foreach (var reservation in reservations)
+            {
+                var reservationDetail = new ReservationDetailDto
+                {
+                    ReservationId = reservation.ReservationId,
+                    VenueId = reservation.VenueId,
+                    VenueName = reservation.Venue?.Name,
+                    AvailabilityId = reservation.AvailabilityId,
+                    StartTime = reservation.Availability?.StartTime ?? DateTime.MinValue,
+                    EndTime = reservation.Availability?.EndTime ?? DateTime.MinValue,
+                    ReservationTime = reservation.ReservationTime,
+                    PaymentAmount = reservation.PaymentAmount,
+                    ReservationType = reservation.ReservationType
+                };
+
+                if (reservation.ReservationType == "User")
+                {
+                    var userReservation = _context.UserReservations
+                        .FirstOrDefault(ur => ur.ReservationId == reservation.ReservationId);
+                    reservationDetail.NumOfPeople = userReservation?.NumOfPeople ?? 0;
+                }
+                else if (reservation.ReservationType == "Group")
+                {
+                    var groupReservationCount = _context.GroupReservationMembers
+                        .Count(gr => gr.ReservationId == reservation.ReservationId);
+                    reservationDetail.MemberCount = groupReservationCount;
+                }
+
+                reservationDetails.Add(reservationDetail);
+            }
+
+            return reservationDetails;
+        }
+
+
+        // 查找团体预约每个成员的预约信息
+        public List<UserReservationInfoDto> GetGroupReservationMembers(string reservationId)
+        {
+            // 获取用户预约关系表中的记录
+            var userReservations = _userReservationRepository
+                .Find(ur => ur.ReservationId == reservationId).ToList();
+
+            // 创建结果列表
+            var memberDetails = new List<UserReservationInfoDto>();
+
+            foreach (var userReservation in userReservations)
+            {
+                // 查找每个用户的详细信息
+                var user = _userRepository.GetById(userReservation.UserId);
+
+                // 将结果加入到列表
+                memberDetails.Add(new UserReservationInfoDto
+                {
+                    UserId = user.UserId,
+                    Username = user.Username,
+                    RealName = user.RealName,
+                    CheckInTime = userReservation.CheckInTime,
+                    Status = userReservation.Status
+                });
+            }
+
+            return memberDetails;
         }
     }
 }

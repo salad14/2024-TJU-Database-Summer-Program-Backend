@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 namespace VenueBookingSystem.Dto
 {
     public class ReservationDto
@@ -41,7 +42,7 @@ namespace VenueBookingSystem.Dto
         public int RemainingCapacity { get; set; } // 剩余容量
     }
 
-    public class ReservationDetailDto
+    public class ReservationUserDetailDto
     {
         public  string UserId { get; set; } // 用户ID
         public DateTime? CheckInTime { get; set; } // 用户签到时间
@@ -99,6 +100,65 @@ namespace VenueBookingSystem.Dto
 
         public string VenueName { get; set; } // 场地名称
        
+    }
+
+    public class ReservationStatusUpdateDto
+    {
+        [Required]
+        public string ReservationId { get; set; }
+
+        [Required]
+        public string UserId { get; set; }
+
+        public DateTime CheckInTime { get; set; }
+
+        [Required]
+        public string Status { get; set; }
+    }
+
+
+    public class ReservationDetailDto
+    {
+        public string ReservationId { get; set; }
+        public string VenueId { get; set; }
+        public string VenueName { get; set; }
+        public string AvailabilityId { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public DateTime ReservationTime { get; set; }
+        public decimal PaymentAmount { get; set; }
+        public string ReservationType { get; set; }
+        public int? NumOfPeople { get; set; } // 针对个人预约
+        public int? MemberCount { get; set; } // 针对团体预约
+        public List<UserDetailDto> UserDetails { get; set; }
+        public GroupReservationDetailDto GroupDetails { get; set; }
+    }
+
+    public class UserDetailDto
+    {
+        public string UserId { get; set; }
+        public string RealName { get; set; }
+    }
+
+    public class GroupReservationDetailDto
+    {
+        public string GroupId { get; set; }
+        public string GroupName { get; set; }
+    }
+
+
+    public class VenueIdsDto
+    {
+        public List<string> VenueIds { get; set; }
+    }
+
+    public class UserReservationInfoDto
+    {
+        public string UserId { get; set; } // 用户ID
+        public string Username { get; set; } // 用户名
+        public string RealName { get; set; } // 真实姓名
+        public DateTime? CheckInTime { get; set; } // 签到时间
+        public string Status { get; set; } // 预约状态
     }
 }
 
