@@ -3,6 +3,8 @@ using System.Linq; // 必需的命名空间，用于 LINQ 操作
 using VenueBookingSystem.Data;
 using VenueBookingSystem.Dto;
 using VenueBookingSystem.Models;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace VenueBookingSystem.Services
 {
@@ -23,27 +25,6 @@ namespace VenueBookingSystem.Services
             _adminRepository = adminRepository;
             _venueRepository = venueRepository;
             _context = context; // 注入 ApplicationDbContext
-        }
-
-        // 发布公告
-        public void PublishAnnouncement(AnnouncementDto announcementDto)
-        {
-            var admin = _adminRepository.Find(a => a.AdminId == announcementDto.AdminId).FirstOrDefault();
-            
-            if (admin == null)
-            {
-                throw new ArgumentException("无效的管理员ID");
-            }
-
-            var announcement = new Announcement
-            {
-                Title = announcementDto.Title,
-                Content = announcementDto.Content,
-                PublishedDate = DateTime.Now,
-                AdminId = announcementDto.AdminId // 使用 AdminId 关联公告与管理员
-            };
-
-            _announcementRepository.Add(announcement);
         }
 
 
@@ -127,8 +108,19 @@ namespace VenueBookingSystem.Services
                 };
             }
 
-            // 生成唯一公告ID
-            string announcementId = GenerateUniqueAnnouncementId();
+            // 查找数据库中最大的公告ID，并生成新的唯一公告ID
+            var maxId = _announcementRepository.GetAll()
+                .OrderByDescending(a => a.AnnouncementId)
+                .Select(a => a.AnnouncementId)
+                .FirstOrDefault();
+
+            // 如果数据库中没有任何公告，则从 100001 开始
+            int newId = 100001;
+            if (int.TryParse(maxId, out int currentMaxId))
+            {
+                newId = currentMaxId + 1;
+            }
+            string announcementId = newId.ToString();
 
             // 创建并保存公告
             var announcement = new Announcement
@@ -139,15 +131,19 @@ namespace VenueBookingSystem.Services
                 AdminId = announcementDto.AdminId,
                 PublishedDate = DateTime.Now
             };
+
+            // 使用 _announcementRepository 添加公告
             _announcementRepository.Add(announcement);
 
-            // 添加场地公告
+            // 添加场地公告，如果有多个场地公告，批量添加
             if (announcementDto.NoticeVenues != null && announcementDto.NoticeVenues.Any())
             {
+                var venueAnnouncements = new List<VenueAnnouncement>();
+
                 foreach (var venueId in announcementDto.NoticeVenues)
                 {
-                    // 检查场地是否存在
-                    var venue = _context.Venues.FirstOrDefault(v => v.VenueId == venueId);
+                    // 使用 AsNoTracking 避免重复跟踪场地实体
+                    var venue = _context.Venues.AsNoTracking().FirstOrDefault(v => v.VenueId == venueId);
                     if (venue == null)
                     {
                         return new AddAnnouncementResult
@@ -157,13 +153,15 @@ namespace VenueBookingSystem.Services
                         };
                     }
 
-                    var venueAnnouncement = new VenueAnnouncement
+                    venueAnnouncements.Add(new VenueAnnouncement
                     {
                         AnnouncementId = announcementId,
                         VenueId = venueId
-                    };
-                    _context.VenueAnnouncements.Add(venueAnnouncement);
+                    });
                 }
+
+                // 批量添加场地公告，避免逐个添加
+                _context.VenueAnnouncements.AddRange(venueAnnouncements);
             }
 
             // 保存数据库更改
@@ -176,6 +174,7 @@ namespace VenueBookingSystem.Services
                 Info = "公告添加成功"
             };
         }
+
 
         public UpdateAnnouncementResult UpdateAnnouncement(UpdateAnnouncementDto announcementDto)
         {
@@ -283,30 +282,5 @@ namespace VenueBookingSystem.Services
                 };
             }
         }
-
-
-
-
-        private string GenerateUniqueAnnouncementId()
-        {
-            // 查找数据库中最大的公告ID
-            var maxId = _announcementRepository.GetAll()
-                .OrderByDescending(a => a.AnnouncementId)
-                .Select(a => a.AnnouncementId)
-                .FirstOrDefault();
-
-            // 如果数据库中没有任何公告，则从 100001 开始
-            int newId = 100001;
-            if (int.TryParse(maxId, out int currentMaxId))
-            {
-                newId = currentMaxId + 1;
-            }
-
-            return newId.ToString();
-        }
-
-
-
-
     }
 }

@@ -62,5 +62,18 @@ namespace VenueBookingSystem.Models
         public string? SystemAdminId { get; set; }
     }
 
+    public class AdminInfoResultDto
+    {
+        public int State { get; set; }
+        public string Info { get; set; }
+        public AdminInfoDto Data { get; set; }
+    }
 
+    public class AdminInfoDto
+    {
+        public string RealName { get; set; }
+        public string ContactNumber { get; set; }
+        public string AdminType { get; set; }
+    }
+    
 }

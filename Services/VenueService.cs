@@ -2,6 +2,7 @@ using System.Linq;
 using VenueBookingSystem.Models;
 using VenueBookingSystem.Data;
 using VenueBookingSystem.Dto;
+using Microsoft.EntityFrameworkCore;
 
 namespace VenueBookingSystem.Services
 {
@@ -694,24 +695,8 @@ namespace VenueBookingSystem.Services
          // 添加开放时间段
         public AddAvailabilityResult AddAvailability(string venueId, DateTime startTime, DateTime endTime, decimal price, int remainingCapacity)
         {
-            // 查找当前表中最大的开放时间段ID
-            var maxAvailabilityId = _context.VenueAvailabilities
-                .OrderByDescending(va => va.AvailabilityId)
-                .Select(va => va.AvailabilityId)
-                .FirstOrDefault();
-
-            // 如果没有记录，则从 1 开始，否则加 1
-            int newAvailabilityId = 1;
-            if (!string.IsNullOrEmpty(maxAvailabilityId))
-            {
-                if (int.TryParse(maxAvailabilityId, out int maxId))
-                {
-                    newAvailabilityId = maxId + 1;
-                }
-            }
-
-            // 检查场地是否存在
-            var venue = _context.Venues.FirstOrDefault(v => v.VenueId == venueId);
+            // 使用 AsNoTracking() 查询，避免跟踪问题
+            var venue = _context.Venues.AsNoTracking().FirstOrDefault(v => v.VenueId == venueId);
             if (venue == null)
             {
                 return new AddAvailabilityResult
@@ -722,10 +707,32 @@ namespace VenueBookingSystem.Services
                 };
             }
 
-            // 添加开放时间段记录
+            // 查找当前表中所有的开放时间段ID并拉回内存
+            var availabilityIds = _context.VenueAvailabilities
+                .Select(va => va.AvailabilityId)
+                .ToList()  // 将查询结果拉回内存
+                .Where(id => int.TryParse(id, out _))  // 过滤出可以转换为整数的ID
+                .OrderByDescending(id => Convert.ToInt32(id))  // 转换为整数并排序
+                .FirstOrDefault();  // 获取最大的ID
+
+            Console.WriteLine($"最大 AvailabilityId: {availabilityIds}");  // 输出实际的最大ID
+
+            // 如果数据库中没有任何记录，则从 "1" 开始
+            int newAvailabilityId = 1;
+            if (!string.IsNullOrEmpty(availabilityIds) && int.TryParse(availabilityIds, out int maxId))
+            {
+                newAvailabilityId = maxId + 1;
+            }
+
+            Console.WriteLine($"生成的新 AvailabilityId: {newAvailabilityId}");  // 输出生成的新ID
+
+            // 将生成的 ID 转换为字符串
+            string availabilityId = newAvailabilityId.ToString();
+
+            // 创建并保存新的 VenueAvailability 记录
             var venueAvailability = new VenueAvailability
             {
-                AvailabilityId = newAvailabilityId.ToString(), // 将整数 ID 转换为字符串
+                AvailabilityId = availabilityId,
                 VenueId = venueId,
                 StartTime = startTime,
                 EndTime = endTime,
@@ -733,17 +740,28 @@ namespace VenueBookingSystem.Services
                 RemainingCapacity = remainingCapacity
             };
 
+            // 添加新的 VenueAvailability 实体
             _context.VenueAvailabilities.Add(venueAvailability);
 
-            // 保存更改并返回结果
             try
             {
+                // 保存更改
                 _context.SaveChanges();
                 return new AddAvailabilityResult
                 {
                     State = 1,
-                    AvailabilityId = newAvailabilityId.ToString(),
+                    AvailabilityId = availabilityId,
                     Info = "开放时间段添加成功"
+                };
+            }
+            catch (DbUpdateException dbEx)
+            {
+                var innerException = dbEx.InnerException != null ? dbEx.InnerException.Message : dbEx.Message;
+                return new AddAvailabilityResult
+                {
+                    State = 0,
+                    AvailabilityId = "",
+                    Info = $"添加开放时间段时出错：{innerException}"
                 };
             }
             catch (Exception ex)
@@ -752,10 +770,12 @@ namespace VenueBookingSystem.Services
                 {
                     State = 0,
                     AvailabilityId = "",
-                    Info = $"添加开放时间段时出错：{ex.Message}"
+                    Info = $"发生意外错误：{ex.Message}"
                 };
             }
         }
+
+
          // 删除开放时间段
         public DeleteAvailabilityResult DeleteAvailability(string availabilityId)
         {

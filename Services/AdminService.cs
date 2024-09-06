@@ -344,6 +344,46 @@ namespace VenueBookingSystem.Services
             };
         }
 
+        public AdminInfoResultDto GetAdminInfo(string adminId)
+        {
+            try
+            {
+                // 查找管理员信息
+                var admin = _adminRepository.Find(a => a.AdminId == adminId).FirstOrDefault();
+                if (admin == null)
+                {
+                    return new AdminInfoResultDto
+                    {
+                        State = 0,
+                        Info = "无效的管理员ID",
+                        Data = null
+                    };
+                }
+
+                // 返回管理员的真实姓名、联系电话和管理员类型
+                return new AdminInfoResultDto
+                {
+                    State = 1,  // 成功状态
+                    Info = "获取成功",
+                    Data = new AdminInfoDto
+                    {
+                        RealName = admin.RealName,
+                        ContactNumber = admin.ContactNumber,
+                        AdminType = admin.AdminType
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AdminInfoResultDto
+                {
+                    State = 0,
+                    Info = $"获取数据失败: {ex.Message}",
+                    Data = null
+                };
+            }
+        }
+
 
 
 

@@ -18,14 +18,6 @@ namespace VenueBookingSystem.Controllers
             _announcementService = announcementService;
         }
 
-        // 发布新公告
-        [HttpPost]
-        public IActionResult PublishAnnouncement(AnnouncementDto announcementDto)
-        {
-            _announcementService.PublishAnnouncement(announcementDto);
-            return Ok("公告发布成功");
-        }
-
         // 获取所有公告
         [HttpGet("publicNoticeData")]
         public IActionResult GetPublicNoticeData()

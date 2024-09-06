@@ -12,6 +12,8 @@ namespace VenueBookingSystem.Services
 
         AdminManagedItemsResultDto GetAdminManagedVenuesAndEquipment(string adminId);
 
+        AdminInfoResultDto GetAdminInfo(string adminId);
+
         UpdateResult UpdateAdminInfo(string adminId, AdminUpdateDto adminUpdateDto, List<string> manageVenues);
         
         UpdateResult UpdateAdminPassword(string adminId, string newPassword);

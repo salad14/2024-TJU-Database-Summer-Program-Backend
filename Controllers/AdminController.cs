@@ -4,6 +4,7 @@ using System;
 using VenueBookingSystem.Models;
 using Microsoft.AspNetCore.Cors;
 using VenueBookingSystem.Dto;
+using VenueBookingSystem.Data;
 
 namespace VenueBookingSystem.Controllers
 {
@@ -13,12 +14,14 @@ namespace VenueBookingSystem.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IAdminService _adminService;
+        private readonly ApplicationDbContext _context;
 
         
 
-        public AdminController(IAdminService adminService)
+        public AdminController(IAdminService adminService,ApplicationDbContext context)
         {
             _adminService = adminService;
+            _context = context;
         }
 
         [HttpPost("AdminNoticeData")]
@@ -72,6 +75,28 @@ namespace VenueBookingSystem.Controllers
             }
         }
 
+        [HttpGet("{adminId}/info")]
+        public IActionResult GetAdminInfo(string adminId)
+        {
+            try
+            {
+                var result = _adminService.GetAdminInfo(adminId);
+                return Ok(new
+                {
+                    Status = 1,
+                    Data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Status = 0,
+                    Info = $"获取管理员信息失败: {ex.Message}"
+                });
+            }
+        }
+
 
         [HttpPost("register")]
         public IActionResult RegisterAdmin([FromBody] AdminRegistrationDto registrationDto)
@@ -114,10 +139,36 @@ namespace VenueBookingSystem.Controllers
             return Ok(result);
         }
 
+        // 获取所有管理员信息
+        [HttpGet("allAdmins")]
+        public IActionResult GetAllAdmins()
+        {
+            try
+            {
+                // 查询所有管理员信息
+                var admins = _context.Admins.Select(admin => new AdminResponseDto
+                {
+                    RealName = admin.RealName,
+                    ContactNumber = admin.ContactNumber,
+                    AdminType = admin.AdminType
+                }).ToList();
 
-
-
-
+                return Ok(new
+                {
+                    State = 1,
+                    Info = "成功获取管理员信息",
+                    Data = admins
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    State = 0,
+                    Info = $"获取管理员信息失败: {ex.Message}"
+                });
+            }
+        }
 
         // 其他的 Admin 相关方法可以类似于此处添加
     }
