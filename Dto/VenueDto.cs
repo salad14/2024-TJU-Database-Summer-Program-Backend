@@ -38,6 +38,9 @@ namespace VenueBookingSystem.Models
         public List<VenueAnnouncementResponseDto> Announcements { get; set; } // 修改为新类型
     }
 
-
+    public class DeleteAvailabilityRequest
+    {
+        public string AvailabilityId { get; set; }  // 开放时间段ID
+    }
     
 }

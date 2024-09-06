@@ -405,13 +405,15 @@ namespace VenueBookingSystem.Controllers
 
 
          // 删除开放时间段
-        [HttpDelete("DeleteAvailability")]
-        public IActionResult DeleteAvailability([FromQuery] string availabilityId)
+        [HttpPost("DeleteAvailability")]
+        public IActionResult DeleteAvailability([FromBody] DeleteAvailabilityRequest request)
         {
-            var result = _venueService.DeleteAvailability(availabilityId);
+            var result = _venueService.DeleteAvailability(request.AvailabilityId);
 
             return Ok(result);
         }
+
+
 
         //根据场地ID获取场地公告
         [HttpGet("GetVenueDetailsAnnouncement")]

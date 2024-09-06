@@ -309,13 +309,26 @@ namespace VenueBookingSystem.Services
         // 添加设备信息
         public AddDeviceResult AddDevice(string adminId, string equipmentName, string venueId, DateTime? installationTime)
         {
-            // 生成唯一的设备ID
-            string newEquipmentId = Guid.NewGuid().ToString();
+            // 查找当前表中最大的设备ID
+            var maxEquipmentId = _context.VenueEquipments
+                .OrderByDescending(ve => ve.EquipmentId)
+                .Select(ve => ve.EquipmentId)
+                .FirstOrDefault();
+
+            // 如果没有设备记录，则从 1 开始，否则加 1
+            int newEquipmentId = 1;
+            if (!string.IsNullOrEmpty(maxEquipmentId))
+            {
+                if (int.TryParse(maxEquipmentId, out int maxId))
+                {
+                    newEquipmentId = maxId + 1;
+                }
+            }
 
             // 添加设备到设备表
             var equipment = new Equipment
             {
-                EquipmentId = newEquipmentId,
+                EquipmentId = newEquipmentId.ToString(), // 将整数 ID 转换为字符串
                 EquipmentName = equipmentName,
                 AdminId = adminId
             };
@@ -328,7 +341,7 @@ namespace VenueBookingSystem.Services
                 var venueEquipment = new VenueEquipment
                 {
                     VenueId = venueId,
-                    EquipmentId = newEquipmentId,
+                    EquipmentId = newEquipmentId.ToString(), // 使用新的设备ID
                     InstallationTime = installationTime ?? DateTime.Now
                 };
                 _context.VenueEquipments.Add(venueEquipment);
@@ -341,8 +354,8 @@ namespace VenueBookingSystem.Services
                 return new AddDeviceResult
                 {
                     State = 1,
-                    DeviceId = newEquipmentId,
-                    Info = ""
+                    DeviceId = newEquipmentId.ToString(),
+                    Info = "设备添加成功"
                 };
             }
             catch (Exception ex)
@@ -351,10 +364,11 @@ namespace VenueBookingSystem.Services
                 {
                     State = 0,
                     DeviceId = "",
-                    Info = $"Failed to add device: {ex.Message}"
+                    Info = $"设备添加失败: {ex.Message}"
                 };
             }
         }
+
          // 编辑设备信息
         public EditDeviceResult EditDevice(string equipmentId, string equipmentName, string venueId)
         {
@@ -417,8 +431,21 @@ namespace VenueBookingSystem.Services
         // 添加维修信息
         public AddRepairResult AddRepair(string equipmentId, DateTime maintenanceStartTime, DateTime maintenanceEndTime, string maintenanceDetails)
         {
-            // 生成唯一的维修记录ID
-            string newRepairId = Guid.NewGuid().ToString();
+            // 查找当前表中最大的维修记录ID
+            var maxRepairId = _context.MaintenanceRecords
+                .OrderByDescending(mr => mr.MaintenanceRecordId)
+                .Select(mr => mr.MaintenanceRecordId)
+                .FirstOrDefault();
+
+            // 如果没有维修记录，则从 1 开始，否则加 1
+            int newRepairId = 1;
+            if (!string.IsNullOrEmpty(maxRepairId))
+            {
+                if (int.TryParse(maxRepairId, out int maxId))
+                {
+                    newRepairId = maxId + 1;
+                }
+            }
 
             // 检查设备是否存在
             var equipment = _context.Equipments.FirstOrDefault(e => e.EquipmentId == equipmentId);
@@ -435,7 +462,7 @@ namespace VenueBookingSystem.Services
             // 添加维修记录
             var maintenanceRecord = new MaintenanceRecord
             {
-                MaintenanceRecordId = newRepairId,
+                MaintenanceRecordId = newRepairId.ToString(), // 将整数 ID 转换为字符串
                 EquipmentId = equipmentId,
                 MaintenanceStartTime = maintenanceStartTime,
                 MaintenanceEndTime = maintenanceEndTime,
@@ -451,8 +478,8 @@ namespace VenueBookingSystem.Services
                 return new AddRepairResult
                 {
                     State = 1,
-                    RepairId = newRepairId,
-                    Info = ""
+                    RepairId = newRepairId.ToString(),
+                    Info = "维修记录添加成功"
                 };
             }
             catch (Exception ex)
@@ -464,7 +491,8 @@ namespace VenueBookingSystem.Services
                     Info = $"添加维修记录时出错：{ex.Message}"
                 };
             }
-        }
+}
+
          // 编辑维修信息
         public EditRepairResult EditRepair(string repairId, DateTime maintenanceStartTime, DateTime maintenanceEndTime, string maintenanceDetails)
         {
@@ -666,8 +694,21 @@ namespace VenueBookingSystem.Services
          // 添加开放时间段
         public AddAvailabilityResult AddAvailability(string venueId, DateTime startTime, DateTime endTime, decimal price, int remainingCapacity)
         {
-            // 生成唯一的开放时间段ID
-            string newAvailabilityId = Guid.NewGuid().ToString();
+            // 查找当前表中最大的开放时间段ID
+            var maxAvailabilityId = _context.VenueAvailabilities
+                .OrderByDescending(va => va.AvailabilityId)
+                .Select(va => va.AvailabilityId)
+                .FirstOrDefault();
+
+            // 如果没有记录，则从 1 开始，否则加 1
+            int newAvailabilityId = 1;
+            if (!string.IsNullOrEmpty(maxAvailabilityId))
+            {
+                if (int.TryParse(maxAvailabilityId, out int maxId))
+                {
+                    newAvailabilityId = maxId + 1;
+                }
+            }
 
             // 检查场地是否存在
             var venue = _context.Venues.FirstOrDefault(v => v.VenueId == venueId);
@@ -684,7 +725,7 @@ namespace VenueBookingSystem.Services
             // 添加开放时间段记录
             var venueAvailability = new VenueAvailability
             {
-                AvailabilityId = newAvailabilityId,
+                AvailabilityId = newAvailabilityId.ToString(), // 将整数 ID 转换为字符串
                 VenueId = venueId,
                 StartTime = startTime,
                 EndTime = endTime,
@@ -701,8 +742,8 @@ namespace VenueBookingSystem.Services
                 return new AddAvailabilityResult
                 {
                     State = 1,
-                    AvailabilityId = newAvailabilityId,
-                    Info = ""
+                    AvailabilityId = newAvailabilityId.ToString(),
+                    Info = "开放时间段添加成功"
                 };
             }
             catch (Exception ex)
