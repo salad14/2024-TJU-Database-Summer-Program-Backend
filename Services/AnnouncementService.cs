@@ -137,7 +137,7 @@ namespace VenueBookingSystem.Services
                 Title = announcementDto.Title,
                 Content = announcementDto.Content,
                 AdminId = announcementDto.AdminId,
-                PublishedDate = DateTime.UtcNow
+                PublishedDate = DateTime.Now
             };
             _announcementRepository.Add(announcement);
 
@@ -193,7 +193,7 @@ namespace VenueBookingSystem.Services
             // 2. 更新公告的基本信息
             announcement.Title = announcementDto.Title;
             announcement.Content = announcementDto.Content;
-            announcement.PublishedDate = DateTime.UtcNow;
+            announcement.PublishedDate = DateTime.Now;
             _announcementRepository.Update(announcement);
 
             // 3. 处理场地公告关系

@@ -13,7 +13,7 @@ namespace VenueBookingSystem.Models
         public string ReservationPermission { get; set; } = "n"; // 预约权限
         public int ViolationCount { get; set; } = 0; // 违约次数，默认值为0
         public string IsVip { get; set; } = "n";// VIP状态
-        public DateTime RegistrationDate { get; set; } = DateTime.UtcNow; // 注册时间
+        public DateTime RegistrationDate { get; set; } = DateTime.Now; // 注册时间
         public double DiscountRate { get; set; } = 0.0; // 折扣力度，默认值为0.0
 
          public required string RealName { get; set; }  // 真实姓名

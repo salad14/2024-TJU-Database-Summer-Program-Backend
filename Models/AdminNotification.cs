@@ -10,7 +10,7 @@ namespace VenueBookingSystem.Models
         public string NotificationType { get; set; } = string.Empty; // 通知类型
         public string Title { get; set; } = string.Empty; // 通知标题
         public string Content { get; set; } = string.Empty; // 通知内容
-        public DateTime NotificationTime { get; set; } = DateTime.UtcNow; // 通知时间
+        public DateTime NotificationTime { get; set; } = DateTime.Now; // 通知时间
 
         // 导航属性：关联到管理员
         public Admin? Admin { get; set; }

@@ -49,7 +49,7 @@ namespace VenueBookingSystem.Services
                 GroupId = groupId,
                 GroupName = groupDto.GroupName,
                 Description = groupDto.Description,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = DateTime.Now
             };
 
             // 添加团体到数据库
@@ -150,7 +150,7 @@ namespace VenueBookingSystem.Services
                 NotificationType = "team/" + notificationType,  // 通知类型
                 Title = "加入团体确认",  // 通知标题
                 Content = notificationContent,
-                NotificationTime = DateTime.UtcNow,
+                NotificationTime = DateTime.Now,
                 TargetUser = userId,
                 TargetTeam = groupId,
             };
@@ -198,7 +198,7 @@ namespace VenueBookingSystem.Services
                 Content = string.IsNullOrEmpty(adminId)
                     ? $"您已成功退出团体 [{group?.GroupName}]"
                     : $"您已被管理员 [{adminId}] 移出团体 [{group?.GroupName}]",
-                NotificationTime = DateTime.UtcNow
+                NotificationTime = DateTime.Now
             };
 
 
@@ -244,7 +244,7 @@ namespace VenueBookingSystem.Services
                 NotificationType = "team/" + notificationType,  // 通知类型
                 Title = notificationType == "roleChange" ? "团体角色变更" : "加入团体成功",  // 通知标题
                 Content = notificationContent,
-                NotificationTime = DateTime.UtcNow
+                NotificationTime = DateTime.Now
             };
 
             _userNotificationRepository.Add(notification);

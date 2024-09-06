@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using VenueBookingSystem.Models;
 using VenueBookingSystem.Services;
 using VenueBookingSystem.Dto;
+using VenueBookingSystem.Data;
 
 namespace VenueBookingSystem.Controllers
 {
@@ -13,12 +14,14 @@ namespace VenueBookingSystem.Controllers
     {
         private readonly IVenueService _venueService;
         private readonly IVenueAnalysisService _venueAnalysisService;
+        private readonly ApplicationDbContext _context;
 
         // 构造函数，注入场地服务
-        public VenueController(IVenueService venueService, IVenueAnalysisService venueAnalysisService)
+        public VenueController(IVenueService venueService, IVenueAnalysisService venueAnalysisService,ApplicationDbContext context)
         {
             _venueService = venueService;
             _venueAnalysisService = venueAnalysisService;
+            _context = context;
         }
 
         // 获取所有场地信息
@@ -473,8 +476,18 @@ namespace VenueBookingSystem.Controllers
         {
             try
             {
-                var venueMaintenances = _venueService.GetAllVenueDetails();
-                return Ok(venueMaintenances);
+                // 从 VenueMaintenances 表中获取所有保养信息
+                var venueMaintenances = _context.VenueMaintenances
+                    .Select(vm => new VenueMaintenanceDto
+                    {
+                        VenueMaintenanceId = vm.VenueMaintenanceId,
+                        VenueId = vm.VenueId,
+                        MaintenanceStartDate = vm.MaintenanceStartDate,
+                        MaintenanceEndDate = vm.MaintenanceEndDate,
+                        Description = vm.Description
+                    }).ToList();
+
+                return Ok(new { state = 1, data = venueMaintenances, info = "" });
             }
             catch (Exception ex)
             {
@@ -488,14 +501,39 @@ namespace VenueBookingSystem.Controllers
         {
             try
             {
-                var venueMaintenances = _venueService.GetVenueDetails(venueId);
+                // 检查场地是否存在
+                var venueExists = _context.Venues
+                    .Where(v => v.VenueId == venueId)
+                    .Select(v => 1) 
+                    .FirstOrDefault() == 1;
+                if (!venueExists)
+                {
+                    return NotFound(new { state = 0, info = "未找到该场地" });
+                }
+
+                // 根据场地 ID 获取该场地的保养记录
+                var venueMaintenances = _context.VenueMaintenances
+                    .Where(vm => vm.VenueId == venueId)
+                    .Select(vm => new VenueMaintenanceDto
+                    {
+                        VenueMaintenanceId = vm.VenueMaintenanceId,
+                        VenueId = vm.VenueId,
+                        MaintenanceStartDate = vm.MaintenanceStartDate,
+                        MaintenanceEndDate = vm.MaintenanceEndDate,
+                        Description = vm.Description
+                    }).ToList();
+
+                // 返回保养记录
                 return Ok(new { state = 1, data = venueMaintenances, info = "" });
             }
             catch (Exception ex)
             {
+                // 返回错误信息
                 return BadRequest(new { state = 0, info = $"获取失败: {ex.Message}" });
             }
         }
+
+
 
         // 更新保养信息
         [HttpPut("UpdateVenueMaintenance")]

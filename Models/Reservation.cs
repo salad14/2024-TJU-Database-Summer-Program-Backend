@@ -8,7 +8,7 @@ namespace VenueBookingSystem.Models
         public required string VenueId { get; set; } // 场地ID
         public required string AvailabilityId { get; set; } // 开放时间段ID
         public required string ReservationItem { get; set; } // 预约项目的描述
-        public required DateTime ReservationTime { get; set; } = DateTime.UtcNow; // 预约操作时间
+        public required DateTime ReservationTime { get; set; } = DateTime.Now; // 预约操作时间
         public required decimal PaymentAmount { get; set; } // 支付金额
         public required string ReservationType { get; set; }  //预约类型（用户，团体）
 

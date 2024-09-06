@@ -204,7 +204,7 @@ namespace VenueBookingSystem.Services
                     NotificationType = "adminValidation",
                     Title = "管理员注册申请",
                     Content = $"管理员 [{admin.RealName}] 申请注册成为 [{admin.AdminType}]，联系电话为 {admin.ContactNumber}，申请说明为 [{adminDto.ApplyDescription}]，申请管理的场地为 {string.Join(", ", manageVenues)}",
-                    NotificationTime = DateTime.UtcNow,
+                    NotificationTime = DateTime.Now,
                     NewAdminId = adminId // 将新管理员ID存储到通知表中
                 };
 

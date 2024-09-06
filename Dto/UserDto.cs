@@ -12,7 +12,7 @@ namespace VenueBookingSystem.Models
         public string? IsVip { get; set; } // VIP状态
         public double DiscountRate { get; set; } = 0.0;  // 折扣力度
         public required string RealName { get; set; }  // 真实姓名
-        public DateTime RegistrationDate { get; set; } = DateTime.UtcNow; // 注册时间
+        public DateTime RegistrationDate { get; set; } = DateTime.Now; // 注册时间
     }
 
     public class UserGroupInfoDto

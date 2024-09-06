@@ -87,7 +87,7 @@ namespace VenueBookingSystem.Services
                 VenueId = reservationDto.VenueId,
                 AvailabilityId = reservationDto.AvailabilityId,
                 ReservationType = reservationDto.ReservationType,
-                ReservationTime = DateTime.UtcNow,
+                ReservationTime = DateTime.Now,
                 PaymentAmount = reservationDto.PaymentAmount,
                 ReservationItem = reservationDto.ReservationItem
             };
@@ -279,53 +279,6 @@ namespace VenueBookingSystem.Services
             {
                 _reservationRepository.Delete(reservation);
             }
-        }
-
-        // 获取预约人的信息
-        public ReservationResponseDto GetReservationUser(string reservationId)
-        {
-            // 从 Reservations 表中获取预约记录
-            var reservation = _reservationRepository.GetAll().FirstOrDefault(x => x.ReservationId == reservationId);
-
-            // 检查预约记录是否存在
-            if (reservation == null)
-            {
-                return new ReservationResponseDto
-                {
-                    State = 0,
-                    Info = "预约记录不存在",
-                    Data = null
-                };
-            }
-
-            // 检查预约类型是否为 Group
-            if (reservation.ReservationType != "Group")
-            {
-                return new ReservationResponseDto
-                {
-                    State = 0,
-                    Info = "不是团队预约",
-                    Data = null
-                };
-            }
-
-            // 查询团体预约成员信息
-            var reservationUsers = _userReservation.GetAll().Where(x => x.ReservationId == reservationId).Select(y =>
-                new ReservationUserDetailDto
-                {
-                    UserId = y.UserId,
-                    CheckInTime = y.CheckInTime,
-                    Status = y.Status,
-                    Username = y.User.Username,
-                    RealName = y.User.RealName
-                }).ToList();
-
-            return new ReservationResponseDto
-            {
-                State = 1,
-                Info = "",
-                Data = reservationUsers
-            };
         }
 
 

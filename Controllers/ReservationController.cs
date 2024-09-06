@@ -39,14 +39,6 @@ namespace VenueBookingSystem.Controllers
             return BadRequest(result);
         }
 
-        // 根据预约记录ID，查找团体预约每个成员的预约信息
-        [HttpGet("getReservationUser")]
-        public IActionResult GetReservationUser(string reservationId)
-        {
-            var result = _reservationService.GetReservationUser(reservationId);
-            return Ok(result);
-        }
-
         // 预约记录修改
         [HttpPost("updateReservationUser")]
         public IActionResult UpdateReservationUser(UpdateReservationUserDto req)

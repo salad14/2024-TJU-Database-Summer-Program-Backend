@@ -8,7 +8,7 @@ namespace VenueBookingSystem.Models
         public string GroupId { get; set; }
         public required Group Group { get; set; }
 
-        public DateTime JoinDate { get; set; } = DateTime.UtcNow; // 加入时间
+        public DateTime JoinDate { get; set; } = DateTime.Now; // 加入时间
 
         public string RoleInGroup { get; set; } // 团体中的地位
     }
