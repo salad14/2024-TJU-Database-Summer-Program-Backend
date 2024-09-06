@@ -8,6 +8,8 @@ namespace VenueBookingSystem.Models
         public int Capacity { get; set; } // 可容纳人数
         public string Status { get; set; } // 场地状态
 
+        public string? VenueDescription{ get; set; }//场地描述
+
         public string VenueLocation { get; set; }  
         public string VenueImageUrl { get; set; }
         public IEnumerable<EquipmentDto> VenueDevices { get; set; } // 设备信息
@@ -48,4 +50,12 @@ namespace VenueBookingSystem.Models
         public DateTime PublishedDate { get; set; } // 发布时间
         public DateTime LastModifiedDate { get; set; } // 最近修改时间
     }
+
+    public class VenueAnnouncementResponseDto
+    {
+        public string Title { get; set; }  // 公告标题
+        public string Content { get; set; }  // 公告内容
+        public DateTime PublishDate { get; set; }  // 公告发布时间
+    }
+
 }

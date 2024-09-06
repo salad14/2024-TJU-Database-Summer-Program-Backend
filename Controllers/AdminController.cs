@@ -74,11 +74,16 @@ namespace VenueBookingSystem.Controllers
 
 
         [HttpPost("register")]
-        public IActionResult RegisterAdmin([FromBody] AdminDto adminDto, [FromQuery] List<string> manageVenues)
+        public IActionResult RegisterAdmin([FromBody] AdminRegistrationDto registrationDto)
         {
             try
             {
-                var result = _adminService.RegisterAdmin(adminDto, manageVenues);
+                // 传入 systemAdminId
+                var result = _adminService.RegisterAdmin(
+                    registrationDto.AdminDto, 
+                    registrationDto.ManageVenues, 
+                    registrationDto.SystemAdminId
+                );
                 return Ok(result);
             }
             catch (Exception ex)
@@ -91,6 +96,8 @@ namespace VenueBookingSystem.Controllers
                 });
             }
         }
+
+
 
         [HttpPut("updateAdminInfo/{adminId}")]
         public IActionResult UpdateAdminInfo(string adminId, [FromBody] AdminUpdateDto adminUpdateDto, [FromQuery] List<string> manageVenues)

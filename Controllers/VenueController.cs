@@ -95,6 +95,75 @@ namespace VenueBookingSystem.Controllers
             }
         }
 
+        //编辑场地信息
+        [HttpPut("EditVenue")]
+        public IActionResult EditVenue([FromQuery] string venueId, [FromBody] VenueDto venueDto)
+        {
+            try
+            {
+                var result = _venueService.EditVenue(venueId, venueDto);
+                if (result.State == 1)
+                {
+                    return Ok(new
+                    {
+                        state = result.State,
+                        info = result.Info
+                    });
+                }
+                else
+                {
+                    return Ok(new
+                    {
+                        state = result.State,
+                        info = result.Info
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    state = 0,
+                    info = $"编辑场地信息时发生错误：{ex.Message}"
+                });
+            }
+        }
+
+        //获取场地管理员和公告信息
+        [HttpGet("GetVenueAdminAndAnnouncements")]
+        public IActionResult GetVenueAdminAndAnnouncements([FromQuery] string venueId)
+        {
+            try
+            {
+                var result = _venueService.GetVenueAdminAndAnnouncements(venueId);
+                if (result.State == 1)
+                {
+                    return Ok(new
+                    {
+                        state = result.State,
+                        info = result.Info,
+                        data = result.Data
+                    });
+                }
+                else
+                {
+                    return Ok(new
+                    {
+                        state = result.State,
+                        info = result.Info
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    state = 0,
+                    info = $"获取场地管理员和公告详情时发生错误：{ex.Message}"
+                });
+            }
+        }
+
 
         // 获取所有维修记录及其相关设备和场地信息
         [HttpGet("GetAllRepairRecords")]
@@ -312,26 +381,6 @@ namespace VenueBookingSystem.Controllers
             }
         }
 
-        // 添加保养信息
-        [HttpPost("AddMaintenance")]
-        public IActionResult AddMaintenance([FromBody] AddMaintenanceRequest request)
-        {
-            var result = _venueService.AddMaintenance(request.VenueId, request.MaintenanceStartDate, request.MaintenanceEndDate, request.Description);
-
-            return Ok(result);
-        }
-
-
-        // 修改保养信息
-        [HttpPut("EditMaintenance")]
-        public IActionResult EditMaintenance([FromBody] EditMaintenanceRequest request)
-        {
-            var result = _venueService.EditMaintenance(request.MaintenanceId, request.MaintenanceStartDate, request.MaintenanceEndDate, request.Description);
-
-            return Ok(result);
-        }
-
-
         // 修改开放时间段信息
         [HttpPut("EditAvailability")]
         public IActionResult EditAvailability([FromBody] EditAvailabilityRequest request)
@@ -394,5 +443,92 @@ namespace VenueBookingSystem.Controllers
                 });
             }
         }
+
+        // 添加保养信息
+        [HttpPost("AddMaintenance")]
+        public IActionResult AddMaintenance([FromBody] VenueMaintenanceDto venueMaintenanceDto)
+        {
+            try
+            {
+                // 调用服务层，生成保养记录
+                var result = _venueService.AddMaintenance(
+                    venueMaintenanceDto.VenueId, 
+                    venueMaintenanceDto.MaintenanceStartDate, 
+                    venueMaintenanceDto.MaintenanceEndDate, 
+                    venueMaintenanceDto.Description
+                );
+
+                return Ok(new { state = result.State, VenueMaintenanceId = result.MaintenanceId, info = result.Info });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { state = 0, VenueMaintenanceId = "", info = $"添加失败: {ex.Message}" });
+            }
+        }
+
+
+        // 获取所有保养信息
+        [HttpGet("GetAllVenueMaintenances")]
+        public IActionResult GetAllVenueMaintenances()
+        {
+            try
+            {
+                var venueMaintenances = _venueService.GetAllVenueDetails();
+                return Ok(venueMaintenances);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { state = 0, info = $"获取失败: {ex.Message}" });
+            }
+        }
+
+        // 获取某个场地的保养信息
+        [HttpGet("GetAllVenueMaintenancesByVenueId")]
+        public IActionResult GetAllVenueMaintenancesByVenueId(string venueId)
+        {
+            try
+            {
+                var venueMaintenances = _venueService.GetVenueDetails(venueId);
+                return Ok(new { state = 1, data = venueMaintenances, info = "" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { state = 0, info = $"获取失败: {ex.Message}" });
+            }
+        }
+
+        // 更新保养信息
+        [HttpPut("UpdateVenueMaintenance")]
+        public IActionResult UpdateVenueMaintenance([FromBody] VenueMaintenanceDto venueMaintenanceDto)
+        {
+            try
+            {
+                // 调用服务层，传递更新的保养记录
+                var result = _venueService.EditMaintenance(
+                    venueMaintenanceDto.VenueMaintenanceId,
+                    venueMaintenanceDto.MaintenanceStartDate,
+                    venueMaintenanceDto.MaintenanceEndDate,
+                    venueMaintenanceDto.Description
+                );
+
+                // 根据服务层的返回值决定返回给前端的状态
+                if (result.State == 1)
+                {
+                    return Ok(new { state = 1, info = "保养信息更新成功" });
+                }
+                else
+                {
+                    return BadRequest(new { state = 0, info = result.Info });
+                }
+            }
+            catch (Exception ex)
+            {
+                // 捕获异常并返回详细错误信息
+                return BadRequest(new { state = 0, info = $"更新失败: {ex.Message}" });
+            }
+        }
+
+
+
     }
 }

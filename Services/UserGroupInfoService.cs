@@ -24,7 +24,7 @@ namespace VenueBookingSystem.Services
 
         public List<UserPersonalGroupInfoDto> GetUserGroups(string userId)
         {
-            var userGroups = (from gu in _groupUserRepository.Find(gu => gu.UserId == userId && (gu.RoleInGroup == "admin" || gu.RoleInGroup == "creator"))
+            var userGroups = (from gu in _groupUserRepository.Find(gu => gu.UserId == userId && (gu.RoleInGroup == "Admin" || gu.RoleInGroup == "Creator"))
                               join g in _groupRepository.GetAll() on gu.GroupId equals g.GroupId
                               select new UserPersonalGroupInfoDto
                               {

@@ -153,5 +153,18 @@ namespace VenueBookingSystem.Dto
         public string Info { get; set; }
     }
 
+    public class EditVenueResult
+    {
+        public int State { get; set; } // 0: 失败, 1: 成功
+        public string Info { get; set; } // 成功或失败的信息
+    }
+
+    public class VenueAdminAndAnnouncementResult
+    {
+        public int State { get; set; } // 0: 失败, 1: 成功
+        public string Info { get; set; } // 成功或失败的信息
+        public VenueAdminAndAnnouncementDto Data { get; set; } // 管理员和公告信息
+    }
+
 
 }

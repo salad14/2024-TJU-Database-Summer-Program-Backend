@@ -23,6 +23,8 @@ namespace VenueBookingSystem.Services
         // 获取所有场地信息的方法签名
         IEnumerable<VenueDto> GetAllVenueInfos();
 
+        EditVenueResult EditVenue(string venueId, VenueDto venueDto);
+
         AddDeviceResult AddDevice(string adminId, string equipmentName, string venueId, DateTime? installationTime);
         EditDeviceResult EditDevice(string equipmentId, string equipmentName, string venueId);
         // 添加维修信息
@@ -31,17 +33,19 @@ namespace VenueBookingSystem.Services
         EditRepairResult EditRepair(string repairId, DateTime maintenanceStartTime, DateTime maintenanceEndTime, string maintenanceDetails);
         // 查询场地的开放时间段
         IEnumerable<AvailabilityDto> GetVenueAvailabilityByDate(string venueId, DateTime date);
-        // 添加保养信息
-        AddMaintenanceResult AddMaintenance(string venueId, DateTime maintenanceStartDate, DateTime maintenanceEndDate, string description);
-        // 修改保养信息
-        EditMaintenanceResult EditMaintenance(string maintenanceId, DateTime maintenanceStartDate, DateTime maintenanceEndDate, string description);
         // 修改开放时间段信息
         EditAvailabilityResult EditAvailability(string availabilityId, DateTime startTime, DateTime endTime, decimal price, int remainingCapacity);
         // 添加开放时间段信息
         AddAvailabilityResult AddAvailability(string venueId, DateTime startTime, DateTime endTime, decimal price, int remainingCapacity);
         // 删除开放时间段
         DeleteAvailabilityResult DeleteAvailability(string availabilityId);
-
         VenueAnnouncementDto GetVenueDetailsAnnouncement(string venueId);
+
+        VenueAdminAndAnnouncementResult GetVenueAdminAndAnnouncements(string venueId);
+
+        AddMaintenanceResult AddMaintenance(string venueId, DateTime maintenanceStartDate, DateTime maintenanceEndDate, string description);
+
+        EditMaintenanceResult EditMaintenance(string maintenanceId, DateTime maintenanceStartDate, DateTime maintenanceEndDate, string description);
+        
     }
 }

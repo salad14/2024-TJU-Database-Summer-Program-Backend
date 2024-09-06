@@ -6,7 +6,7 @@ namespace VenueBookingSystem.Models
         public required string Content { get; set; }  // 公告内容
         public DateTime PublishDate { get; set; }  // 发布日期
 
-        public required string AdminId { get; set; }  // 发布公告的管理员ID
+        public string? AdminId { get; set; }  // 发布公告的管理员ID
     }
 
     public class AnnouncementDetailsDto

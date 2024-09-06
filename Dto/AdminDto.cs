@@ -4,11 +4,19 @@ namespace VenueBookingSystem.Models
     public class AdminDto
     {
         public string RealName { get; set; }  // 管理员真实姓名
-        public string Password { get; set; }  // 管理员密码（已加密）
+        public string? Password { get; set; }  // 管理员密码（已加密）
         public string ContactNumber { get; set; }  // 管理员联系电话
         public string AdminType { get; set; }  // 管理员类型，如 admin-validate/system
-        public string ApplyDescription { get; set; } // 申请说明
+        public string? ApplyDescription { get; set; } // 申请说明
     }
+
+    public class AdminResponseDto
+    {
+        public string RealName { get; set; }
+        public string ContactNumber { get; set; }
+        public string AdminType { get; set; }
+    }
+
 
     public class AdminRequestDto
     {
@@ -46,6 +54,13 @@ namespace VenueBookingSystem.Models
         public IEnumerable<EquipmentDto> ManagedEquipment { get; set; }
     }
 
+    public class AdminRegistrationDto
+    {
+        public AdminDto AdminDto { get; set; }
+        public List<string> ManageVenues { get; set; }
+
+        public string? SystemAdminId { get; set; }
+    }
 
 
 }

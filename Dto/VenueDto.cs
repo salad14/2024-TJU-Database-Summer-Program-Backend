@@ -31,5 +31,13 @@ namespace VenueBookingSystem.Models
 
     }
 
+    public class VenueAdminAndAnnouncementDto
+    {
+        public string VenueId { get; set; }
+        public AdminResponseDto Admin { get; set; }
+        public List<VenueAnnouncementResponseDto> Announcements { get; set; } // 修改为新类型
+    }
+
+
     
 }
