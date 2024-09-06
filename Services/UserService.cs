@@ -21,6 +21,7 @@ namespace VenueBookingSystem.Services
         private readonly IRepository<Group> _groupRepository;
         private readonly IConfiguration _configuration;
         private readonly IRepository<Admin> _adminRepository;
+        private readonly IRepository<UserReservation> _userReservationRepository;
 
 
         // 构造函数，注入存储库和配置
@@ -433,5 +434,32 @@ namespace VenueBookingSystem.Services
                 Info = "删除成功"
             };
         }
+
+        public int GetUserViolationCount(string userId)
+        {
+            // 查找用户的所有预约记录
+            var userReservations = _userReservationRepository?.Find(x => x.UserId == userId)?.ToList();
+
+            // 检查 userReservations 是否为 null
+            if (userReservations == null || !userReservations.Any())
+            {
+                return 0; // 如果用户没有预约记录，返回0
+            }
+
+            int violationCount = 0;
+
+            // 如果有预约记录，计算违约次数
+            foreach (var reservation in userReservations)
+            {
+                // 确保 reservation 和 reservation.Status 不为 null
+                if (reservation != null && !string.IsNullOrEmpty(reservation.Status) && reservation.Status == "已违约")
+                {
+                    violationCount++;
+                }
+            }
+
+            return violationCount;
+        }
+
     }
 }

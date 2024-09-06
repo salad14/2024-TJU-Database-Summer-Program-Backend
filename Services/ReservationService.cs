@@ -94,7 +94,7 @@ namespace VenueBookingSystem.Services
                 VenueId = reservationDto.VenueId,
                 AvailabilityId = reservationDto.AvailabilityId,
                 ReservationType = reservationDto.ReservationType,
-                ReservationTime = DateTime.UtcNow,
+                ReservationTime = DateTime.Now,
                 PaymentAmount = reservationDto.PaymentAmount,
                 ReservationItem = reservationDto.ReservationItem
             };
@@ -123,7 +123,7 @@ namespace VenueBookingSystem.Services
                 NotificationType = "reservation",
                 Title = "预约成功通知",
                 Content = $"您已成功预约场地 {reservationDto.VenueId}，时间段为 {availability.StartTime} - {availability.EndTime}，请按时到场",
-                NotificationTime = DateTime.UtcNow
+                NotificationTime = DateTime.Now
             };
 
             _context.UserNotifications.Add(notification);
@@ -208,7 +208,7 @@ namespace VenueBookingSystem.Services
                 VenueId = groupReservationDto.VenueId,
                 AvailabilityId = groupReservationDto.AvailabilityId,
                 ReservationType = groupReservationDto.ReservationType,
-                ReservationTime = DateTime.UtcNow,
+                ReservationTime = DateTime.Now,
                 PaymentAmount = groupReservationDto.PaymentAmount,
                 ReservationItem = groupReservationDto.ReservationItem
             };
@@ -245,7 +245,7 @@ namespace VenueBookingSystem.Services
                     NotificationType = "reservation",
                     Title = "团体预约成功通知",
                     Content = $"您的团体 {groupReservationDto.GroupName} 已成功预约场地 {groupReservationDto.VenueId}，时间段为 {availability.StartTime} - {availability.EndTime}，请按时到场",
-                    NotificationTime = DateTime.UtcNow
+                    NotificationTime = DateTime.Now
                 };
                 _context.UserNotifications.Add(notification);
                 _context.SaveChanges();

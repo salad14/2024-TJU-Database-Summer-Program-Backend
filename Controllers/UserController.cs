@@ -34,6 +34,9 @@ namespace VenueBookingSystem.Controllers
                 return NotFound(new { message = "用户未找到" });
             }
 
+            // 调用 GetUserViolationCount 来获取违约次数
+            var violationCount = _userService.GetUserViolationCount(userId);
+
             return Ok(new
             {
                 UserId = user.UserId,
