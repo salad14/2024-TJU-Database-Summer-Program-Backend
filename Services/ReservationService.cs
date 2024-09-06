@@ -2,6 +2,7 @@ using VenueBookingSystem.Dto;  // 引入 ReservationDto 所在的命名空间
 using VenueBookingSystem.Models;
 using VenueBookingSystem.Data;  // 引入 IRepository<T> 和 Repository<T> 所在的命名空间
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace VenueBookingSystem.Services
 {
@@ -11,9 +12,11 @@ namespace VenueBookingSystem.Services
         private readonly IRepository<Reservation> _reservationRepository;  // 预约存储库，用于与数据库交互
         private readonly IRepository<User> _userRepository;  // 用户存储库，用于查找和管理用户数据
         private readonly IRepository<Venue> _venueRepository;  // 场地存储库，用于查找和管理场地数据
-        private readonly IRepository<UserReservation> _userReservation; 
+        private readonly IRepository<UserReservation> _userReservation;
         private readonly IRepository<GroupReservationMember> _groupReservationMemberRepository;
         private readonly IRepository<UserReservation> _userReservationRepository;
+        private readonly IRepository<VenueAvailability> _availablityRepository;
+        private readonly IRepository<Group> _groupRepository;
         private readonly ApplicationDbContext _context;
 
         // 构造函数，通过依赖注入初始化存储库
@@ -23,6 +26,8 @@ namespace VenueBookingSystem.Services
                                   IRepository<UserReservation> userReservation,
                                   IRepository<GroupReservationMember> groupReservationMemberRepository,
                                   IRepository<UserReservation> userReservationRepository,
+                                  IRepository<VenueAvailability> availablityRepository,
+                                  IRepository<Group> groupRepository,
                                   ApplicationDbContext context)
         {
             _reservationRepository = reservationRepository;
@@ -31,6 +36,8 @@ namespace VenueBookingSystem.Services
             _userReservation = userReservation;
             _groupReservationMemberRepository = groupReservationMemberRepository;
             _userReservationRepository = userReservationRepository;
+            _groupRepository = groupRepository;
+            _availablityRepository = availablityRepository;
             _context = context;
         }
 
@@ -38,7 +45,7 @@ namespace VenueBookingSystem.Services
         {
 
             var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
-    
+
             if (user == null)
             {
                 return new ReservationResult
@@ -87,7 +94,7 @@ namespace VenueBookingSystem.Services
                 VenueId = reservationDto.VenueId,
                 AvailabilityId = reservationDto.AvailabilityId,
                 ReservationType = reservationDto.ReservationType,
-                ReservationTime = DateTime.Now,
+                ReservationTime = DateTime.UtcNow,
                 PaymentAmount = reservationDto.PaymentAmount,
                 ReservationItem = reservationDto.ReservationItem
             };
@@ -135,7 +142,7 @@ namespace VenueBookingSystem.Services
 
             // 检查团体是否存在
             var group = _context.Groups.FirstOrDefault(g => g.GroupId == groupReservationDto.GroupId && g.GroupName == groupReservationDto.GroupName);
-            
+
             if (group == null)
             {
                 return new ReservationResult
@@ -163,7 +170,7 @@ namespace VenueBookingSystem.Services
                     Info = $"部分用户不存在,缺少的用户ID: {string.Join(", ", missingUserIds)}"
                 };
             }
-                    // 检查时间段的剩余容量
+            // 检查时间段的剩余容量
             var availability = _context.VenueAvailabilities.FirstOrDefault(a => a.AvailabilityId == groupReservationDto.AvailabilityId);
 
             if (availability == null)
@@ -241,9 +248,8 @@ namespace VenueBookingSystem.Services
                     NotificationTime = DateTime.UtcNow
                 };
                 _context.UserNotifications.Add(notification);
+                _context.SaveChanges();
             }
-
-            _context.SaveChanges();
 
             return new ReservationResult
             {
@@ -281,6 +287,53 @@ namespace VenueBookingSystem.Services
             }
         }
 
+        // 获取预约人的信息
+        public ReservationResponseDto GetReservationUser(string reservationId)
+        {
+            // 从 Reservations 表中获取预约记录
+            var reservation = _reservationRepository.GetAll().FirstOrDefault(x => x.ReservationId == reservationId);
+
+            // 检查预约记录是否存在
+            if (reservation == null)
+            {
+                return new ReservationResponseDto
+                {
+                    State = 0,
+                    Info = "预约记录不存在",
+                    Data = null
+                };
+            }
+
+            // 检查预约类型是否为 Group
+            if (reservation.ReservationType != "group")
+            {
+                return new ReservationResponseDto
+                {
+                    State = 0,
+                    Info = "不是团队预约",
+                    Data = null
+                };
+            }
+
+            // 查询团体预约成员信息
+            var reservationUsers = _userReservation.GetAll().Where(x => x.ReservationId == reservationId).Select(y =>
+                new ReservationUserDetailDto
+                {
+                    UserId = y.UserId,
+                    CheckInTime = y.CheckInTime,
+                    Status = y.Status,
+                    Username = y.User.Username,
+                    RealName = y.User.RealName
+                }).ToList();
+
+            return new ReservationResponseDto
+            {
+                State = 1,
+                Info = "",
+                Data = reservationUsers
+            };
+        }
+
 
         //预约记录修改
         public void UpdateReservationUser(UpdateReservationUserDto req)
@@ -311,40 +364,78 @@ namespace VenueBookingSystem.Services
                 NumOfPeople = _userReservation.GetAll()
                                 .Where(t => t.ReservationId == x.ReservationId)
                                 .Sum(t => t.NumOfPeople),
-
                 // 仅在 ReservationType 为 "User" 时获取 UserId 和 UserName
-                UserId = x.ReservationType == "User" 
-                    ? _userReservation.GetAll()
-                        .Where(t => t.ReservationId == x.ReservationId)
-                        .Select(t => t.UserId)
-                        .FirstOrDefault()
-                    : null,
+                // UserId = x.ReservationType == "individual"
+                //     ? _userReservation.GetAll()
+                //         .Where(t => t.ReservationId == x.ReservationId)
+                //         .Select(t => t.UserId)
+                //         .FirstOrDefault()
+                //     : null,
 
                 // 通过 UserId 获取 UserName
-                UserName = x.ReservationType == "User"
-                    ? (from u in _context.Users.AsEnumerable() // 添加 AsEnumerable()
-                    join ur in _userReservation.GetAll().AsEnumerable() // 添加 AsEnumerable()
-                    on u.UserId equals ur.UserId
-                    where ur.ReservationId == x.ReservationId
-                    select u.Username).FirstOrDefault()
-                    : null,
+                // UserName = x.ReservationType == "individual"
+                //     ? (from u in _context.Users.AsEnumerable() // 添加 AsEnumerable()
+                //        join ur in _userReservation.GetAll().AsEnumerable() // 添加 AsEnumerable()
+                //        on u.UserId equals ur.UserId
+                //        where ur.ReservationId == x.ReservationId
+                //        select u.Username).FirstOrDefault()
+                //     : null,
 
                 // 场地名称查询
                 VenueName = (from v in _context.Venues.AsEnumerable() // 查询场地名称
-                            where v.VenueId == x.VenueId
-                            select v.Name).FirstOrDefault(),
+                             where v.VenueId == x.VenueId
+                             select v.Name).FirstOrDefault(),
 
-                // 仅在 ReservationType 为 "Group" 时获取团队预约信息，并检查 t.Group 不为空
-                GroupReservationListDto = x.ReservationType == "Group"
-                    ? _groupReservationMemberRepository.GetAll()
-                        .Where(t => t.ReservationId == x.ReservationId && t.Group != null)
+                // // 仅在 ReservationType 为 "Group" 时获取团队预约信息，并检查 t.Group 不为空
+                // GroupReservationListDto = x.ReservationType == "group"
+                //     ? _groupReservationMemberRepository.GetAll()
+                //         .Where(t => t.ReservationId == x.ReservationId && t.Group != null)
+                //         .Select(t => new GroupReservationListDto
+                //         {
+                //             GroupId = t.GroupId,
+                //             GroupName = t.Group.GroupName
+                //         }).ToList()
+                //     : null
+            }).ToList();
+            foreach (var reservation in reservations)
+            {
+                var availabilityData = _availablityRepository.GetAll()
+                .Where(x => x.AvailabilityId == reservation.AvailabilityId)
+                .Select(y => new
+                {
+                    StartTime = y.StartTime,
+                    EndTime = y.EndTime
+                }).FirstOrDefault();
+                reservation.StartTime = availabilityData.StartTime;
+                reservation.EndTime = availabilityData.EndTime;
+                if (reservation.ReservationType == "individual")
+                {
+                    var userReservationInfo = _userReservation.GetAll()
+                        .Where(t => t.ReservationId == reservation.ReservationId)
+                        .Select(t => new
+                        {
+                            UserId = t.UserId,
+                            Status = t.Status,
+                        })
+                        .FirstOrDefault();
+                    reservation.UserId = userReservationInfo.UserId;
+                    reservation.Status = userReservationInfo.Status;
+                    reservation.UserName = (from u in _context.Users.AsEnumerable()
+                                            where u.UserId == userReservationInfo.UserId
+                                            select u.Username).FirstOrDefault();
+                }
+                else if (reservation.ReservationType == "group")
+                {
+                    reservation.GroupReservationListDto = _groupReservationMemberRepository.GetAll()
+                        .Where(t => t.ReservationId == reservation.ReservationId)
                         .Select(t => new GroupReservationListDto
                         {
                             GroupId = t.GroupId,
-                            GroupName = t.Group.GroupName
-                        }).ToList()
-                    : null
-            }).ToList();
+                            GroupName = _groupRepository.GetAll()
+                            .Where(x => x.GroupId == t.GroupId).Select(g => g.GroupName).FirstOrDefault()
+                        }).FirstOrDefault();
+                }
+            }
 
             return reservations;
         }
@@ -404,29 +495,65 @@ namespace VenueBookingSystem.Services
             foreach (var userReservation in userReservations)
             {
                 var reservation = userReservation.Reservation;
+                var reservationAvailability = _availablityRepository.GetAll()
+                .Where(a => a.AvailabilityId == reservation.AvailabilityId)
+                .Select(x => new
+                {
+                    StartTime = x.StartTime,
+                    EndTime = x.EndTime,
+                    Price = x.Price,
+                }).FirstOrDefault();
+                var reservationVenue = _venueRepository.GetAll().Select(x => new
+                {
+                    VenueId = x.VenueId,
+                    Name = x.Name
+                }).Where(v => v.VenueId == reservation.VenueId).FirstOrDefault();
                 var reservationDetail = new ReservationDetailDto
                 {
                     ReservationId = reservation.ReservationId,
                     VenueId = reservation.VenueId,
-                    VenueName = reservation.Venue?.Name,
+                    VenueName = reservationVenue.Name,
                     AvailabilityId = reservation.AvailabilityId,
-                    StartTime = reservation.VenueAvailability?.StartTime ?? DateTime.MinValue,
-                    EndTime = reservation.VenueAvailability?.EndTime ?? DateTime.MinValue,
+                    StartTime = reservationAvailability.StartTime,
+                    EndTime = reservationAvailability.EndTime,
                     ReservationTime = reservation.ReservationTime,
-                    PaymentAmount = reservation.PaymentAmount,
+                    PaymentAmount = reservationAvailability.Price,
                     ReservationType = reservation.ReservationType
                 };
 
-                if (reservation.ReservationType == "User")
+                if (reservation.ReservationType == "individual")
                 {
+                    var reservationUserDetail = (from u in _context.Users.AsEnumerable() // 添加 AsEnumerable()
+                                                 join ur in _userReservation.GetAll().AsEnumerable() // 添加 AsEnumerable()
+                                                 on u.UserId equals ur.UserId
+                                                 where ur.ReservationId == reservation.ReservationId
+                                                 select new ReservationUserDetailDto
+                                                 {
+                                                     UserId = u.UserId,
+                                                     RealName = u.RealName,
+                                                     Status = ur.Status,
+                                                     CheckInTime = ur.CheckInTime,
+                                                     Username = u.Username,
+                                                 }).ToList();
                     reservationDetail.NumOfPeople = userReservation.NumOfPeople; // 返回 NumOfPeople
+                    reservationDetail.UserDetails = reservationUserDetail;
                 }
-                else if (reservation.ReservationType == "Group")
+                else if (reservation.ReservationType == "group")
                 {
-                    var groupReservation = _context.GroupReservationMembers
+                    var groupMemberCount = _context.GroupReservationMembers
                         .Where(gr => gr.ReservationId == reservation.ReservationId)
                         .Count();
-                    reservationDetail.MemberCount = groupReservation; // 返回 MemberCount
+                    var groupDetail = (from g in _groupRepository.GetAll().AsEnumerable()
+                                       join gr in _groupReservationMemberRepository.GetAll().AsEnumerable()
+                                       on g.GroupId equals gr.GroupId
+                                       where gr.ReservationId == reservation.ReservationId
+                                       select new GroupReservationDetailDto
+                                       {
+                                           GroupId = g.GroupId,
+                                           GroupName = g.GroupName
+                                       }).FirstOrDefault();
+                    reservationDetail.GroupDetails = groupDetail;
+                    reservationDetail.MemberCount = groupMemberCount; // 返回 MemberCount
                 }
 
                 reservationDetails.Add(reservationDetail);
