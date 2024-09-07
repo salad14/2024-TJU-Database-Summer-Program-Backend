@@ -12,6 +12,7 @@ namespace VenueBookingSystem.Models
 
     public class AdminResponseDto
     {
+        public string AdminId { get; set; }
         public string RealName { get; set; }
         public string ContactNumber { get; set; }
         public string AdminType { get; set; }
@@ -75,5 +76,5 @@ namespace VenueBookingSystem.Models
         public string ContactNumber { get; set; }
         public string AdminType { get; set; }
     }
-    
+
 }

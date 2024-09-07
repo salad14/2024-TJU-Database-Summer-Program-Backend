@@ -13,7 +13,7 @@ namespace VenueBookingSystem.Models
         public string? VenueImageUrl { get; set; } // 场地图片 URL
 
         public string VenueLocation { get; set; }
-        public string? VenueDescription{ get; set; } 
+        public string? VenueDescription { get; set; }
     }
 
     public class VenueInfoDto
@@ -24,9 +24,9 @@ namespace VenueBookingSystem.Models
 
     public class VADto
     {
-        public  string VenueId { get; set; }  // 场地名称
-        public  string Name { get; set; }  // 场地名称
-        public  string Type { get; set; }  // 场地类型
+        public string VenueId { get; set; }  // 场地名称
+        public string Name { get; set; }  // 场地名称
+        public string Type { get; set; }  // 场地类型
         public int Capacity { get; set; }  // 场地容纳人数
 
     }
@@ -34,7 +34,7 @@ namespace VenueBookingSystem.Models
     public class VenueAdminAndAnnouncementDto
     {
         public string VenueId { get; set; }
-        public AdminResponseDto Admin { get; set; }
+        public List<AdminResponseDto> Admin { get; set; }
         public List<VenueAnnouncementResponseDto> Announcements { get; set; } // 修改为新类型
     }
 
@@ -42,5 +42,11 @@ namespace VenueBookingSystem.Models
     {
         public string AvailabilityId { get; set; }  // 开放时间段ID
     }
-    
+
+    public class UpdateVenueAdminRequest
+    {
+        public string VenueId { get; set; }
+        public IEnumerable<string> VenueAdmins { get; set; }
+    }
+
 }

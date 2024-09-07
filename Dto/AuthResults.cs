@@ -14,11 +14,11 @@ namespace VenueBookingSystem.Dto
     // 登录结果类
     public class LoginResult
     {
-    public int State { get; set; }  // 登录状态，1 表示成功，0 表示失败
-    public required string UserId { get; set; }  // 用户ID
-    public required string UserName { get; set; }  // 用户名
-    public required string UserType { get; set; }  // 用户类型
-    public required string Info { get; set; }  // 额外的信息，通常用于存储错误消息
+        public int State { get; set; }  // 登录状态，1 表示成功，0 表示失败
+        public required string UserId { get; set; }  // 用户ID
+        public required string UserName { get; set; }  // 用户名
+        public required string UserType { get; set; }  // 用户类型
+        public required string Info { get; set; }  // 额外的信息，通常用于存储错误消息
     }
 
     //创建团队结果类
@@ -42,7 +42,7 @@ namespace VenueBookingSystem.Dto
         public string Info { get; set; }  // 删除结果的说明
     }
 
-        public class GroupUpdateResult
+    public class GroupUpdateResult
     {
         public int State { get; set; }  // 状态：0表示失败，1表示成功
         public string Info { get; set; }  // 信息：成功时为空字符串，失败时包含错误信息
@@ -166,5 +166,10 @@ namespace VenueBookingSystem.Dto
         public VenueAdminAndAnnouncementDto Data { get; set; } // 管理员和公告信息
     }
 
+    public class UpdateVenueAdminResult
+    {
+        public int State { get; set; } // 0: 失败, 1: 成功
+        public string Info { get; set; } // 成功或失败的信息
+    }
 
 }

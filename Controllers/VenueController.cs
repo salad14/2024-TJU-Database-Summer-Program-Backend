@@ -17,7 +17,7 @@ namespace VenueBookingSystem.Controllers
         private readonly ApplicationDbContext _context;
 
         // 构造函数，注入场地服务
-        public VenueController(IVenueService venueService, IVenueAnalysisService venueAnalysisService,ApplicationDbContext context)
+        public VenueController(IVenueService venueService, IVenueAnalysisService venueAnalysisService, ApplicationDbContext context)
         {
             _venueService = venueService;
             _venueAnalysisService = venueAnalysisService;
@@ -31,20 +31,20 @@ namespace VenueBookingSystem.Controllers
             try
             {
                 var venueInfos = _venueService.GetAllVenueInfos();
-                return Ok(new 
-                { 
-                    state = 1, 
-                    data = venueInfos, 
-                    info = "" 
+                return Ok(new
+                {
+                    state = 1,
+                    data = venueInfos,
+                    info = ""
                 });
             }
             catch (Exception ex)
             {
-                return Ok(new 
-                { 
-                    state = 0, 
-                    data = (object)null, 
-                    info = "An error occurred while retrieving venue information: " + ex.Message 
+                return Ok(new
+                {
+                    state = 0,
+                    data = (object)null,
+                    info = "An error occurred while retrieving venue information: " + ex.Message
                 });
             }
         }
@@ -56,43 +56,43 @@ namespace VenueBookingSystem.Controllers
             {
                 // 调用服务层的方法添加场地，并返回分配的场地ID
                 var result = _venueService.AddVenue(venueDto);
-                
+
                 // 如果添加成功
                 if (!string.IsNullOrEmpty(result.VenueId))
                 {
-                    return Ok(new 
-                    { 
-                        state = 1, 
-                        info = "", 
+                    return Ok(new
+                    {
+                        state = 1,
+                        info = "",
                         venueId = result.VenueId  // 返回分配的场地ID
                     });
                 }
                 // 如果场地名称已存在
                 if (result.Info == "场地名称已存在")
                 {
-                    return Ok(new 
-                    { 
-                        state = 0, 
-                        info = "场地名称已存在", 
+                    return Ok(new
+                    {
+                        state = 0,
+                        info = "场地名称已存在",
                         venueId = (object)null
                     });
                 }
 
                 // 添加失败时的处理
-                return Ok(new 
-                { 
-                    state = 0, 
-                    info = "场地添加失败", 
+                return Ok(new
+                {
+                    state = 0,
+                    info = "场地添加失败",
                     venueId = (object)null
                 });
             }
             catch (Exception ex)
             {
                 // 处理异常情况
-                return Ok(new 
-                { 
-                    state = 0, 
-                    info = $"添加场地时发生错误：{ex.Message}", 
+                return Ok(new
+                {
+                    state = 0,
+                    info = $"添加场地时发生错误：{ex.Message}",
                     venueId = (object)null
                 });
             }
@@ -177,20 +177,20 @@ namespace VenueBookingSystem.Controllers
                 var repairRecords = _venueService.GetAllRepairRecords();
 
                 // 成功时返回
-                return Ok(new 
-                { 
-                    state = 1, 
-                    data = repairRecords, 
-                    info = "" 
+                return Ok(new
+                {
+                    state = 1,
+                    data = repairRecords,
+                    info = ""
                 });
             }
             catch (Exception ex)
             {
-                return Ok(new 
-                { 
-                    state = 0, 
-                    data = (object)null, 
-                    info = "An error occurred while retrieving data: " + ex.Message 
+                return Ok(new
+                {
+                    state = 0,
+                    data = (object)null,
+                    info = "An error occurred while retrieving data: " + ex.Message
                 });
             }
         }
@@ -203,27 +203,27 @@ namespace VenueBookingSystem.Controllers
                 var venueDetails = _venueService.GetVenueDetails(venueId);
                 if (venueDetails == null)
                 {
-                    return Ok(new 
-                    { 
-                        state = 0, 
-                        data = (object)null, 
-                        info = "场地未找到" 
+                    return Ok(new
+                    {
+                        state = 0,
+                        data = (object)null,
+                        info = "场地未找到"
                     });
                 }
-                return Ok(new 
-                { 
-                    state = 1, 
-                    data = venueDetails, 
-                    info = "" 
+                return Ok(new
+                {
+                    state = 1,
+                    data = venueDetails,
+                    info = ""
                 });
             }
             catch (Exception ex)
             {
-                return Ok(new 
-                { 
-                    state = 0, 
-                    data = (object)null, 
-                    info = $"获取场地详情时发生错误：{ex.Message}" 
+                return Ok(new
+                {
+                    state = 0,
+                    data = (object)null,
+                    info = $"获取场地详情时发生错误：{ex.Message}"
                 });
             }
         }
@@ -236,27 +236,27 @@ namespace VenueBookingSystem.Controllers
                 var equipmentDetails = _venueService.GetEquipmentDetails(equipmentId);
                 if (equipmentDetails == null)
                 {
-                    return Ok(new 
-                    { 
-                        state = 0, 
-                        data = (object)null, 
-                        info = "Equipment not found" 
+                    return Ok(new
+                    {
+                        state = 0,
+                        data = (object)null,
+                        info = "Equipment not found"
                     });
                 }
-                return Ok(new 
-                { 
-                    state = 1, 
-                    data = equipmentDetails, 
-                    info = "" 
+                return Ok(new
+                {
+                    state = 1,
+                    data = equipmentDetails,
+                    info = ""
                 });
             }
             catch (Exception ex)
             {
-                return Ok(new 
-                { 
-                    state = 0, 
-                    data = (object)null, 
-                    info = "An error occurred while retrieving equipment details: " + ex.Message 
+                return Ok(new
+                {
+                    state = 0,
+                    data = (object)null,
+                    info = "An error occurred while retrieving equipment details: " + ex.Message
                 });
             }
         }
@@ -320,7 +320,7 @@ namespace VenueBookingSystem.Controllers
             return Ok(result);
         }
 
-       // 编辑设备信息
+        // 编辑设备信息
         [HttpPut("EditDevice")]
         public IActionResult EditDevice([FromBody] EditDeviceRequest request)
         {
@@ -329,7 +329,7 @@ namespace VenueBookingSystem.Controllers
             return Ok(result);
         }
 
-         // 添加维修信息
+        // 添加维修信息
         [HttpPost("AddRepair")]
         public IActionResult AddRepair([FromBody] AddRepairRequest request)
         {
@@ -358,28 +358,28 @@ namespace VenueBookingSystem.Controllers
                 var availabilities = _venueService.GetVenueAvailabilityByDate(venueId, date);
                 if (availabilities == null || !availabilities.Any())
                 {
-                    return Ok(new 
-                    { 
-                        state = 0, 
-                        data = (object)null, 
-                        info = "未找到该日期的场地开放时间段" 
+                    return Ok(new
+                    {
+                        state = 0,
+                        data = (object)null,
+                        info = "未找到该日期的场地开放时间段"
                     });
                 }
 
-                return Ok(new 
-                { 
-                    state = 1, 
-                    data = availabilities, 
-                    info = "" 
+                return Ok(new
+                {
+                    state = 1,
+                    data = availabilities,
+                    info = ""
                 });
             }
             catch (Exception ex)
             {
-                return Ok(new 
-                { 
-                    state = 0, 
-                    data = (object)null, 
-                    info = $"查询开放时间段时发生错误：{ex.Message}" 
+                return Ok(new
+                {
+                    state = 0,
+                    data = (object)null,
+                    info = $"查询开放时间段时发生错误：{ex.Message}"
                 });
             }
         }
@@ -404,12 +404,11 @@ namespace VenueBookingSystem.Controllers
         }
 
 
-         // 删除开放时间段
+        // 删除开放时间段
         [HttpPost("DeleteAvailability")]
         public IActionResult DeleteAvailability([FromBody] DeleteAvailabilityRequest request)
         {
             var result = _venueService.DeleteAvailability(request.AvailabilityId);
-
             return Ok(result);
         }
 
@@ -457,9 +456,9 @@ namespace VenueBookingSystem.Controllers
             {
                 // 调用服务层，生成保养记录
                 var result = _venueService.AddMaintenance(
-                    venueMaintenanceDto.VenueId, 
-                    venueMaintenanceDto.MaintenanceStartDate, 
-                    venueMaintenanceDto.MaintenanceEndDate, 
+                    venueMaintenanceDto.VenueId,
+                    venueMaintenanceDto.MaintenanceStartDate,
+                    venueMaintenanceDto.MaintenanceEndDate,
                     venueMaintenanceDto.Description
                 );
 
@@ -506,7 +505,7 @@ namespace VenueBookingSystem.Controllers
                 // 检查场地是否存在
                 var venueExists = _context.Venues
                     .Where(v => v.VenueId == venueId)
-                    .Select(v => 1) 
+                    .Select(v => 1)
                     .FirstOrDefault() == 1;
                 if (!venueExists)
                 {
@@ -568,7 +567,32 @@ namespace VenueBookingSystem.Controllers
             }
         }
 
+        [HttpGet("GetAllEquipment")]
+        public IActionResult GetAllEquipment()
+        {
+            try
+            {
+                var result = _venueService.GetAllEquipment();
+                return Ok(new { State = 1, Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { State = 0, Info = ex.Message });
+            }
+        }
 
-
+        [HttpPost("UpdateVenueAdmin")]
+        public IActionResult UpdateVenueAdmin([FromBody] UpdateVenueAdminRequest updateData)
+        {
+            try
+            {
+                var result = _venueService.UpdateVenueAdmin(updateData.VenueId, updateData.VenueAdmins);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new UpdateVenueAdminResult { State = 0, Info = ex.Message });
+            }
+        }
     }
 }

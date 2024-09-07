@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "4lrcHAdSt4g=",
+  "dgSpecHash": "kytY/Q5+eic=",
   "success": true,
-  "projectFilePath": "C:\\Users\\17912\\Desktop\\sports_management\\sports_management.csproj",
+  "projectFilePath": "C:\\Users\\17912\\Desktop\\backend14\\backend14\\sports_management.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\17912\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\17912\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",

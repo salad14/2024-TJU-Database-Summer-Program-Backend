@@ -16,9 +16,9 @@ namespace VenueBookingSystem.Controllers
         private readonly IAdminService _adminService;
         private readonly ApplicationDbContext _context;
 
-        
 
-        public AdminController(IAdminService adminService,ApplicationDbContext context)
+
+        public AdminController(IAdminService adminService, ApplicationDbContext context)
         {
             _adminService = adminService;
             _context = context;
@@ -33,7 +33,7 @@ namespace VenueBookingSystem.Controllers
 
                 if (result == null || !result.Any())
                 {
-                    return Ok(new 
+                    return Ok(new
                     {
                         Status = 1,  // 状态为1表示成功
                         Info = "没有通知数据",
@@ -45,10 +45,10 @@ namespace VenueBookingSystem.Controllers
             catch (Exception ex)
             {
                 // 处理获取数据时的任何异常，返回错误信息
-                return BadRequest(new 
-                { 
-                    Status = 0, 
-                    Info = $"获取通知数据失败: {ex.Message}" 
+                return BadRequest(new
+                {
+                    Status = 0,
+                    Info = $"获取通知数据失败: {ex.Message}"
                 });
             }
         }
@@ -105,8 +105,8 @@ namespace VenueBookingSystem.Controllers
             {
                 // 传入 systemAdminId
                 var result = _adminService.RegisterAdmin(
-                    registrationDto.AdminDto, 
-                    registrationDto.ManageVenues, 
+                    registrationDto.AdminDto,
+                    registrationDto.ManageVenues,
                     registrationDto.SystemAdminId
                 );
                 return Ok(result);
@@ -148,6 +148,7 @@ namespace VenueBookingSystem.Controllers
                 // 查询所有管理员信息
                 var admins = _context.Admins.Select(admin => new AdminResponseDto
                 {
+                    AdminId = admin.AdminId,
                     RealName = admin.RealName,
                     ContactNumber = admin.ContactNumber,
                     AdminType = admin.AdminType

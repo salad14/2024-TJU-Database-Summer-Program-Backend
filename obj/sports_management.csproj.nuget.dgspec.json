@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\17912\\Desktop\\sports_management\\sports_management.csproj": {}
+    "C:\\Users\\17912\\Desktop\\backend14\\backend14\\sports_management.csproj": {}
   },
   "projects": {
-    "C:\\Users\\17912\\Desktop\\sports_management\\sports_management.csproj": {
+    "C:\\Users\\17912\\Desktop\\backend14\\backend14\\sports_management.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\17912\\Desktop\\sports_management\\sports_management.csproj",
+        "projectUniqueName": "C:\\Users\\17912\\Desktop\\backend14\\backend14\\sports_management.csproj",
         "projectName": "sports_management",
-        "projectPath": "C:\\Users\\17912\\Desktop\\sports_management\\sports_management.csproj",
+        "projectPath": "C:\\Users\\17912\\Desktop\\backend14\\backend14\\sports_management.csproj",
         "packagesPath": "C:\\Users\\17912\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\17912\\Desktop\\sports_management\\obj\\",
+        "outputPath": "C:\\Users\\17912\\Desktop\\backend14\\backend14\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\17912\\AppData\\Roaming\\NuGet\\NuGet.Config",

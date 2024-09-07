@@ -23,7 +23,7 @@ namespace VenueBookingSystem.Services
         {
             return _context.Venues.Select(v => new VenueDto
             {
-                VenueId=v.VenueId,
+                VenueId = v.VenueId,
                 Name = v.Name,
                 Type = v.Type,
                 Capacity = v.Capacity,
@@ -55,21 +55,22 @@ namespace VenueBookingSystem.Services
                 .Where(vm => vm.VenueId == venueId)
                 .Select(vm => new AdminResponseDto
                 {
+                    AdminId = vm.Admin.AdminId,
                     RealName = vm.Admin.RealName,
                     ContactNumber = vm.Admin.ContactNumber,
                     AdminType = vm.Admin.AdminType
                 })
-                .FirstOrDefault();
+                .ToList();
 
-            if (admin == null)
-            {
-                return new VenueAdminAndAnnouncementResult
-                {
-                    State = 0,
-                    Info = "未找到管理员信息",
-                    Data = null
-                };
-            }
+            // if (admin == null)
+            // {
+            //     return new VenueAdminAndAnnouncementResult
+            //     {
+            //         State = 0,
+            //         Info = "未找到管理员信息",
+            //         Data = null
+            //     };
+            // }
 
             // 使用新的 VenueAnnouncementResponseDto 查找公告信息
             var announcements = _context.VenueAnnouncements
@@ -137,7 +138,7 @@ namespace VenueBookingSystem.Services
             {
                 _context.Venues.Add(venue);
                 _context.SaveChanges();
-                
+
                 return new AddVenueResult
                 {
                     VenueId = newVenueId.ToString(),
@@ -171,9 +172,9 @@ namespace VenueBookingSystem.Services
             // 更新场地信息
             venue.Name = venueDto.Name;
             venue.Type = venueDto.Type;
-            venue.Status=venueDto.Status;
+            venue.Status = venueDto.Status;
             venue.Capacity = venueDto.Capacity;
-            venue.VenueImageUrl=venueDto.VenueImageUrl;
+            venue.VenueImageUrl = venueDto.VenueImageUrl;
             venue.VenueLocation = venueDto.VenueLocation;
             venue.VenueDescription = venueDto.VenueDescription;
 
@@ -233,7 +234,7 @@ namespace VenueBookingSystem.Services
 
             return repairData.ToList(); // 将查询结果转换为列表返回
         }
-         // 获取场地的详细信息
+        // 获取场地的详细信息
         public VenueDetailsDto GetVenueDetails(string venueId)
         {
             // 查找场地信息
@@ -265,7 +266,7 @@ namespace VenueBookingSystem.Services
             return new VenueDetailsDto
             {
                 VenueId = venue.VenueId,
-                VenueDescription=venue.VenueDescription,
+                VenueDescription = venue.VenueDescription,
                 Name = venue.Name,
                 Type = venue.Type,
                 Capacity = venue.Capacity,
@@ -370,7 +371,7 @@ namespace VenueBookingSystem.Services
             }
         }
 
-         // 编辑设备信息
+        // 编辑设备信息
         public EditDeviceResult EditDevice(string equipmentId, string equipmentName, string venueId)
         {
             // 查找设备
@@ -492,9 +493,9 @@ namespace VenueBookingSystem.Services
                     Info = $"添加维修记录时出错：{ex.Message}"
                 };
             }
-}
+        }
 
-         // 编辑维修信息
+        // 编辑维修信息
         public EditRepairResult EditRepair(string repairId, DateTime maintenanceStartTime, DateTime maintenanceEndTime, string maintenanceDetails)
         {
             // 查找维修记录
@@ -612,7 +613,7 @@ namespace VenueBookingSystem.Services
 
 
 
-         // 修改保养信息
+        // 修改保养信息
         public EditMaintenanceResult EditMaintenance(string maintenanceId, DateTime maintenanceStartDate, DateTime maintenanceEndDate, string description)
         {
             // 查找保养记录
@@ -692,7 +693,7 @@ namespace VenueBookingSystem.Services
                 };
             }
         }
-         // 添加开放时间段
+        // 添加开放时间段
         public AddAvailabilityResult AddAvailability(string venueId, DateTime startTime, DateTime endTime, decimal price, int remainingCapacity)
         {
             // 使用 AsNoTracking() 查询，避免跟踪问题
@@ -776,7 +777,7 @@ namespace VenueBookingSystem.Services
         }
 
 
-         // 删除开放时间段
+        // 删除开放时间段
         public DeleteAvailabilityResult DeleteAvailability(string availabilityId)
         {
             // 查找开放时间段记录
@@ -824,12 +825,12 @@ namespace VenueBookingSystem.Services
                 {
                     AdminId = va.AdminId,
                     RealName = va.Admin.RealName,
-                }).FirstOrDefault();
+                }).ToList();
 
             List<VenueAnnouncementVDto> vaList = new List<VenueAnnouncementVDto>();
-            if(venue.VenueAnnouncements!=null && venue.VenueAnnouncements.Count()>0)
+            if (venue.VenueAnnouncements != null && venue.VenueAnnouncements.Count() > 0)
             {
-                foreach(var item in venue.VenueAnnouncements)
+                foreach (var item in venue.VenueAnnouncements)
                 {
                     var announcements = _context.Announcements
                         .Where(va => va.AnnouncementId == item.AnnouncementId)
@@ -837,8 +838,8 @@ namespace VenueBookingSystem.Services
                         {
                             AnnouncementId = va.AnnouncementId,
                             Title = va.Title,
-                            PublishedDate=va.PublishedDate,
-                            LastModifiedDate=va.LastModifiedDate 
+                            PublishedDate = va.PublishedDate,
+                            LastModifiedDate = va.LastModifiedDate
                         }).FirstOrDefault();
                     if (announcements != null)
                     {
@@ -858,7 +859,67 @@ namespace VenueBookingSystem.Services
             };
         }
 
+        public List<EquipmentDetailsDto> GetAllEquipment()
+        {
+            var equipments = _context.Equipments.AsEnumerable();
+            var equipmentDetails = new List<EquipmentDetailsDto>();
+            foreach (var equipment in equipments)
+            {
+                var venueEquipment = _context.VenueEquipments.FirstOrDefault(ve => ve.EquipmentId == equipment.EquipmentId);
+                var venue = venueEquipment != null ? _context.Venues.FirstOrDefault(v => v.VenueId == venueEquipment.VenueId) : null;
 
+                equipmentDetails.Append(new EquipmentDetailsDto
+                {
+                    EquipmentId = equipment.EquipmentId,
+                    EquipmentName = equipment.EquipmentName,
+                    EquipmentStatus = venueEquipment != null ? "Active" : "Inactive", // 假设状态根据是否有场地来定义
+                    EquipmentIntroTime = venueEquipment != null ? venueEquipment.InstallationTime : DateTime.MinValue,
+                    VenueId = venue?.VenueId,
+                    VenueName = venue?.Name,
+                });
+            }
+            return equipmentDetails;
+        }
+        public UpdateVenueAdminResult UpdateVenueAdmin(string venueId, IEnumerable<string> adminArr)
+        {
+            var existingAdmins = _context.VenueManagements.Where(x => x.VenueId == venueId)
+            .Select(y => y.AdminId).AsEnumerable();
+            var newAdmins = adminArr.Except(existingAdmins);
+            foreach (var admin in newAdmins)
+            {
+                // if (!_context.Admins.Where(x => x.AdminId == admin).Any())
+                // {
+                //     return new UpdateVenueAdminResult
+                //     {
+                //         State = 0,
+                //         Info = "未找到管理员",
+                //     };
+                // }
+                var venueAdmin = new VenueManagement
+                {
+                    VenueId = venueId,
+                    AdminId = admin
+                };
+                _context.VenueManagements.Add(venueAdmin);
+            }
+            _context.SaveChanges();
+            var kickedAdmins = existingAdmins.Except(adminArr);
+            foreach (var admin in newAdmins)
+            {
+                var venueAdmin = new VenueManagement
+                {
+                    VenueId = venueId,
+                    AdminId = admin
+                };
+                _context.VenueManagements.Remove(venueAdmin);
+            };
+            _context.SaveChanges();
+            return new UpdateVenueAdminResult
+            {
+                State = 1,
+                Info = ""
+            };
+        }
 
         // 其他场地服务逻辑...
     }

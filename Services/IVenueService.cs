@@ -46,6 +46,9 @@ namespace VenueBookingSystem.Services
         AddMaintenanceResult AddMaintenance(string venueId, DateTime maintenanceStartDate, DateTime maintenanceEndDate, string description);
 
         EditMaintenanceResult EditMaintenance(string maintenanceId, DateTime maintenanceStartDate, DateTime maintenanceEndDate, string description);
-        
+
+        List<EquipmentDetailsDto> GetAllEquipment();
+
+        UpdateVenueAdminResult UpdateVenueAdmin(string venueId, IEnumerable<string> adminArr);
     }
 }
