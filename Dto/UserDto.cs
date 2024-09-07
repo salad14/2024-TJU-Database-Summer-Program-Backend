@@ -7,7 +7,7 @@ namespace VenueBookingSystem.Models
         public required string Password { get; set; }  // 密码
         public required string ContactNumber { get; set; }  // 联系电话
         public required string UserType { get; set; }  // 用户类型
-        public string? ReservationPermission { get; set; }  // 预约权限
+        public string? ReservationPermission { get; set; } = "y"  ;// 预约权限
         public int ViolationCount { get; set; } = 0;  // 违约次数
         public string? IsVip { get; set; } // VIP状态
         public double DiscountRate { get; set; } = 0.0;  // 折扣力度

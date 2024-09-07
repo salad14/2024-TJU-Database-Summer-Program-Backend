@@ -23,9 +23,6 @@ namespace sports_management.Services
                 {
                     var  venue = new VADto ();
                     venue.VenueId = item?.Venue.VenueId;
-                    venue.Name = item?.Venue.Name;
-                    venue.Capacity = item.Venue==null?0: item.Venue.Capacity;
-                    venue.Type = item?.Venue.Type;
                     vaList.Add(venue);
                 }
             }

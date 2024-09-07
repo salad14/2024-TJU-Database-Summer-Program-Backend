@@ -12,8 +12,8 @@ using VenueBookingSystem.Data;
 namespace sports_management.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240905140005_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240907104436_Create")]
+    partial class Create
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

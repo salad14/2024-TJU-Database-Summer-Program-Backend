@@ -130,7 +130,7 @@ namespace VenueBookingSystem.Services
                 Name = venueDto.Name,
                 Type = venueDto.Type,
                 Capacity = venueDto.Capacity,
-                VenueDescription=venueDto.VenueDescription,
+                VenueDescription = venueDto.VenueDescription,
                 VenueLocation = venueDto.VenueLocation,
                 VenueImageUrl = venueDto.VenueImageUrl
             };
@@ -868,8 +868,17 @@ namespace VenueBookingSystem.Services
             {
                 var venueEquipment = _context.VenueEquipments.FirstOrDefault(ve => ve.EquipmentId == equipment.EquipmentId);
                 var venue = venueEquipment != null ? _context.Venues.FirstOrDefault(v => v.VenueId == venueEquipment.VenueId) : null;
+                var repairRecords = _context.MaintenanceRecords
+                    .Where(mr => mr.EquipmentId == equipment.EquipmentId)
+                    .Select(mr => new RepairDataDto
+                    {
+                        MaintenanceRecordId = mr.MaintenanceRecordId,
+                        MaintenanceStartTime = mr.MaintenanceStartTime,
+                        MaintenanceEndTime = mr.MaintenanceEndTime,
+                        MaintenanceDetails = mr.MaintenanceDetails
+                    }).ToList();
 
-                equipmentDetails.Append(new EquipmentDetailsDto
+                equipmentDetails.Add(new EquipmentDetailsDto
                 {
                     EquipmentId = equipment.EquipmentId,
                     EquipmentName = equipment.EquipmentName,
@@ -877,6 +886,7 @@ namespace VenueBookingSystem.Services
                     EquipmentIntroTime = venueEquipment != null ? venueEquipment.InstallationTime : DateTime.MinValue,
                     VenueId = venue?.VenueId,
                     VenueName = venue?.Name,
+                    RepairRecords = repairRecords,
                 });
             }
             return equipmentDetails;

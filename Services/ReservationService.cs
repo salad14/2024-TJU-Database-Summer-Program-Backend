@@ -404,10 +404,12 @@ namespace VenueBookingSystem.Services
                 .Select(y => new
                 {
                     StartTime = y.StartTime,
-                    EndTime = y.EndTime
+                    EndTime = y.EndTime,
+                    Price = y.Price
                 }).FirstOrDefault();
                 reservation.StartTime = availabilityData.StartTime;
                 reservation.EndTime = availabilityData.EndTime;
+                reservation.PaymentAmount= availabilityData.Price;
                 if (reservation.ReservationType == "individual")
                 {
                     var userReservationInfo = _userReservation.GetAll()
