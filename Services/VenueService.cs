@@ -130,6 +130,7 @@ namespace VenueBookingSystem.Services
                 Name = venueDto.Name,
                 Type = venueDto.Type,
                 Capacity = venueDto.Capacity,
+                VenueDescription=venueDto.VenueDescription,
                 VenueLocation = venueDto.VenueLocation,
                 VenueImageUrl = venueDto.VenueImageUrl
             };
